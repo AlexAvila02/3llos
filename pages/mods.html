@@ -169,7 +169,6 @@ a{color:inherit}
 <input id="search" class="search" placeholder="BUSCAR MOD..." oninput="render()">
 <button class="btn-mc" id="pickFolderBtn" onclick="pickFolder()">📁 CARPETA</button>
 <span id="folderName" class="folder" style="display:none"></span>
-<button class="btn-mc green" onclick="downloadZipServer()" id="dlAllBtn">⬇ TODOS</button>
 <button class="btn-mc green" onclick="downloadZipServer()" id="zipBtn">⬇ ZIP</button>
 <button class="btn-mc" onclick="loadMods()">↻ ACTUALIZAR</button>
 </div>
@@ -312,11 +311,11 @@ async function loadMods(){
     if(!Array.isArray(mods)||mods.length===0){
       state.textContent='No hay mods instalados';
       count.textContent='';
-      document.getElementById('dlAllBtn').style.display='none';
+      const zb=document.getElementById('zipBtn'); if(zb) zb.style.display='none';
       document.getElementById('selBar').style.display='none';
       return;
     }
-    document.getElementById('dlAllBtn').style.display='';
+    const zb2=document.getElementById('zipBtn'); if(zb2) zb2.style.display='';
     render();
   }catch(e){
     state.textContent='Error: '+e.message;
