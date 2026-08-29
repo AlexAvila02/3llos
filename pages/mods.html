@@ -415,9 +415,9 @@ async function downloadZipServer(){
   if(zipCancelled){ status.textContent='Cancelado'; fill.style.width='0%'; return; }
   status.textContent='Comprimiendo archivo ZIP final...'; pct.textContent='90%'; fill.style.width='90%';
   try{
-    const content=await zip.generateAsync({type:'blob', compression:'STORE'});
+    const content=await zip.generateAsync({type:'blob', compression:'STORE', mimeType:'application/zip'});
     fill.style.width='100%'; pct.textContent='100%'; status.textContent='✓ ZIP listo';
-    const url=URL.createObjectURL(content);
+    const url=URL.createObjectURL(new Blob([content],{type:'application/zip'}));
     const a=document.createElement('a'); a.href=url; a.download='mods-servidor.zip'; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),5000);
     setTimeout(()=>modal.classList.remove('active'),1500);
