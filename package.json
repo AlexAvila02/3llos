@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "dev": "live-server --port=8080"
+    "dev": "live-server --port=8080",
+    "deploy": "git add . && git commit -m \"chore: deploy\" && git push"
   },
   "dependencies": {
     "jszip": "^3.10.1"
