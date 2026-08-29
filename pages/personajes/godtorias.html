@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Godtorias</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 30%, #FF6347 60%, #8B4513 100%);
+            color: #FFF8DC;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Georgia', serif;
+            font-size: 90px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .title {
+            position: relative;
+            z-index: 10;
+            animation: godlyGlow 3s ease-in-out infinite;
+            text-shadow: 0 0 30px #FFD700, 0 0 60px #FFA500, 0 0 90px #FF6347;
+        }
+        
+        @keyframes godlyGlow {
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.1); filter: brightness(1.3); }
+        }
+        
+        .crown {
+            position: absolute;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 80px;
+            animation: crownFloat 2s ease-in-out infinite;
+        }
+        
+        @keyframes crownFloat {
+            0%, 100% { transform: translateX(-50%) translateY(0) rotate(-5deg); }
+            50% { transform: translateX(-50%) translateY(-10px) rotate(5deg); }
+        }
+        
+        .light-ray {
+            position: absolute;
+            width: 2px;
+            height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,215,0,0.8), transparent);
+            animation: rayRotate 8s linear infinite;
+            transform-origin: top center;
+        }
+        
+        @keyframes rayRotate {
+            0% { transform: rotate(0deg); opacity: 0.3; }
+            50% { opacity: 0.8; }
+            100% { transform: rotate(360deg); opacity: 0.3; }
+        }
+        
+        .sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, #FFF 0%, #FFD700 50%, transparent 100%);
+            border-radius: 50%;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { transform: scale(0) rotate(0deg); opacity: 0; }
+            50% { transform: scale(1) rotate(180deg); opacity: 1; }
+        }
+        
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 100px;
+            animation: cloudFloat 15s linear infinite;
+        }
+        
+        @keyframes cloudFloat {
+            0% { transform: translateX(-200px); }
+            100% { transform: translateX(100vw); }
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: white; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+    
+    <div class="title">
+        <div class="crown">👑</div>
+        Godtorias
+    </div>
+    
+    <script>
+        // Crear rayos de luz divinos
+        function createLightRay() {
+            const ray = document.createElement('div');
+            ray.className = 'light-ray';
+            ray.style.left = (Math.random() * window.innerWidth) + 'px';
+            ray.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            ray.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(ray);
+        }
+        
+        // Crear destellos dorados
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = Math.random() * window.innerWidth + 'px';
+            sparkle.style.top = Math.random() * window.innerHeight + 'px';
+            sparkle.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(sparkle);
+        }
+        
+        // Crear nubes doradas
+        function createCloud() {
+            const cloud = document.createElement('div');
+            cloud.className = 'cloud';
+            cloud.style.width = (Math.random() * 150 + 100) + 'px';
+            cloud.style.height = (Math.random() * 60 + 40) + 'px';
+            cloud.style.top = (Math.random() * window.innerHeight * 0.4) + 'px';
+            cloud.style.animationDuration = (Math.random() * 10 + 15) + 's';
+            document.body.appendChild(cloud);
+        }
+        
+        // Inicializar elementos
+        for(let i = 0; i < 12; i++) createLightRay();
+        for(let i = 0; i < 40; i++) createSparkle();
+        for(let i = 0; i < 4; i++) createCloud();
+        
+        function playCloseSound() {
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+          oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
+          gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.15);
+        }
+    </script>
+</body>
+</html>

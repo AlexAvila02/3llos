@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mods - Papubanda</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Press Start 2P',monospace;
+  background:#6b8cff url('https://i.imgur.com/2cG2U9C.png');
+  background-color:#6B8CFF;
+  min-height:100vh;color:#fff;padding:24px;
+  image-rendering:pixelated;
+  position:relative;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    linear-gradient(rgba(0,0,0,.18),rgba(0,0,0,.18)),
+    repeating-linear-gradient(0deg,rgba(0,0,0,.06) 0 2px,transparent 2px 4px);
+  pointer-events:none;z-index:-1;
+}
+a{color:inherit}
+.back{
+  position:fixed;top:14px;left:14px;text-decoration:none;
+  background:#8b8b8b;border:3px solid #373737;border-right-color:#fff;border-bottom-color:#fff;
+  padding:8px 12px;font-size:9px;color:#fff;box-shadow:2px 2px 0 #000;
+}
+.header{max-width:920px;margin:0 auto 22px;text-align:center;text-shadow:3px 3px 0 #3a3a3a, 0 0 10px rgba(0,0,0,.6)}
+.header h1{font-size:22px;line-height:1.4;letter-spacing:1px}
+.header h1 span{color:#55ff55}
+.header p{font-size:8px;opacity:.9;margin-top:10px;line-height:1.6}
+.mc-panel{
+  max-width:920px;margin:0 auto 16px;
+  background:#c6c6c6;border:4px solid #000;
+  box-shadow:inset -4px -4px 0 #555, inset 4px 4px 0 #fff, 4px 4px 0 rgba(0,0,0,.5);
+  padding:12px;
+}
+.toolbar{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.count{font-size:8px;color:#373737}
+.btn-mc{
+  font-family:'Press Start 2P',monospace;font-size:8px;
+  background:#8b8b8b;color:#fff;
+  border:3px solid #000; border-top-color:#fff; border-left-color:#fff;
+  padding:10px 12px;cursor:pointer;
+  box-shadow:inset -2px -2px 0 #555, inset 2px 2px 0 #fff;
+  text-shadow:1px 1px 0 #373737;
+}
+.btn-mc:hover{background:#9a9a9a}
+.btn-mc:active{border-color:#373737;box-shadow:inset 2px 2px 0 #555;transform:translate(1px,1px)}
+.btn-mc.green{background:#5aaa3a;border-color:#2d631d;border-top-color:#8be07a;border-left-color:#8be07a}
+.btn-mc.green:hover{background:#6fbf4a}
+.folder{font-size:7px;color:#373737;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#fff;border:2px solid #373737;padding:4px 6px;box-shadow:inset 2px 2px 0 #8b8b8b}
+.grid{max-width:920px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.card{
+  background:#c6c6c6;border:3px solid #000;
+  box-shadow:inset -3px -3px 0 #555, inset 3px 3px 0 #fff;
+  padding:12px;display:flex;flex-direction:column;gap:8px;
+  position:relative;
+}
+.card::before{content:'⬢';position:absolute;top:6px;right:8px;font-size:10px;color:#5aaa3a;text-shadow:1px 1px 0 #000}
+.card h3{font-size:9px;color:#373737;word-break:break-all;line-height:1.5;min-height:26px}
+.meta{font-size:7px;color:#5a5a5a}
+.mc-inv{
+  background:#8b8b8b;border:2px solid #373737;box-shadow:inset 2px 2px 0 #fff, inset -2px -2px 0 #555;
+  padding:6px;display:flex;align-items:center;gap:8px;
+}
+.mc-inv .slot{
+  width:28px;height:28px;background:#8b8b8b;border:2px solid #373737;
+  box-shadow:inset 2px 2px 0 #373737, inset -2px -2px 0 #fff;
+  display:grid;place-items:center;font-size:14px;
+}
+.download-mc{
+  font-family:'Press Start 2P',monospace;font-size:8px;
+  background:#5aaa3a;color:#fff;text-decoration:none;text-align:center;
+  padding:10px;border:3px solid #2d631d;border-top-color:#8be07a;border-left-color:#8be07a;
+  box-shadow:inset -2px -2px 0 #2d631d, 2px 2px 0 #000;
+  text-shadow:1px 1px 0 #2d631d;
+}
+.download-mc:hover{background:#6fbf4a}
+.download-mc:active{transform:translate(1px,1px)}
+.state{
+  max-width:920px;margin:24px auto;text-align:center;
+  background:#c6c6c6;border:3px solid #000;box-shadow:inset -3px -3px 0 #555, inset 3px 3px 0 #fff, 3px 3px 0 rgba(0,0,0,.4);
+  padding:16px;font-size:9px;color:#373737;line-height:1.6
+}
+.error{color:#9b0000}
+.grass-bar{height:14px;background:repeating-linear-gradient(90deg,#5aaa3a 0 16px,#4a962f 16px 32px);border:3px solid #2d631d;box-shadow:2px 2px 0 #000;margin:0 auto 14px;max-width:920px}
+</style>
+</head>
+<body>
+<a class="back" href="../index.html">‹ INICIO</a>
+<div class="header">
+<h1>◼ <span>MODS</span> DEL SERVIDOR ◼</h1>
+<p>◆ Sincronizado en tiempo real desde Minehost / Pterodactyl ◆<br>Coloca los .jar en /mods y dale a Actualizar</p>
+</div>
+<div class="grass-bar"></div>
+<div class="mc-panel">
+<div class="toolbar">
+<span id="count" class="count"></span>
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+<button class="btn-mc" id="pickFolderBtn" onclick="pickFolder()">📁 CARPETA</button>
+<span id="folderName" class="folder" style="display:none"></span>
+<button class="btn-mc green" onclick="downloadAllSequential()" id="dlAllBtn">⬇ TODOS</button>
+<button class="btn-mc green" onclick="downloadZip()">⬇ ZIP</button>
+<button class="btn-mc" onclick="loadMods()">↻ ACTUALIZAR</button>
+</div>
+</div>
+</div>
+<div id="progress" class="state" style="display:none"></div>
+<div id="state" class="state">Cargando mods...</div>
+<div id="grid" class="grid" style="display:none"></div>
+<script>
+async function loadMods(){
+  const state=document.getElementById('state');
+  const grid=document.getElementById('grid');
+  const count=document.getElementById('count');
+  state.style.display='block'; state.textContent='Cargando mods...'; state.className='state';
+  grid.style.display='none'; grid.innerHTML='';
+  try{
+    const res=await fetch('/.netlify/functions/mods');
+    if(!res.ok){
+      const j=await res.json().catch(()=>({error:res.statusText}));
+      throw new Error(j.error||j.details||res.statusText);
+    }
+    const mods=await res.json();
+    cachedMods=Array.isArray(mods)?mods:[];
+    if(!Array.isArray(mods)||mods.length===0){
+      state.textContent='No hay mods instalados';
+      count.textContent='';
+      document.getElementById('dlAllBtn').style.display='none';
+      return;
+    }
+    document.getElementById('dlAllBtn').style.display='';
+    state.style.display='none';
+    grid.style.display='grid';
+    count.textContent=mods.length+' MODS';
+    grid.innerHTML=mods.map(m=>`
+      <div class="card">
+        <h3>${m.name}</h3>
+        <div class="mc-inv"><div class="slot">📦</div><span class="meta">${m.filename}<br>${m.size}</span></div>
+        <a class="download-mc" href="#" onclick="downloadOne('${m.filename.replace(/'/g,"\\'")}');return false">DESCARGAR</a>
+      </div>
+    `).join('');
+  }catch(e){
+    state.textContent='Error: '+e.message;
+    state.className='state error';
+    count.textContent='';
+  }
+}
+let cachedMods=[];
+let dirHandle=null;
+async function pickFolder(){
+  if(!window.showDirectoryPicker){ alert('Tu navegador no soporta elegir carpeta (usa Chrome/Edge). Se usara Descargas.'); return; }
+  try{
+    dirHandle=await window.showDirectoryPicker({mode:'readwrite'});
+    const el=document.getElementById('folderName'); el.textContent='📁 '+dirHandle.name; el.style.display='block';
+    const perm=await dirHandle.requestPermission({mode:'readwrite'});
+    if(perm!=='granted') dirHandle=null;
+  }catch(e){ if(e.name!=='AbortError') alert(e.message); }
+}
+async function ensureFolder(){
+  if(dirHandle) return true;
+  if(window.showDirectoryPicker){
+    const want=confirm('Elige la carpeta donde guardar los mods.\n¿Elegir ahora?');
+    if(want){ await pickFolder(); return !!dirHandle; }
+  }
+  return false;
+}
+async function saveToFolder(filename, blob){
+  if(!dirHandle) return false;
+  try{
+    const fh=await dirHandle.getFileHandle(filename,{create:true});
+    const w=await fh.createWritable(); await w.write(blob); await w.close(); return true;
+  }catch(e){ alert('Error guardando '+filename+': '+e.message); return false; }
+}
+function fallbackDownload(filename){
+  const a=document.createElement('a'); a.href='/.netlify/functions/download-mod?file='+encodeURIComponent(filename); a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+async function downloadOne(filename){
+  const useFolder=dirHandle||await ensureFolder();
+  const prog=document.getElementById('progress');
+  if(useFolder && dirHandle){
+    prog.style.display='block'; prog.textContent='Descargando '+filename+'...';
+    try{
+      const res=await fetch('/.netlify/functions/download-mod?file='+encodeURIComponent(filename));
+      if(!res.ok) throw new Error('Error '+res.status);
+      const blob=await res.blob(); const ok=await saveToFolder(filename, blob);
+      prog.textContent=ok?'Guardado en '+dirHandle.name+'/'+filename:'Error';
+      setTimeout(()=>prog.style.display='none',2000); if(ok) return;
+    }catch(e){ prog.textContent='Error: '+e.message; }
+  }
+  fallbackDownload(filename);
+}
+async function downloadAllSequential(){
+  if(!cachedMods.length) return alert('No hay mods');
+  const useFolder=dirHandle||await ensureFolder();
+  if(useFolder && dirHandle){
+    const prog=document.getElementById('progress'); prog.style.display='block';
+    for(let i=0;i<cachedMods.length;i++){
+      const f=cachedMods[i].filename; prog.textContent='Guardando '+(i+1)+'/'+cachedMods.length+': '+f;
+      try{ const res=await fetch('/.netlify/functions/download-mod?file='+encodeURIComponent(f)); const blob=await res.blob(); await saveToFolder(f, blob);}catch(e){}
+    }
+    prog.textContent='✓ '+cachedMods.length+' mods en '+dirHandle.name; setTimeout(()=>prog.style.display='none',3000); return;
+  }
+  if(!confirm('Se descargaran '+cachedMods.length+' .jar. ¿Continuar?')) return;
+  for(let i=0;i<cachedMods.length;i++){ fallbackDownload(cachedMods[i].filename); await new Promise(r=>setTimeout(r,600)); }
+}
+async function downloadZip(){
+  const useFolder=dirHandle||await ensureFolder();
+  const url='/.netlify/functions/download-all';
+  if(useFolder && dirHandle){
+    const prog=document.getElementById('progress'); prog.style.display='block'; prog.textContent='Descargando ZIP...';
+    try{
+      const res=await fetch(url); if(!res.ok) throw new Error('Error '+res.status);
+      const blob=await res.blob(); const ok=await saveToFolder('mods.zip', blob);
+      prog.textContent=ok?'ZIP en '+dirHandle.name+'/mods.zip':'Error'; setTimeout(()=>prog.style.display='none',2500); if(ok) return;
+    }catch(e){ prog.textContent='Error: '+e.message; }
+  }
+  window.location.href=url;
+}
+loadMods();
+</script>
+</body>
+</html>

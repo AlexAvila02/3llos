@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bowl Filling with Black Rice</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: Arial, sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .steam {
+            position: absolute;
+            width: 8px;
+            height: 20px;
+            background: radial-gradient(ellipse at bottom, rgba(255,255,255,0.4) 0%, transparent 100%);
+            border-radius: 50%;
+            animation: steamRise 3s ease-out infinite;
+            opacity: 0;
+        }
+        
+        @keyframes steamRise {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(-100px) scale(2); opacity: 0; }
+        }
+        
+        #bowl {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            border: 5px solid #8b4513;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            background: linear-gradient(135deg, #f5f5dc 0%, #d4c4a8 100%);
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 -20px 30px rgba(0,0,0,0.2);
+        }
+        
+        #bowl::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            height: 10px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            border-radius: 50%;
+        }
+        
+        #fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: linear-gradient(180deg, #2a2a2a 0%, #000000 100%);
+            transition: height 0.5s ease-out;
+        }
+        
+        .rice-grain {
+            position: absolute;
+            width: 4px;
+            height: 8px;
+            background: linear-gradient(135deg, #333 0%, #111 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            opacity: 0.9;
+        }
+        
+        .bowl-label {
+            position: absolute;
+            bottom: -60px;
+            font-size: 24px;
+            color: #f5f5dc;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            animation: labelGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes labelGlow {
+            0%, 100% { text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+            50% { text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(255,200,100,0.5); }
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: white; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+    
+    <div id="bowl">
+        <div id="fill"></div>
+    </div>
+    <div class="bowl-label">🍚 Black Rice 🍚</div>
+    
+    <script>
+        function playCloseSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+        }
+        
+        const bowl = document.getElementById('bowl');
+        const fill = document.getElementById('fill');
+        const bowlRect = bowl.getBoundingClientRect();
+        const maxHeight = bowlRect.height - 10;
+        const numGrains = 400;
+        let currentHeight = 0;
+        const fillDuration = 30000;
+        const interval = 50;
+        const heightIncrement = (maxHeight / fillDuration) * interval;
+        
+        function createSteam() {
+            const steam = document.createElement('div');
+            steam.className = 'steam';
+            steam.style.left = (Math.random() * 200 + 50) + 'px';
+            steam.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            steam.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(steam);
+            setTimeout(() => steam.remove(), 4000);
+        }
+        
+        setInterval(createSteam, 300);
+        
+        fill.style.height = '0px';
+        setTimeout(() => {
+            fill.style.height = maxHeight + 'px';
+        }, 100);
+        
+        let grainCount = 0;
+        const grainInterval = setInterval(() => {
+            if (grainCount >= numGrains) {
+                clearInterval(grainInterval);
+                return;
+            }
+            const grain = document.createElement('div');
+            grain.className = 'rice-grain';
+            const left = Math.random() * (bowlRect.width - 20) + 10;
+            grain.style.left = left + 'px';
+            grain.style.bottom = Math.random() * currentHeight + 'px';
+            grain.style.transform = `rotate(${Math.random() * 360}deg)`;
+            fill.appendChild(grain);
+            grainCount++;
+            currentHeight += heightIncrement;
+        }, interval);
+    </script>
+</body>
+</html>

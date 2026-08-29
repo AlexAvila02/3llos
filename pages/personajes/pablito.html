@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Pablito</title>
+    <style>
+        body {
+            background: linear-gradient(45deg, #ff006e, #8338ec, #3a86ff, #06ffa5, #ffbe0b);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 100px;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .title {
+            position: relative;
+            z-index: 10;
+            animation: artisticFloat 3s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(255,255,255,0.8);
+            mix-blend-mode: overlay;
+        }
+        
+        @keyframes artisticFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+        
+        .paint-splash {
+            position: absolute;
+            border-radius: 50%;
+            animation: splash 4s ease-in-out infinite;
+            filter: blur(20px);
+        }
+        
+        @keyframes splash {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.5); opacity: 0.3; }
+        }
+        
+        .brush-stroke {
+            position: absolute;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            animation: strokeMove 6s linear infinite;
+        }
+        
+        @keyframes strokeMove {
+            0% { transform: translateX(-100vw) rotate(0deg); }
+            100% { transform: translateX(100vw) rotate(0deg); }
+        }
+        
+        .color-particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: particleDance 5s ease-in-out infinite;
+        }
+        
+        @keyframes particleDance {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -50px) scale(1.2); }
+            50% { transform: translate(0, -100px) scale(1); }
+            75% { transform: translate(-50px, -50px) scale(0.8); }
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: white; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+    
+    <div class="title">🎨 Pablito 🎨</div>
+    
+    <script>
+        // Crear salpicaduras de pintura
+        function createPaintSplash() {
+            const splash = document.createElement('div');
+            splash.className = 'paint-splash';
+            const colors = ['#ff006e', '#8338ec', '#3a86ff', '#06ffa5', '#ffbe0b', '#fb5607'];
+            splash.style.background = colors[Math.floor(Math.random() * colors.length)];
+            splash.style.width = (Math.random() * 200 + 100) + 'px';
+            splash.style.height = splash.style.width;
+            splash.style.left = Math.random() * window.innerWidth + 'px';
+            splash.style.top = Math.random() * window.innerHeight + 'px';
+            splash.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(splash);
+        }
+        
+        // Crear trazos de pincel
+        function createBrushStroke() {
+            const stroke = document.createElement('div');
+            stroke.className = 'brush-stroke';
+            stroke.style.width = (Math.random() * 300 + 200) + 'px';
+            stroke.style.top = Math.random() * window.innerHeight + 'px';
+            stroke.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            document.body.appendChild(stroke);
+            setTimeout(() => stroke.remove(), 7000);
+        }
+        
+        // Crear partículas de color
+        function createColorParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'color-particle';
+            const colors = ['#ff006e', '#8338ec', '#3a86ff', '#06ffa5', '#ffbe0b'];
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.left = Math.random() * window.innerWidth + 'px';
+            particle.style.top = Math.random() * window.innerHeight + 'px';
+            particle.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(particle);
+        }
+        
+        // Inicializar elementos
+        for(let i = 0; i < 10; i++) createPaintSplash();
+        for(let i = 0; i < 30; i++) createColorParticle();
+        
+        // Generar trazos periódicamente
+        setInterval(createBrushStroke, 2000);
+        
+        function playCloseSound() {
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+          oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
+          gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.15);
+        }
+    </script>
+</body>
+</html>

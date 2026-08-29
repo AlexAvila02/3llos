@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruleta - Papubanda</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(100, 200, 255, 0.5);
+        }
+        
+        h1.animated-title {
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+        
+        h1.animated-title span {
+            display: inline-block;
+            opacity: 0;
+            animation: 
+                letterFadeIn 0.5s ease-out forwards,
+                letterFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes letterFadeIn {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes letterFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-8px) rotate(2deg); }
+            50% { transform: translateY(0) rotate(0deg); }
+            75% { transform: translateY(-5px) rotate(-1deg); }
+        }
+        
+        .wheel-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+        
+        #canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #ff6b6b;
+            filter: drop-shadow(0 0 10px rgba(255, 107, 107, 0.8));
+            z-index: 10;
+        }
+        
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .input-group input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input[type="number"]:focus {
+            outline: none;
+            border-color: rgba(100, 200, 255, 0.8);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .number-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .number-selector input[type="number"] {
+            flex: 1;
+            min-width: 80px;
+        }
+        
+        .number-selector select {
+            padding: 12px 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 70px;
+        }
+        
+        .number-selector select:focus {
+            outline: none;
+            border-color: rgba(100, 200, 255, 0.8);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .number-selector select option {
+            background: #1a1a2e;
+            color: white;
+        }
+        
+        .options-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .option-input {
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .option-input:focus {
+            outline: none;
+            border-color: rgba(100, 200, 255, 0.8);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .option-input::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+            font-style: italic;
+        }
+        
+        .auto-delete-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .toggle-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: .3s;
+            border-radius: 26px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: rgba(100, 200, 100, 0.8);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        .spin-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .spin-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .spin-btn:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+        
+        .spin-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            min-height: 150px;
+            min-width: 200px;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .result-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        .result-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .spinning {
+            animation: pulse 0.5s ease infinite;
+        }
+        
+        .center-spin-btn:hover:not(:disabled) {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 6px 30px rgba(102, 126, 234, 0.7), inset 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+        
+        .center-spin-btn:active:not(:disabled) {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+        
+        .center-spin-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .center-spin-btn.spinning {
+            animation: none;
+        }
+        
+        .center-spin-btn.spinning .btn-text {
+            display: inline-block;
+            animation: pulse 0.5s ease infinite;
+        }
+        
+        .center-spin-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .center-spin-btn:hover:not(:disabled) {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 6px 30px rgba(102, 126, 234, 0.7), inset 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+        
+        .center-spin-btn:active:not(:disabled) {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+        
+        .center-spin-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 600px) {
+            .wheel-container {
+                width: 300px;
+                height: 300px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        body {
+            transition: background 0.8s ease-in-out;
+        }
+        .wave-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        .wave {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            border-radius: 50%;
+            animation: wavePulse 8s infinite ease-in-out;
+            opacity: 0;
+            transition: background 0.8s ease-in-out;
+        }
+        .wave:nth-child(1) {
+            background: radial-gradient(ellipse at center, rgba(100,150,255,0.4) 0%, rgba(70,120,220,0.2) 30%, rgba(50,90,180,0.1) 50%, transparent 70%);
+            top: -50%;
+            left: -50%;
+            animation-delay: 0s;
+        }
+        .wave:nth-child(2) {
+            background: radial-gradient(ellipse at center, rgba(80,130,235,0.3) 0%, rgba(60,100,200,0.15) 30%, rgba(40,70,150,0.08) 50%, transparent 70%);
+            top: -50%;
+            right: -50%;
+            left: auto;
+            animation-delay: 2s;
+        }
+        .wave:nth-child(3) {
+            background: radial-gradient(ellipse at center, rgba(60,110,215,0.25) 0%, rgba(45,85,170,0.12) 30%, rgba(30,60,130,0.06) 50%, transparent 70%);
+            bottom: -50%;
+            left: -50%;
+            top: auto;
+            animation-delay: 4s;
+        }
+        .wave:nth-child(4) {
+            background: radial-gradient(ellipse at center, rgba(45,90,195,0.2) 0%, rgba(35,70,140,0.1) 30%, rgba(20,50,100,0.05) 50%, transparent 70%);
+            bottom: -50%;
+            right: -50%;
+            top: auto;
+            left: auto;
+            animation-delay: 6s;
+        }
+        @keyframes wavePulse {
+            0% { transform: scale(0.8) rotate(0deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: scale(1.2) rotate(5deg); opacity: 0; }
+        }
+        .ambient-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: ambientFloat 20s infinite linear;
+        }
+        @keyframes ambientFloat {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            5% { opacity: 0.3; }
+            95% { opacity: 0.3; }
+            100% { transform: translateY(-10vh) translateX(30px); opacity: 0; }
+        }
+        
+        /* Hamburger Menu */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            cursor: pointer;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hamburger-menu:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(100, 150, 255, 0.3);
+        }
+
+        .hamburger-menu:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .hamburger-line {
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 5px 0;
+            border-radius: 3px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: center;
+        }
+
+        .hamburger-menu.active .hamburger-line {
+            background: #a8d8ff;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .hamburger-menu.active {
+            background: rgba(100, 150, 255, 0.2);
+            border-color: rgba(100, 150, 255, 0.4);
+            box-shadow: 0 0 25px rgba(100, 150, 255, 0.4);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100%;
+            background: rgba(5, 15, 40, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 999;
+            transition: left 0.4s ease;
+            padding: 80px 20px 100px 20px;
+            border-right: 1px solid rgba(100, 150, 255, 0.2);
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 20, 50, 0.5);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sidebar-item {
+            padding: 15px 20px;
+            margin: 10px 0;
+            color: white;
+            text-decoration: none;
+            display: block;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(10px);
+        }
+
+        /* Theme Section */
+        .theme-section {
+            margin-top: 20px;
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .theme-label {
+            color: rgba(255,255,255,0.8);
+            font-size: 16px;
+            margin: 0 0 12px 0;
+            font-weight: 500;
+        }
+
+        .theme-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .theme-btn {
+            width: 100%;
+            height: 40px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.05);
+            border-color: rgba(255,255,255,0.6);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .theme-btn:active {
+            transform: scale(0.95);
+        }
+
+        .theme-btn.active {
+            border-color: white;
+            box-shadow: 0 0 15px rgba(255,255,255,0.5);
+        }
+
+        .theme-btn.active::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="wave-container">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+    
+    <!-- Menú hamburguesa -->
+    <div class="hamburger-menu" onclick="toggleSidebar()">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+    </div>
+    
+    <!-- Overlay del sidebar -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="../../index.html" class="sidebar-item">Inicio</a>
+        <a href="ruleta.html" class="sidebar-item">Ruleta</a>
+        <a href="teclado.html" class="sidebar-item">Test Teclado</a>
+        <a href="tierlist.html" class="sidebar-item">Tier List</a>
+        
+        <div class="theme-section">
+            <p class="theme-label">Modos</p>
+            <div class="theme-buttons">
+                <button class="theme-btn" data-theme="default" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);"></button>
+                <button class="theme-btn" data-theme="dark" style="background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0a0a0a 100%);"></button>
+                <button class="theme-btn" data-theme="purple" style="background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0f3d 100%);"></button>
+                <button class="theme-btn" data-theme="green" style="background: linear-gradient(135deg, #0a2e1a 0%, #1b4e2d 50%, #0f3d1a 100%);"></button>
+                <button class="theme-btn" data-theme="red" style="background: linear-gradient(135deg, #2e0a0a 0%, #4e1b1b 50%, #3d0f0f 100%);"></button>
+                <button class="theme-btn" data-theme="orange" style="background: linear-gradient(135deg, #2e1a0a 0%, #4e2d1b 50%, #3d1f0f 100%);"></button>
+            </div>
+        </div>
+        
+        <div class="links-section" style="margin-top: 20px; padding: 15px 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <p class="links-label" style="color: rgba(255,255,255,0.8); font-size: 16px; margin: 0 0 12px 0; font-weight: 500;">Links</p>
+            <a href="https://drive.google.com/drive/folders/1KdsfAYtp-uTZXhpbL9Y9tEfNvGqx_Dtn" target="_blank" class="sidebar-item" style="margin: 5px 0; font-size: 14px;">Excels</a>
+            <a href="https://balatro-mod-manager.dasguney.com/download" target="_blank" class="sidebar-item" style="margin: 5px 0; font-size: 14px;">Balatro Mod</a>
+            <a href="https://fast.com/es/" target="_blank" class="sidebar-item" style="margin: 5px 0; font-size: 14px;">Internet Velocidad</a>
+        </div>
+    </div>
+    
+    <a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: white; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+    
+    <div class="container">
+        <h1 class="animated-title"><span style="animation-delay: 0s">R</span><span style="animation-delay: 0.1s">u</span><span style="animation-delay: 0.2s">l</span><span style="animation-delay: 0.3s">e</span><span style="animation-delay: 0.4s">t</span><span style="animation-delay: 0.5s">a</span></h1>
+        
+        <div class="wheel-section">
+            <div class="wheel-container">
+                <div class="pointer"></div>
+                <canvas id="canvas" width="400" height="400"></canvas>
+                <button id="spinBtn" class="center-spin-btn" onclick="spin()"><span class="btn-text">Girar</span></button>
+            </div>
+            
+            <div id="result" class="result">
+                <div class="result-label">Resultado</div>
+                <div id="resultText" class="result-text"></div>
+            </div>
+        </div>
+        
+        <div class="auto-delete-toggle" style="margin: 20px 0; justify-content: center;">
+            <label class="switch">
+                <input type="checkbox" id="autoDeleteToggle" checked>
+                <span class="slider"></span>
+            </label>
+            <span class="toggle-label">Eliminar ganador automáticamente</span>
+        </div>
+        
+        <div class="controls">
+            <div class="input-group">
+                <label for="numOptions">Cantidad de opciones:</label>
+                <div class="number-selector">
+                    <input type="number" id="numOptions" min="2" max="20" value="2" onchange="syncFromInput()">
+                    <select id="numOptionsSelect" onchange="syncFromSelect()">
+                        <option value="20">20</option>
+                        <option value="19">19</option>
+                        <option value="18">18</option>
+                        <option value="17">17</option>
+                        <option value="16">16</option>
+                        <option value="15">15</option>
+                        <option value="14">14</option>
+                        <option value="13">13</option>
+                        <option value="12">12</option>
+                        <option value="11">11</option>
+                        <option value="10">10</option>
+                        <option value="9">9</option>
+                        <option value="8">8</option>
+                        <option value="7">7</option>
+                        <option value="6">6</option>
+                        <option value="5">5</option>
+                        <option value="4">4</option>
+                        <option value="3">3</option>
+                        <option value="2" selected>2</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="optionsContainer" class="options-container">
+                <!-- Los inputs se generarán dinámicamente -->
+            </div>
+            
+            <button onclick="addNewOption()" style="
+                margin-top: 10px;
+                padding: 8px 16px;
+                background: rgba(100, 200, 100, 0.8);
+                color: white;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: bold;
+                transition: all 0.2s ease;
+            " onmouseover="this.style.background='rgba(80, 180, 80, 1)'" onmouseout="this.style.background='rgba(100, 200, 100, 0.8)'">+ Agregar opción</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Cargar opciones guardadas o usar valores por defecto
+        let options = JSON.parse(localStorage.getItem('rouletteOptions')) || ['Opción 1', 'Opción 2'];
+        
+        let colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
+            '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2',
+            '#F8B739', '#52BE80', '#EC7063', '#AF7AC5',
+            '#5DADE2', '#48C9B0', '#F4D03F', '#EB984E'
+        ];
+        let currentRotation = 0;
+        let isSpinning = false;
+        
+        // Función para guardar opciones
+        function saveOptions() {
+            localStorage.setItem('rouletteOptions', JSON.stringify(options));
+        }
+        
+        function syncFromInput() {
+            const input = document.getElementById('numOptions');
+            const select = document.getElementById('numOptionsSelect');
+            let value = parseInt(input.value);
+            
+            // Validar rango
+            if (value < 2) value = 2;
+            if (value > 20) value = 20;
+            
+            input.value = value;
+            select.value = value;
+            
+            // Ajustar array de opciones
+            if (value > options.length) {
+                // Agregar opciones
+                for (let i = options.length; i < value; i++) {
+                    options.push(`Opción ${i + 1}`);
+                }
+            } else if (value < options.length) {
+                // Eliminar opciones del final
+                options.splice(value);
+            }
+            
+            saveOptions();
+            updateOptions();
+        }
+        
+        function syncFromSelect() {
+            const input = document.getElementById('numOptions');
+            const select = document.getElementById('numOptionsSelect');
+            const value = parseInt(select.value);
+            input.value = value;
+            
+            // Ajustar array de opciones
+            if (value > options.length) {
+                for (let i = options.length; i < value; i++) {
+                    options.push(`Opción ${i + 1}`);
+                }
+            } else if (value < options.length) {
+                options.splice(value);
+            }
+            
+            saveOptions();
+            updateOptions();
+        }
+        
+        function addNewOption() {
+            if (options.length >= 20) {
+                alert('Máximo 20 opciones permitidas');
+                return;
+            }
+            options.push(`Opción ${options.length + 1}`);
+            document.getElementById('numOptions').value = options.length;
+            document.getElementById('numOptionsSelect').value = options.length;
+            saveOptions();
+            updateOptions();
+        }
+        
+        function updateOptions() {
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+            
+            // Crear inputs con botón de eliminar
+            for (let i = 0; i < options.length; i++) {
+                const wrapper = document.createElement('div');
+                wrapper.style.display = 'flex';
+                wrapper.style.alignItems = 'center';
+                wrapper.style.gap = '8px';
+                wrapper.style.marginBottom = '8px';
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'option-input';
+                // Las cajas están vacías inicialmente
+                input.value = '';
+                input.placeholder = options[i] || `Opción ${i + 1}`;
+                input.style.flex = '1';
+                input.style.marginBottom = '0';
+                input.onchange = (e) => {
+                    // Si está vacío, mantener el valor original
+                    if (!e.target.value.trim()) {
+                        e.target.value = '';
+                    } else {
+                        options[i] = e.target.value;
+                        saveOptions();
+                        drawWheel();
+                    }
+                };
+                
+                input.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        // Guardar valor actual (si no está vacío)
+                        if (input.value.trim()) {
+                            options[i] = input.value;
+                        }
+                        saveOptions();
+                        drawWheel();
+                        // Si es el último input, girar la ruleta
+                        if (i === options.length - 1) {
+                            spin();
+                        } else {
+                            // Mover al siguiente input
+                            const nextInput = container.querySelectorAll('input')[i + 1];
+                            if (nextInput) {
+                                nextInput.focus();
+                            }
+                        }
+                    }
+                };
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '×';
+                deleteBtn.style.cssText = `
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 50%;
+                    border: none;
+                    background: rgba(255, 100, 100, 0.8);
+                    color: white;
+                    font-size: 18px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    line-height: 1;
+                    transition: all 0.2s ease;
+                `;
+                deleteBtn.onmouseover = () => deleteBtn.style.background = 'rgba(255, 70, 70, 1)';
+                deleteBtn.onmouseout = () => deleteBtn.style.background = 'rgba(255, 100, 100, 0.8)';
+                deleteBtn.onclick = () => {
+                    if (options.length > 2) {
+                        options.splice(i, 1);
+                        document.getElementById('numOptions').value = options.length;
+                        saveOptions();
+                        updateOptions();
+                    } else {
+                        alert('Debe haber al menos 2 opciones');
+                    }
+                };
+                
+                wrapper.appendChild(input);
+                wrapper.appendChild(deleteBtn);
+                container.appendChild(wrapper);
+            }
+            
+            drawWheel();
+        }
+        
+        function drawWheel() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 10;
+            const numOptions = options.length;
+            const anglePerOption = (2 * Math.PI) / numOptions;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Dibujar cada sector
+            for (let i = 0; i < numOptions; i++) {
+                const startAngle = i * anglePerOption + currentRotation;
+                const endAngle = (i + 1) * anglePerOption + currentRotation;
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Dibujar texto
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + anglePerOption / 2);
+                ctx.textAlign = 'right';
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 16px Arial';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                ctx.shadowBlur = 4;
+                
+                // Truncar texto si es muy largo
+                let text = options[i];
+                if (text.length > 12) {
+                    text = text.substring(0, 12) + '...';
+                }
+                
+                ctx.fillText(text, radius - 20, 5);
+                ctx.restore();
+            }
+            
+            // Dibujar círculo central
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 30, 0, 2 * Math.PI);
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+        
+        let sharedAudioContext = null;
+        
+        function getAudioContext() {
+            if (!sharedAudioContext) {
+                sharedAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            // Resume if suspended (browser policy)
+            if (sharedAudioContext.state === 'suspended') {
+                sharedAudioContext.resume();
+            }
+            return sharedAudioContext;
+        }
+        
+        function playRouletteTick(speed) {
+            try {
+                const audioContext = getAudioContext();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                const filter = audioContext.createBiquadFilter();
+                
+                oscillator.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                const baseFreq = 800 + (speed * 400);
+                
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(baseFreq, audioContext.currentTime);
+                
+                filter.type = 'highpass';
+                filter.frequency.value = 1200;
+                filter.Q.value = 5;
+                
+                gainNode.gain.setValueAtTime(0.15 * speed, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.03);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.03);
+            } catch (e) {
+                console.log('Audio error:', e);
+            }
+        }
+        
+        function spin() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            document.getElementById('spinBtn').disabled = true;
+            document.getElementById('spinBtn').classList.add('spinning');
+            document.getElementById('result').style.display = 'none';
+            
+            const spinDuration = 6400; // 6.4 segundos (60% más)
+            const startRotation = currentRotation;
+            const extraSpins = 5 + Math.random() * 5; // Entre 5 y 10 vueltas extra
+            const targetRotation = startRotation + (extraSpins * 2 * Math.PI);
+            const startTime = performance.now();
+            let lastTickAngle = 0;
+            
+            function animate(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / spinDuration, 1);
+                
+                // Easing function (ease-out cubic)
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                
+                currentRotation = startRotation + (targetRotation - startRotation) * easeOut;
+                
+                // Sonido de tick cuando pasa cada segmento
+                const anglePerOption = (2 * Math.PI) / options.length;
+                const currentTick = Math.floor(currentRotation / anglePerOption);
+                if (currentTick !== lastTickAngle) {
+                    lastTickAngle = currentTick;
+                    // El pitch disminuye según la velocidad
+                    const speed = 1 - easeOut;
+                    playRouletteTick(speed);
+                }
+                
+                drawWheel();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    isSpinning = false;
+                    document.getElementById('spinBtn').disabled = false;
+                    document.getElementById('spinBtn').classList.remove('spinning');
+                    
+                    // Calcular resultado
+                    const numOptions = options.length;
+                    const anglePerOption = (2 * Math.PI) / numOptions;
+                    // El puntero está en -PI/2 (arriba)
+                    const normalizedRotation = (currentRotation % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+                    const pointerAngle = (3 * Math.PI / 2 - normalizedRotation + 2 * Math.PI) % (2 * Math.PI);
+                    const winningIndex = Math.floor(pointerAngle / anglePerOption);
+                    
+                    showResult(options[winningIndex]);
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        function showResult(winner) {
+            const resultDiv = document.getElementById('result');
+            const resultText = document.getElementById('resultText');
+            
+            resultText.textContent = winner;
+            resultDiv.style.display = 'flex';
+            
+            // Animación de entrada
+            resultDiv.style.opacity = '0';
+            resultDiv.style.transform = 'scale(0.8)';
+            
+            setTimeout(() => {
+                resultDiv.style.transition = 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                resultDiv.style.opacity = '1';
+                resultDiv.style.transform = 'scale(1)';
+            }, 10);
+            
+            // Eliminar automáticamente al ganador después de 1 segundo si el toggle está activado
+            const autoDelete = document.getElementById('autoDeleteToggle').checked;
+            if (autoDelete) {
+                setTimeout(() => {
+                    if (options.length > 2) {
+                        const winnerIndex = options.indexOf(winner);
+                        if (winnerIndex > -1) {
+                            options.splice(winnerIndex, 1);
+                            document.getElementById('numOptions').value = options.length;
+                            document.getElementById('numOptionsSelect').value = options.length;
+                            saveOptions();
+                            updateOptions();
+                        }
+                    }
+                }, 1000);
+            }
+        }
+        
+        // Apply saved theme
+        const themes = {
+            default: {
+                body: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+                wave1: 'rgba(100,150,255,0.4)',
+                wave2: 'rgba(80,130,235,0.3)',
+                wave3: 'rgba(60,110,215,0.25)',
+                wave4: 'rgba(45,90,195,0.2)'
+            },
+            dark: {
+                body: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0a0a0a 100%)',
+                wave1: 'rgba(100,100,100,0.4)',
+                wave2: 'rgba(80,80,80,0.3)',
+                wave3: 'rgba(60,60,60,0.25)',
+                wave4: 'rgba(40,40,40,0.2)'
+            },
+            purple: {
+                body: 'linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0f3d 100%)',
+                wave1: 'rgba(150,100,200,0.4)',
+                wave2: 'rgba(130,80,180,0.3)',
+                wave3: 'rgba(110,60,160,0.25)',
+                wave4: 'rgba(90,45,140,0.2)'
+            },
+            green: {
+                body: 'linear-gradient(135deg, #0a2e1a 0%, #1b4e2d 50%, #0f3d1a 100%)',
+                wave1: 'rgba(100,200,100,0.4)',
+                wave2: 'rgba(80,180,80,0.3)',
+                wave3: 'rgba(60,160,60,0.25)',
+                wave4: 'rgba(45,140,45,0.2)'
+            },
+            red: {
+                body: 'linear-gradient(135deg, #2e0a0a 0%, #4e1b1b 50%, #3d0f0f 100%)',
+                wave1: 'rgba(200,80,80,0.4)',
+                wave2: 'rgba(180,60,60,0.3)',
+                wave3: 'rgba(160,45,45,0.25)',
+                wave4: 'rgba(140,35,35,0.2)'
+            },
+            orange: {
+                body: 'linear-gradient(135deg, #2e1a0a 0%, #4e2d1b 50%, #3d1f0f 100%)',
+                wave1: 'rgba(200,130,50,0.4)',
+                wave2: 'rgba(180,110,40,0.3)',
+                wave3: 'rgba(160,90,30,0.25)',
+                wave4: 'rgba(140,70,25,0.2)'
+            }
+        };
+
+        function applyTheme() {
+            const savedTheme = localStorage.getItem('selectedTheme') || 'default';
+            const theme = themes[savedTheme];
+            if (theme) {
+                document.body.style.background = theme.body;
+                const waves = document.querySelectorAll('.wave');
+                if (waves.length >= 4) {
+                    waves[0].style.background = `radial-gradient(ellipse at center, ${theme.wave1} 0%, rgba(70,120,220,0.2) 30%, rgba(50,90,180,0.1) 50%, transparent 70%)`;
+                    waves[1].style.background = `radial-gradient(ellipse at center, ${theme.wave2} 0%, rgba(60,100,200,0.15) 30%, rgba(40,70,150,0.08) 50%, transparent 70%)`;
+                    waves[2].style.background = `radial-gradient(ellipse at center, ${theme.wave3} 0%, rgba(45,85,170,0.12) 30%, rgba(30,60,130,0.06) 50%, transparent 70%)`;
+                    waves[3].style.background = `radial-gradient(ellipse at center, ${theme.wave4} 0%, rgba(35,70,140,0.1) 30%, rgba(20,50,100,0.05) 50%, transparent 70%)`;
+                }
+            }
+            // Update ripple colors
+            const rippleColors = {
+                default: '100, 180, 255',
+                dark: '150, 150, 180',
+                purple: '170, 120, 255',
+                green: '100, 220, 140',
+                red: '255, 100, 100',
+                orange: '255, 160, 80'
+            };
+            const rippleColor = rippleColors[savedTheme] || '100, 180, 255';
+            document.body.style.setProperty('--ripple-color', rippleColor);
+        }
+        applyTheme();
+
+        // Create ambient particles
+        function createAmbientParticles() {
+            const container = document.querySelector('.wave-container');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'ambient-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                container.appendChild(particle);
+            }
+        }
+        createAmbientParticles();
+        
+        // Inicializar
+        updateOptions();
+        
+        // Menu functions
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const isOpening = !sidebar.classList.contains('active');
+            
+            document.querySelector('.hamburger-menu').classList.toggle('active');
+            sidebar.classList.toggle('active');
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+            
+            if (isOpening) {
+                playSlideSound();
+            } else {
+                playCloseSoundMenu();
+            }
+        }
+
+        function playSlideSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(600, audioContext.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+        }
+
+        function playCloseSoundMenu() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+        }
+
+        // Theme management
+        const menuThemes = {
+            default: {
+                body: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
+            },
+            dark: {
+                body: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0a0a0a 100%)'
+            },
+            purple: {
+                body: 'linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0f3d 100%)'
+            },
+            green: {
+                body: 'linear-gradient(135deg, #0a2e1a 0%, #1b4e2d 50%, #0f3d1a 100%)'
+            },
+            red: {
+                body: 'linear-gradient(135deg, #2e0a0a 0%, #4e1b1b 50%, #3d0f0f 100%)'
+            },
+            orange: {
+                body: 'linear-gradient(135deg, #2e1a0a 0%, #4e2d1b 50%, #3d1f0f 100%)'
+            }
+        };
+
+        function setMenuTheme(themeName) {
+            const theme = menuThemes[themeName];
+            document.body.style.background = theme.body;
+            localStorage.setItem('selectedTheme', themeName);
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.theme === themeName) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // Initialize theme
+        const savedMenuTheme = localStorage.getItem('selectedTheme') || 'default';
+        setMenuTheme(savedMenuTheme);
+
+        // Add click handlers to theme buttons
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setMenuTheme(btn.dataset.theme);
+                playSlideSound();
+            });
+        });
+        
+        function playCloseSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Torneo Calipso Vuelta</title>
+  <link rel="stylesheet" href="../../css/main.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: #0a0a1a;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .torneo-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(100, 0, 200, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(200, 50, 50, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 80%, rgba(0, 150, 255, 0.05) 0%, transparent 60%);
+      z-index: 0;
+    }
+
+    .torneo-container {
+      position: relative;
+      z-index: 1;
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .back-btn {
+      display: inline-block;
+      padding: 8px 20px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 50px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      margin-bottom: 30px;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+    }
+
+    .torneo-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .torneo-header h1 {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #a855f7, #6366f1, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .torneo-header .subtitle {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.5);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+
+    .torneo-divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(160, 80, 247, 0.4), transparent);
+      margin: 30px 0;
+    }
+
+    .equipos-section {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .equipo-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .equipo-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .equipo-card.winner {
+      border-color: rgba(160, 80, 247, 0.3);
+      box-shadow: 0 0 20px rgba(160, 80, 247, 0.1);
+    }
+
+    .equipo-label {
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 8px;
+    }
+
+    .equipo-nombre {
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 4px;
+    }
+
+    .equipo-card.winner .equipo-nombre {
+      color: #a855f7;
+    }
+
+    .equipo-lider {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .equipo-lider span {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 600;
+    }
+
+    .equipo-miembros {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.45);
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    .vs-badge {
+      font-size: 20px;
+      font-weight: 900;
+      color: rgba(160, 80, 247, 0.6);
+      letter-spacing: 2px;
+    }
+
+    .top10-section h2 {
+      font-size: 14px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 20px;
+    }
+
+    .top10-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 6px;
+    }
+
+    .top10-table thead th {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.35);
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .top10-table thead th:first-child {
+      text-align: center;
+      width: 50px;
+    }
+
+    .top10-table tbody tr {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .top10-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.07);
+      transform: translateX(4px);
+    }
+
+    .top10-table td {
+      padding: 12px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .top10-table td:first-child {
+      text-align: center;
+      border-radius: 12px 0 0 12px;
+    }
+
+    .top10-table td:last-child {
+      border-radius: 0 12px 12px 0;
+    }
+
+    .top10-table .rank-cell {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .rank-1 { background: linear-gradient(135deg, #ffaa00, #ff6400); color: #0a0a1a; }
+    .rank-2 { background: linear-gradient(135deg, #c0c0c0, #888); color: #0a0a1a; }
+    .rank-3 { background: linear-gradient(135deg, #cd7f32, #8b5a2b); color: white; }
+    .rank-default { background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.6); }
+
+    .player-name {
+      font-weight: 700;
+      color: white;
+    }
+
+    .team-tag {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .role-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .kda-positive { color: #4ade80; }
+    .kda-neutral { color: rgba(255, 255, 255, 0.6); }
+    .kda-negative { color: #f87171; }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 50px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.25);
+      letter-spacing: 2px;
+    }
+
+    @media (max-width: 700px) {
+      .equipos-section {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .vs-badge { font-size: 16px; }
+      .torneo-header h1 { font-size: 28px; }
+      .top10-table { font-size: 12px; }
+      .top10-table td { padding: 8px 6px; }
+      .top10-table thead th { font-size: 9px; padding: 6px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="torneo-bg"></div>
+
+  <div class="torneo-container">
+    <a href="index.html" class="back-btn">&#8592; Volver a Torneos</a>
+
+    <div class="torneo-header">
+      <h1>Torneo Calipso Vuelta</h1>
+      <p class="subtitle">Resultados del enfrentamiento</p>
+    </div>
+
+    <div class="torneo-divider"></div>
+
+    <div class="equipos-section">
+      <div class="equipo-card">
+        <p class="equipo-label">Equipo 1</p>
+        <p class="equipo-nombre">Elfic Ticio</p>
+        <p class="equipo-lider">Lider: <span>Elfic Ticio</span></p>
+        <p class="equipo-miembros">Chrollo Lucilfer &middot; BlakricE &middot; Momoo &middot; FraxiFrax</p>
+        <p class="equipo-stats">5 / 2 / 5 &middot; 11,067 oro</p>
+      </div>
+      <span class="vs-badge">VS</span>
+      <div class="equipo-card winner">
+        <p class="equipo-label">Equipo 2</p>
+        <p class="equipo-nombre">LauritaAmorosa</p>
+        <p class="equipo-lider">Lider: <span>LauritaAmorosa</span></p>
+        <p class="equipo-miembros">Kisuke Urahara &middot; ====Fama==== &middot; Jackras &middot; LauraSad &middot; LOKI7O</p>
+        <p class="equipo-stats">2 / 5 / 0 &middot; 8,437 oro</p>
+      </div>
+    </div>
+
+    <div class="top10-section">
+      <h2>Top 10 Jugadores</h2>
+      <table class="top10-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Jugador</th>
+            <th>Equipo</th>
+            <th>Rol</th>
+            <th>Lvl</th>
+            <th>KDA</th>
+            <th>CS</th>
+            <th>Oro</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="rank-cell rank-1">1</span></td>
+            <td><span class="player-name">BlakricE</span></td>
+            <td><span class="team-tag">Eq 1</span></td>
+            <td><span class="role-tag">Jungla</span></td>
+            <td>5</td>
+            <td><span class="kda-positive">3 / 0 / 0</span></td>
+            <td>44</td>
+            <td>3,002</td>
+          </tr>
+          <tr>
+            <td><span class="rank-cell rank-2">2</span></td>
+            <td><span class="player-name">Elfic Ticio</span></td>
+            <td><span class="team-tag">Eq 1</span></td>
+            <td><span class="role-tag">ADC</span></td>
+            <td>5</td>
+            <td><span class="kda-positive">1 / 0 / 2</span></td>
+            <td>43</td>
+            <td>2,541</td>
+          </tr>
+          <tr>
+            <td><span class="rank-cell rank-3">3</span></td>
+            <td><span class="player-name">Kisuke Urahara</span></td>
+            <td><span class="team-tag">Eq 2</span></td>
+            <td><span class="role-tag">Top</span></td>
+            <td>6</td>
+            <td><span class="kda-positive">2 / 1 / 0</span></td>
+            <td>33</td>
+            <td>2,315</td>
+          </tr>
+          <tr>
+            <td><span class="rank-cell rank-default">4</span></td>
+            <td><span class="player-name">Chrollo Lucilfer</span></td>
+            <td><span class="team-tag">Eq 1</span></td>
+            <td><span class="role-tag">Top</span></td>
+            <td>6</td>
+            <td><span class="kda-neutral">1 / 2 / 0</span></td>
+            <td>33</td>
+            <td>1,989</td>
+          </tr>
+          <tr>
+            <td><span class="rank-cell rank-default">5</span></td>
+            <td><span class="player-name">Jackras</span></td>
+            <td><span class="team-tag">Eq 2</span></td>
+            <td><span class="role-tag">Mid</span></td>
+            <td>5</td>
+            <td><span class="kda-neutral">0 / 0 / 0</span></td>
+            <td>42</td>
+            <td>1,881</td>
+          </tr>
+          <tr>
+            <td><span class="rank-cell rank-default">6</span></td>
+            <td><span class="player-name">Momoo</span></td>
+            <td><span class="team-tag">Eq 1</span></td>
+            <td><span class="role-tag">Mid</span></td>
+            <td>6</td>
+            <td><span class="kda-neutral">0 / 0 / 0</span></td>
+            <td>33</td>
+            <td>1,775</td>
+          </tr>
+          <tr>
+            <td><span class="rank-cell rank-default">7</span></td>
+            <td><span class="player-name">FraxiFrax</span></td>
+            <td><span class="team-tag">Eq 1</span></td>
+            <td><span class="role-tag">Soporte</span></td>
+            <td>4</td>
+            <td><span class="kda-neutral">0 / 0 / 3</span></td>
+            <td>9</td>
+            <td>1,760</td>
+          </tr>
+          <tr>
+            <td><span class="rank-cell rank-default">8</span></td>
+            <td><span class="player-name">====Fama====</span></td>
+            <td><span class="team-tag">Eq 2</span></td>
+            <td><span class="role-tag">Jungla</span></td>
+            <td>4</td>
+            <td><span class="kda-negative">0 / 1 / 0</span></td>
+            <td>18</td>
+            <td>1,574</td>
+          </tr>
+          <tr>
+            <td><span class="rank-cell rank-default">9</span></td>
+            <td><span class="player-name">LOKI7O</span></td>
+            <td><span class="team-tag">Eq 2</span></td>
+            <td><span class="role-tag">Soporte</span></td>
+            <td>3</td>
+            <td><span class="kda-negative">0 / 1 / 0</span></td>
+            <td>6</td>
+            <td>1,338</td>
+          </tr>
+          <tr>
+            <td><span class="rank-cell rank-default">10</span></td>
+            <td><span class="player-name">LauraSad</span></td>
+            <td><span class="team-tag">Eq 2</span></td>
+            <td><span class="role-tag">ADC</span></td>
+            <td>3</td>
+            <td><span class="kda-negative">0 / 2 / 0</span></td>
+            <td>10</td>
+            <td>1,329</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="footer-note">PAPUBANDA 2026</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Calipso</title>
+    <style>
+        body {
+            background: linear-gradient(180deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 100px;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .title {
+            position: relative;
+            z-index: 10;
+            animation: calipsoGlow 3s ease-in-out infinite;
+            text-shadow: 0 0 30px #ff6b35, 0 0 60px #f7931e;
+        }
+        
+        @keyframes calipsoGlow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); text-shadow: 0 0 40px #ff6b35, 0 0 80px #f7931e, 0 0 120px #ffd93d; }
+        }
+        
+        .moon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 80px;
+            animation: moonFloat 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 200, 0.8));
+        }
+        
+        @keyframes moonFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+        
+        .palm-leaf {
+            position: absolute;
+            font-size: 60px;
+            animation: leafSway 3s ease-in-out infinite;
+            opacity: 0.8;
+        }
+        
+        @keyframes leafSway {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        
+        .note {
+            position: absolute;
+            font-size: 30px;
+            animation: noteFloat 5s ease-in-out infinite;
+            opacity: 0.6;
+        }
+        
+        @keyframes noteFloat {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+        
+        .star {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+        
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: waveMove 4s linear infinite;
+        }
+        
+        @keyframes waveMove {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: white; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+    
+    <div class="title">Calipso</div>
+    <div class="moon">🌙</div>
+    <div class="wave"></div>
+    
+    <script>
+        // Crear hojas de palmera
+        function createPalmLeaf() {
+            const leaf = document.createElement('div');
+            leaf.className = 'palm-leaf';
+            leaf.textContent = '🌴';
+            leaf.style.left = Math.random() * window.innerWidth + 'px';
+            leaf.style.top = Math.random() * window.innerHeight * 0.5 + 'px';
+            leaf.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(leaf);
+        }
+        
+        // Crear notas musicales
+        function createNote() {
+            const note = document.createElement('div');
+            note.className = 'note';
+            const notes = ['🎵', '🎶', '🎼', '🎹'];
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.style.left = Math.random() * window.innerWidth + 'px';
+            note.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            document.body.appendChild(note);
+            setTimeout(() => note.remove(), 6000);
+        }
+        
+        // Crear estrellas
+        function createStar() {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * window.innerWidth + 'px';
+            star.style.top = Math.random() * window.innerHeight * 0.6 + 'px';
+            star.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(star);
+        }
+        
+        // Crear hojas iniciales
+        for(let i = 0; i < 5; i++) createPalmLeaf();
+        for(let i = 0; i < 30; i++) createStar();
+        
+        // Generar notas periódicamente
+        setInterval(createNote, 1500);
+        
+        function playCloseSound() {
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+          oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
+          gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.15);
+        }
+    </script>
+</body>
+</html>

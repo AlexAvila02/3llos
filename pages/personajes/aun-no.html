@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>???</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e94560;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 72px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glitch {
+            position: relative;
+            z-index: 10;
+            animation: glitch 1s linear infinite;
+            color: transparent;
+            user-select: text;
+            cursor: text;
+        }
+        
+        .glitch::selection {
+            background: #0066cc;
+            color: white;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: 'no aplicable';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: transparent;
+        }
+        
+        .glitch::before {
+            animation: glitch-1 0.3s linear infinite alternate-reverse;
+            clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+        }
+        
+        .glitch::after {
+            animation: glitch-2 0.3s linear infinite alternate-reverse;
+            clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+        }
+        
+        .glitch::selection::before,
+        .glitch::selection::after {
+            color: inherit;
+        }
+        
+        @keyframes glitch-1 {
+            0% { transform: translate(0); }
+            100% { transform: translate(5px, 0); }
+        }
+        
+        @keyframes glitch-2 {
+            0% { transform: translate(0); }
+            100% { transform: translate(-5px, 0); }
+        }
+        
+        .noise {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            animation: noise 0.5s steps(10) infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes noise {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .static-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            animation: static 0.1s steps(2) infinite;
+        }
+        
+        @keyframes static {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        .chaos-shape {
+            position: absolute;
+            border: 2px solid rgba(233, 69, 96, 0.3);
+            animation: chaosRotate 10s linear infinite;
+        }
+        
+        @keyframes chaosRotate {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.5); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: white; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+    
+    <div class="noise"></div>
+    <div class="glitch">no aplicable</div>
+    
+    <script>
+        // Crear partículas de estática
+        function createStaticParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'static-particle';
+            particle.style.left = Math.random() * window.innerWidth + 'px';
+            particle.style.top = Math.random() * window.innerHeight + 'px';
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 100);
+        }
+        
+        // Crear formas caóticas
+        function createChaosShape() {
+            const shape = document.createElement('div');
+            shape.className = 'chaos-shape';
+            shape.style.width = (Math.random() * 100 + 50) + 'px';
+            shape.style.height = shape.style.width;
+            shape.style.left = Math.random() * window.innerWidth + 'px';
+            shape.style.top = Math.random() * window.innerHeight + 'px';
+            shape.style.animationDuration = (Math.random() * 10 + 5) + 's';
+            document.body.appendChild(shape);
+        }
+        
+        // Inicializar elementos
+        for(let i = 0; i < 10; i++) createChaosShape();
+        
+        // Generar estática periódicamente
+        setInterval(createStaticParticle, 10);
+        
+        function playCloseSound() {
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+          oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
+          gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.15);
+        }
+    </script>
+</body>
+</html>

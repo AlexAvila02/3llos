@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Andres</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #1a252f 100%);
+      color: #ecf0f1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: 'Impact', sans-serif;
+      font-size: 130px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .title {
+      position: relative;
+      z-index: 10;
+      animation: strongPulse 2s ease-in-out infinite;
+      text-shadow: 0 0 20px #3498db, 0 0 40px #2980b9;
+    }
+    
+    @keyframes strongPulse {
+      0%, 100% { transform: scale(1); text-shadow: 0 0 20px #3498db; }
+      50% { transform: scale(1.05); text-shadow: 0 0 30px #3498db, 0 0 60px #2980b9; }
+    }
+    
+    .lightning {
+      position: absolute;
+      width: 3px;
+      height: 100px;
+      background: linear-gradient(to bottom, #fff, #3498db, transparent);
+      animation: lightning 3s ease-out infinite;
+      opacity: 0;
+    }
+    
+    @keyframes lightning {
+      0%, 90%, 100% { opacity: 0; }
+      95% { opacity: 1; }
+    }
+    
+    .gear {
+      position: absolute;
+      font-size: 50px;
+      animation: gearRotate 10s linear infinite;
+      opacity: 0.3;
+    }
+    
+    @keyframes gearRotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .steel-bar {
+      position: absolute;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+      animation: barSlide 5s linear infinite;
+    }
+    
+    @keyframes barSlide {
+      0% { transform: translateX(-100vw); }
+      100% { transform: translateX(100vw); }
+    }
+    
+    .sparks {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #fff;
+      border-radius: 50%;
+      animation: sparkFly 1s ease-out infinite;
+    }
+    
+    @keyframes sparkFly {
+      0% { transform: translate(0, 0); opacity: 1; }
+      100% { transform: translate(50px, -100px); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: #ecf0f1; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+  
+  <div class="title">⚡ Andres ⚡</div>
+  
+  <script>
+    function createLightning() {
+      const lightning = document.createElement('div');
+      lightning.className = 'lightning';
+      lightning.style.left = Math.random() * window.innerWidth + 'px';
+      lightning.style.top = (Math.random() * window.innerHeight * 0.3) + 'px';
+      lightning.style.animationDelay = Math.random() * 3 + 's';
+      document.body.appendChild(lightning);
+    }
+    
+    function createGear() {
+      const gear = document.createElement('div');
+      gear.className = 'gear';
+      gear.textContent = '⚙️';
+      gear.style.left = Math.random() * window.innerWidth + 'px';
+      gear.style.top = Math.random() * window.innerHeight + 'px';
+      gear.style.animationDuration = (Math.random() * 5 + 10) + 's';
+      gear.style.animationDirection = Math.random() > 0.5 ? 'normal' : 'reverse';
+      document.body.appendChild(gear);
+    }
+    
+    function createSteelBar() {
+      const bar = document.createElement('div');
+      bar.className = 'steel-bar';
+      bar.style.width = (Math.random() * 200 + 100) + 'px';
+      bar.style.top = Math.random() * window.innerHeight + 'px';
+      bar.style.animationDuration = (Math.random() * 3 + 4) + 's';
+      document.body.appendChild(bar);
+      setTimeout(() => bar.remove(), 6000);
+    }
+    
+    function createSpark() {
+      const spark = document.createElement('div');
+      spark.className = 'sparks';
+      spark.style.left = Math.random() * window.innerWidth + 'px';
+      spark.style.top = Math.random() * window.innerHeight + 'px';
+      spark.style.animationDelay = Math.random() * 0.5 + 's';
+      document.body.appendChild(spark);
+      setTimeout(() => spark.remove(), 1000);
+    }
+    
+    for(let i = 0; i < 10; i++) createLightning();
+    for(let i = 0; i < 8; i++) createGear();
+    
+    setInterval(createSteelBar, 2000);
+    setInterval(createSpark, 200);
+    
+    function playCloseSound() {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+      oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
+      gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.15);
+    }
+  </script>
+</body>
+</html>

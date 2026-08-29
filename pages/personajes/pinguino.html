@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Pinguipollo</title>
+    <style>
+        body {
+            background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 50%, #FFFFFF 100%);
+            color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 80px;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .title {
+            position: relative;
+            z-index: 10;
+            animation: waddle 2s ease-in-out infinite;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        @keyframes waddle {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+        
+        .snowflake {
+            position: absolute;
+            color: white;
+            font-size: 20px;
+            animation: snowfall linear infinite;
+            text-shadow: 0 0 5px rgba(255,255,255,0.8);
+        }
+        
+        @keyframes snowfall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0.3; }
+        }
+        
+        .penguin {
+            position: absolute;
+            font-size: 50px;
+            animation: penguinWalk 8s linear infinite;
+        }
+        
+        @keyframes penguinWalk {
+            0% { transform: translateX(-100px) scaleX(1); }
+            45% { transform: translateX(calc(100vw - 100px)) scaleX(1); }
+            50% { transform: translateX(calc(100vw - 100px)) scaleX(-1); }
+            95% { transform: translateX(-100px) scaleX(-1); }
+            100% { transform: translateX(-100px) scaleX(1); }
+        }
+        
+        .penguin-walk {
+            animation: walkBounce 0.5s ease-in-out infinite;
+        }
+        
+        @keyframes walkBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .ice-crystal {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 20px solid rgba(255,255,255,0.6);
+            animation: crystalFloat 4s ease-in-out infinite;
+        }
+        
+        @keyframes crystalFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+            50% { transform: translateY(-30px) rotate(180deg); opacity: 1; }
+        }
+        
+        .cloud {
+            position: absolute;
+            background: rgba(255,255,255,0.8);
+            border-radius: 100px;
+            animation: cloudMove 15s linear infinite;
+        }
+        
+        .cloud::before {
+            content: '';
+            position: absolute;
+            background: rgba(255,255,255,0.8);
+            border-radius: 100px;
+        }
+        
+        @keyframes cloudMove {
+            0% { transform: translateX(-200px); }
+            100% { transform: translateX(100vw); }
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: #2c3e50; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+    
+    <div class="title">🐧 Pinguipollo 🐧</div>
+    
+    <script>
+        // Crear copos de nieve
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.className = 'snowflake';
+            snowflake.textContent = '❄';
+            snowflake.style.left = Math.random() * window.innerWidth + 'px';
+            snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            snowflake.style.fontSize = (Math.random() * 15 + 10) + 'px';
+            document.body.appendChild(snowflake);
+            setTimeout(() => snowflake.remove(), 5000);
+        }
+        
+        // Crear pingüinos caminando
+        function createPenguin() {
+            const penguin = document.createElement('div');
+            penguin.className = 'penguin';
+            penguin.innerHTML = '<div class="penguin-walk">🐧</div>';
+            penguin.style.top = (Math.random() * window.innerHeight * 0.6 + window.innerHeight * 0.2) + 'px';
+            penguin.style.animationDuration = (Math.random() * 4 + 6) + 's';
+            penguin.style.animationDelay = Math.random() * 5 + 's';
+            document.body.appendChild(penguin);
+            setTimeout(() => penguin.remove(), 15000);
+        }
+        
+        // Crear cristales de hielo
+        function createCrystal() {
+            const crystal = document.createElement('div');
+            crystal.className = 'ice-crystal';
+            crystal.style.left = Math.random() * window.innerWidth + 'px';
+            crystal.style.top = (Math.random() * window.innerHeight * 0.5 + window.innerHeight * 0.5) + 'px';
+            crystal.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(crystal);
+        }
+        
+        // Crear nubes
+        function createCloud() {
+            const cloud = document.createElement('div');
+            cloud.className = 'cloud';
+            cloud.style.width = (Math.random() * 100 + 100) + 'px';
+            cloud.style.height = (Math.random() * 40 + 40) + 'px';
+            cloud.style.top = (Math.random() * window.innerHeight * 0.3) + 'px';
+            cloud.style.animationDuration = (Math.random() * 10 + 15) + 's';
+            document.body.appendChild(cloud);
+        }
+        
+        // Inicializar elementos
+        for(let i = 0; i < 5; i++) createCrystal();
+        for(let i = 0; i < 3; i++) createCloud();
+        createPenguin();
+        
+        // Generar elementos periódicamente
+        setInterval(createSnowflake, 200);
+        setInterval(createPenguin, 8000);
+        
+        function playCloseSound() {
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+          oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
+          gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.15);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>33</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 150px;
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .number-container {
+            position: relative;
+            z-index: 10;
+            animation: numberGlow 2s ease-in-out infinite;
+            text-shadow: 0 0 20px #e94560, 0 0 40px #e94560, 0 0 60px #e94560;
+        }
+        
+        @keyframes numberGlow {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 20px #e94560, 0 0 40px #e94560; }
+            50% { transform: scale(1.1); text-shadow: 0 0 30px #ff6b6b, 0 0 60px #ff6b6b, 0 0 90px #ff6b6b; }
+        }
+        
+        .binary {
+            position: absolute;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: rgba(233, 69, 96, 0.3);
+            animation: fall linear infinite;
+        }
+        
+        @keyframes fall {
+            0% { transform: translateY(-100vh); opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+        
+        .circuit {
+            position: absolute;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #e94560, transparent);
+            animation: circuitMove 3s linear infinite;
+        }
+        
+        @keyframes circuitMove {
+            0% { transform: translateX(-100vw); }
+            100% { transform: translateX(100vw); }
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #e94560;
+            border-radius: 50%;
+            animation: particleFloat 4s ease-in-out infinite;
+        }
+        
+        @keyframes particleFloat {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.5; }
+            50% { transform: translateY(-100px) translateX(50px); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: white; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+    
+    <div class="number-container">33</div>
+    
+    <script>
+        // Crear números binarios cayendo
+        function createBinary() {
+            const binary = document.createElement('div');
+            binary.className = 'binary';
+            binary.textContent = Math.random() > 0.5 ? '1' : '0';
+            binary.style.left = Math.random() * window.innerWidth + 'px';
+            binary.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            document.body.appendChild(binary);
+            setTimeout(() => binary.remove(), 5000);
+        }
+        
+        // Crear líneas de circuito
+        function createCircuit() {
+            const circuit = document.createElement('div');
+            circuit.className = 'circuit';
+            circuit.style.top = Math.random() * window.innerHeight + 'px';
+            circuit.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            document.body.appendChild(circuit);
+            setTimeout(() => circuit.remove(), 5000);
+        }
+        
+        // Crear partículas
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * window.innerWidth + 'px';
+            particle.style.top = Math.random() * window.innerHeight + 'px';
+            particle.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 4000);
+        }
+        
+        // Generar elementos periódicamente
+        setInterval(createBinary, 200);
+        setInterval(createCircuit, 1000);
+        setInterval(createParticle, 300);
+        
+        // Inicializar con algunos elementos
+        for(let i = 0; i < 20; i++) createBinary();
+        for(let i = 0; i < 5; i++) createCircuit();
+        for(let i = 0; i < 10; i++) createParticle();
+        
+        function playCloseSound() {
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+          oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
+          gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.15);
+        }
+    </script>
+</body>
+</html>

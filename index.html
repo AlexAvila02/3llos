@@ -1,0 +1,263 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quien sos?</title>
+  
+  <!-- Estilos -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/paint.css">
+</head>
+<body>
+  <!-- Partículas flotantes -->
+  <div class="particles-container" id="particlesContainer"></div>
+  
+  <!-- Menú hamburguesa -->
+  <div class="hamburger-menu" onclick="toggleSidebar()">
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+  </div>
+  
+  <!-- Overlay del sidebar -->
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+  
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="pages/juegos/ruleta.html" class="sidebar-item">Ruleta</a>
+    <a href="pages/juegos/teclado.html" class="sidebar-item">Test Teclado</a>
+    <a href="pages/juegos/tierlist.html" class="sidebar-item">Tier List</a>
+    <a href="pages/juegos/pixel-game.html" class="sidebar-item">Pixel Adventure</a>
+    
+    <div class="theme-section">
+      <p class="theme-label">Modos</p>
+      <div class="theme-buttons">
+        <button class="theme-btn" data-theme="default"></button>
+        <button class="theme-btn" data-theme="dark"></button>
+        <button class="theme-btn" data-theme="purple"></button>
+        <button class="theme-btn" data-theme="green"></button>
+        <button class="theme-btn" data-theme="red"></button>
+        <button class="theme-btn" data-theme="orange"></button>
+      </div>
+    </div>
+    
+    <div class="dolar-section">
+      <p class="dolar-label">Cotización Dólar</p>
+      <div id="dolar-rates" class="dolar-rates">
+        <div class="dolar-item">
+          <span class="dolar-item-label">Oficial:</span>
+          <span id="dolar-oficial" class="dolar-item-value dolar-item-value--green">Cargando...</span>
+        </div>
+        <div class="dolar-item">
+          <span class="dolar-item-label">Blue:</span>
+          <span id="dolar-blue" class="dolar-item-value dolar-item-value--red">Cargando...</span>
+        </div>
+      </div>
+      <button onclick="actualizarDolar()" class="dolar-update-btn">Actualizar</button>
+    </div>
+    
+    <div class="links-section">
+      <p class="links-label">Links</p>
+      <a href="pages/mods.html" class="sidebar-item sidebar-link">Mods Servidor</a>
+      <a href="https://drive.google.com/drive/folders/1KdsfAYtp-uTZXhpbL9Y9tEfNvGqx_Dtn" target="_blank" class="sidebar-item sidebar-link">Excels</a>
+      <a href="https://balatro-mod-manager.dasguney.com/download" target="_blank" class="sidebar-item sidebar-link">Balatro Mod</a>
+      <a href="https://fast.com/es/" target="_blank" class="sidebar-item sidebar-link">Internet Velocidad</a>
+    </div>
+    
+    <div class="sidebar-footer">
+      <p class="sidebar-footer-text">Papubanda 2026</p>
+    </div>
+  </div>
+  
+  <!-- Contenedor de ondas -->
+  <div class="wave-container">
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+  </div>
+  
+  <!-- Título -->
+  <h1 class="welcome-text">
+    <span style="animation-delay: 0s">p</span><span style="animation-delay: 0.05s">a</span><span style="animation-delay: 0.1s">p</span><span style="animation-delay: 0.15s">u</span><span style="animation-delay: 0.2s">b</span><span style="animation-delay: 0.25s">a</span><span style="animation-delay: 0.3s">n</span><span style="animation-delay: 0.35s">d</span><span style="animation-delay: 0.4s">a</span>
+  </h1>
+  
+  <!-- Logos -->
+  <div class="logos-container">
+    <div class="kick-container">
+      <div class="logo-wrapper">
+        <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/kick-streaming-platform-logo-icon.png" alt="Kick Logo" class="kick-logo">
+      </div>
+      <div class="kick-modal">
+        <div class="modal-content">
+          <p><span class="kick-channel-name">Canal de arroz</span>: <a href="https://kick.com/arroz-ngr8" target="_blank" class="kick-link">https://kick.com/arroz-ngr8</a></p>
+      <p><span class="kick-channel-name">Canal de Cobi</span>: <a href="https://kick.com/coby220" target="_blank" class="kick-link">https://kick.com/coby220</a></p>
+        </div>
+      </div>
+    </div>
+    <a href="https://discord.gg/EZ4QkSUd" target="_blank" class="discord-link">
+      <div class="logo-wrapper">
+        <img src="https://logos-world.net/wp-content/uploads/2020/12/Discord-Logo.png" alt="Discord Logo" class="discord-logo">
+      </div>
+    </a>
+  </div>
+  
+      <div class="center-stack main-elements">
+       <textarea id="editor" class="text-input"></textarea>
+       <button class="submit-btn" aria-label="Enviar"></button>
+      </div>
+  
+  <!-- Botones adicionales -->
+  <div class="buttons-container main-elements">
+    <span class="timeline-label main-btn" onclick="playPopSound(); setTimeout(() => window.location.href='pages/juegos/lineadetiempo.html', 100);">Historia</span>
+    <span class="paint-btn main-btn" onclick="playPopSound(); openPaintModal();">Pintucalipso <span class="beta-tag">Beta</span></span>
+    <span class="blood-btn main-btn" onclick="playPopSound(); window.open('https://mangaplus-creators.jp/titles/mm2412250726170290026876933', '_blank');">Blood Throne <span class="sub-text">(By Samec)</span></span>
+    <span class="torneos-btn main-btn" onclick="playPopSound(); setTimeout(() => window.location.href='pages/torneos/index.html', 100);">Torneos</span>
+  </div>
+  
+  <!-- Modal de error -->
+  <div id="error-modal">
+    <div class="modal-content">
+      <p>Tu verdadero nombre</p>
+    </div>
+  </div>
+  
+  <!-- Modal de Paint -->
+  <div id="paint-modal">
+    <span class="paint-close" onclick="closePaintModal()">&times;</span>
+    <div class="paint-container">
+      <div class="paint-canvas-form">
+        <div class="canvas-wrapper">
+          <div class="canvas-layers-container" id="canvas-layers-container">
+            <canvas id="paint-canvas" width="800" height="600" class="canvas-layer active-layer"></canvas>
+          </div>
+        </div>
+        <p class="paint-hint">Ctrl/Cmd + rueda del ratón para zoom</p>
+      </div>
+      <div class="paint-controls">
+        <div class="control-group">
+          <span class="control-label">Color</span>
+          <input type="color" class="color-picker" id="color-picker" value="#000000">
+          <div class="color-presets">
+            <div class="color-preset active" style="background: #000000;" onclick="setColor('#000000')"></div>
+            <div class="color-preset" style="background: #FF0000;" onclick="setColor('#FF0000')"></div>
+            <div class="color-preset" style="background: #00FF00;" onclick="setColor('#00FF00')"></div>
+            <div class="color-preset" style="background: #0000FF;" onclick="setColor('#0000FF')"></div>
+            <div class="color-preset" style="background: #FFFF00;" onclick="setColor('#FFFF00')"></div>
+            <div class="color-preset" style="background: #FF00FF;" onclick="setColor('#FF00FF')"></div>
+            <div class="color-preset" style="background: #00FFFF;" onclick="setColor('#00FFFF')"></div>
+            <div class="color-preset" style="background: #FFA500;" onclick="setColor('#FFA500')"></div>
+            <div class="color-preset" style="background: #800080;" onclick="setColor('#800080')"></div>
+            <div class="color-preset" style="background: #FFFFFF; border: 1px solid rgba(0,0,0,0.2);" onclick="setColor('#FFFFFF')"></div>
+          </div>
+        </div>
+        <div class="control-group">
+          <span class="control-label">Grosor</span>
+          <input type="range" class="size-slider" id="brush-size" min="1" max="50" value="5">
+          <span class="size-display" id="size-display">5px</span>
+        </div>
+        <div class="control-group">
+          <span class="control-label">Herramientas</span>
+          <div class="tools-grid">
+            <button class="tool-btn" id="eraser-btn" onclick="toggleEraser()" data-tooltip="Borrador">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/>
+                <path d="M22 21H7"/>
+                <path d="m5 11 9 9"/>
+              </svg>
+            </button>
+            <button class="tool-btn" id="bucket-btn" onclick="toggleBucketMode()" data-tooltip="Balde de pintura">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 7a7 7 0 0 1 14 0"/>
+                <path d="M6 7l2 14h8l2-14"/>
+                <path d="M4 7h16"/>
+                <path d="M12 14v4"/>
+                <path d="M10 16h4"/>
+              </svg>
+            </button>
+            <button class="tool-btn" id="circle-btn" onclick="toggleCircleMode()" data-tooltip="Dibujar círculo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+              </svg>
+            </button>
+            <button class="tool-btn" id="line-btn" onclick="toggleLineMode()" data-tooltip="Dibujar línea">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 19L19 5"/>
+              </svg>
+            </button>
+            <button class="tool-btn clear-btn" onclick="clearCanvas()" data-tooltip="Borrar todo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18"/>
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                <line x1="10" x2="10" y1="11" y2="17"/>
+                <line x1="14" x2="14" y1="11" y2="17"/>
+              </svg>
+            </button>
+            <button class="tool-btn" id="undo-btn" onclick="undo()" data-tooltip="Deshacer" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 7v6h6"/>
+                <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
+              </svg>
+            </button>
+            <button class="tool-btn" id="redo-btn" onclick="redo()" data-tooltip="Rehacer" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 7v6h-6"/>
+                <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/>
+              </svg>
+            </button>
+            <button class="tool-btn save-btn" onclick="downloadDrawing()" data-tooltip="Guardar dibujo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                <polyline points="17 21 17 13 7 13 7 21"/>
+                <polyline points="7 3 7 8 15 8"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Panel de Capas -->
+        <div class="control-group">
+          <span class="control-label">Capas</span>
+          <div class="layers-container" id="layers-container"></div>
+          <div class="layers-controls">
+            <button class="tool-btn layer-btn" onclick="addLayer()" data-tooltip="Nueva capa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </button>
+            <button class="tool-btn layer-btn" onclick="deleteLayer()" data-tooltip="Eliminar capa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+            <button class="tool-btn layer-btn" onclick="moveLayerUp()" data-tooltip="Subir capa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="18 15 12 9 6 15"/>
+              </svg>
+            </button>
+            <button class="tool-btn layer-btn" onclick="moveLayerDown()" data-tooltip="Bajar capa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Firebase SDK (compat v8) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/paint.js"></script>
+</body>
+</html>

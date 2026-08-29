@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Historia</title>
+  <style>
+    .close-btn {
+      position: fixed;
+      top: 20px;
+      right: 30px;
+      font-size: 40px;
+      color: white;
+      text-decoration: none;
+      z-index: 10000;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .close-btn:hover {
+      transform: scale(1.1);
+    }
+    .close-btn:active {
+      transform: scale(0.9);
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      color: white;
+      overflow-x: hidden;
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .timeline-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 80px 20px 40px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .timeline-title {
+      text-align: center;
+      font-size: 48px;
+      margin-bottom: 30px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      animation: titleFloat 3s ease-in-out infinite;
+    }
+    
+    @keyframes titleFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .search-container {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    
+    .search-box {
+      width: 300px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50px;
+      color: white;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    
+    .search-box::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .search-box:focus {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .search-btn {
+      margin-left: 10px;
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50px;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .search-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    .timeline-item {
+      display: flex;
+      margin-bottom: 50px;
+      position: relative;
+      scroll-margin-top: 100px;
+      animation: slideIn 0.5s ease-out forwards;
+      opacity: 0;
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-50px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .timeline-item:nth-child(2) { animation-delay: 0.1s; }
+    .timeline-item:nth-child(3) { animation-delay: 0.2s; }
+    .timeline-item:nth-child(4) { animation-delay: 0.3s; }
+    .timeline-item:nth-child(5) { animation-delay: 0.4s; }
+    
+    .timeline-date {
+      min-width: 120px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      text-align: center;
+      font-weight: bold;
+      margin-right: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+    
+    .timeline-date:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.15);
+    }
+    
+    .timeline-content {
+      flex: 1;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
+    }
+    
+    .timeline-content:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    }
+    
+    .timeline-content.highlight {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+    
+    .timeline-content h3 {
+      margin: 0 0 10px 0;
+      font-size: 24px;
+      color: #fff;
+    }
+    
+    .timeline-content p {
+      margin: 0;
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.6;
+    }
+    
+    .ver-btn {
+      padding: 10px 24px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50px;
+      color: white;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 500;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .ver-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    .ver-btn:active {
+      transform: translateY(2px);
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .image-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 10001;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .image-modal.active {
+      display: flex;
+    }
+    
+    .image-modal img {
+      max-width: 80%;
+      max-height: 70vh;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      animation: zoomIn 0.3s ease;
+    }
+    
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    
+    .close-modal {
+      margin-top: 20px;
+      padding: 10px 30px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 25px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .close-modal:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    .grad-gallery {
+      background: rgba(10, 15, 30, 0.97);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 90vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .grad-title {
+      text-align: center;
+      margin: 0 0 12px 0;
+      font-size: 24px;
+      color: #ffd700;
+    }
+
+    .grad-desc {
+      text-align: center;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      margin: 0 0 20px 0;
+      line-height: 1.5;
+      padding: 0 10px;
+    }
+
+    .grad-section {
+      margin-bottom: 24px;
+    }
+
+    .grad-section h3 {
+      margin: 0 0 12px 0;
+      font-size: 18px;
+      color: #4ecdc4;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 6px;
+    }
+
+    .grad-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+    }
+
+    .grad-grid img, .grad-grid video {
+      width: 100%;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      object-fit: cover;
+      aspect-ratio: 1;
+    }
+
+    .grad-grid img:hover, .grad-grid video:hover {
+      transform: scale(1.03);
+    }
+
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 10002;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .lightbox img {
+      max-width: 95%;
+      max-height: 95%;
+      object-fit: contain;
+      border-radius: 4px;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 36px;
+      color: white;
+      cursor: pointer;
+      z-index: 10001;
+      background: none;
+      border: none;
+      transition: transform 0.2s ease;
+    }
+
+    .lightbox-close:hover {
+      transform: scale(1.2);
+    }
+
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 40px;
+      color: white;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+      user-select: none;
+      z-index: 10001;
+    }
+
+    .lightbox-nav:hover {
+      background: rgba(255,255,255,0.25);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .lightbox-nav.prev { left: 20px; }
+    .lightbox-nav.next { right: 20px; }
+
+    .lightbox-counter {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.8);
+      font-size: 14px;
+      background: rgba(0,0,0,0.5);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+    
+    .particle {
+      position: fixed;
+      width: 3px;
+      height: 3px;
+      background: rgba(100, 200, 255, 0.4);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: particleFloat 15s ease-in-out infinite;
+      z-index: 9999;
+      box-shadow: 0 0 10px rgba(100, 200, 255, 0.6);
+    }
+    
+    @keyframes particleFloat {
+      0% { 
+        transform: translateY(100vh) translateX(0) scale(0); 
+        opacity: 0; 
+      }
+      10% { 
+        opacity: 0.8; 
+        transform: translateY(90vh) translateX(10px) scale(1);
+      }
+      90% { 
+        opacity: 0.8; 
+        transform: translateY(10vh) translateX(-10px) scale(1);
+      }
+      100% { 
+        transform: translateY(-10vh) translateX(0) scale(0); 
+        opacity: 0; 
+      }
+    }
+    
+    @media (max-width: 600px) {
+      h1.timeline-title { font-size: 32px; }
+      .timeline-item { flex-direction: column; }
+      .timeline-date { margin-right: 0; margin-bottom: 15px; min-width: auto; }
+      .search-box { width: 200px; }
+      .image-modal img { max-width: 90%; }
+    }
+    body {
+      transition: background 0.8s ease-in-out;
+      position: relative;
+    }
+
+    .wave-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      overflow: hidden;
+    }
+    .wave {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      border-radius: 50%;
+      animation: wavePulse 8s infinite ease-in-out;
+      opacity: 0;
+      transition: background 0.8s ease-in-out;
+    }
+    .wave:nth-child(1) {
+      background: radial-gradient(ellipse at center, rgba(100,150,255,0.4) 0%, rgba(70,120,220,0.2) 30%, rgba(50,90,180,0.1) 50%, transparent 70%);
+      top: -50%;
+      left: -50%;
+      animation-delay: 0s;
+    }
+    .wave:nth-child(2) {
+      background: radial-gradient(ellipse at center, rgba(80,130,235,0.3) 0%, rgba(60,100,200,0.15) 30%, rgba(40,70,150,0.08) 50%, transparent 70%);
+      top: -50%;
+      right: -50%;
+      left: auto;
+      animation-delay: 2s;
+    }
+    .wave:nth-child(3) {
+      background: radial-gradient(ellipse at center, rgba(60,110,215,0.25) 0%, rgba(45,85,170,0.12) 30%, rgba(30,60,130,0.06) 50%, transparent 70%);
+      bottom: -50%;
+      left: -50%;
+      top: auto;
+      animation-delay: 4s;
+    }
+    .wave:nth-child(4) {
+      background: radial-gradient(ellipse at center, rgba(45,90,195,0.2) 0%, rgba(35,70,140,0.1) 30%, rgba(20,50,100,0.05) 50%, transparent 70%);
+      bottom: -50%;
+      right: -50%;
+      top: auto;
+      left: auto;
+      animation-delay: 6s;
+    }
+    @keyframes wavePulse {
+      0% { transform: scale(0.8) rotate(0deg); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: scale(1.2) rotate(5deg); opacity: 0; }
+    }
+    
+    h1.timeline-title {
+      font-weight: 800;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      text-align: center;
+      font-size: 48px;
+      margin-bottom: 30px;
+      animation: titleFloat 3s ease-in-out infinite;
+    }
+    
+    h1.timeline-title span {
+      display: inline-block;
+      opacity: 0;
+      animation: 
+        letterFadeIn 0.5s ease-out forwards,
+        letterFloat 3s ease-in-out infinite;
+    }
+    
+    @keyframes letterFadeIn {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes letterFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-8px) rotate(2deg); }
+      50% { transform: translateY(0) rotate(0deg); }
+      75% { transform: translateY(-5px) rotate(-1deg); }
+    }
+    
+    @keyframes titleFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wave-container">
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+  </div>
+  <a href="../../index.html" class="close-btn" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+  
+  <div class="image-modal" id="calipsoModal" onclick="closeModal(event)">
+    <img src="../../assets/images/imagenes/calipso.png" alt="Calipso">
+    <button class="close-modal" onclick="playCloseSound(); closeModalBtn()">Cerrar</button>
+  </div>
+  
+  <div class="image-modal" id="clashModal" onclick="closeClashModal(event)">
+    <img src="../../assets/images/imagenes/clash_locura.png" alt="Clash Locura">
+    <button class="close-modal" onclick="playCloseSound(); closeClashModalBtn()">Cerrar</button>
+  </div>
+  
+  <div class="image-modal" id="gradModal" onclick="closeGradModal(event)">
+    <div class="grad-gallery">
+      <button class="close-modal" onclick="playCloseSound(); closeGradModalBtn()">Cerrar</button>
+      <h2 class="grad-title">Graduación - 11/2021</h2>
+      <p class="grad-desc">Día legendario, final de la secundaria. Toda la Papubanda fue de traje a recibir la medalla y el diploma, cada uno podía pasar con 2 invitados. En algún momento Mau creía que iba a pasar Brenda para recibir su diploma por lo que se levantó, empezó a aplaudir y a gritar "ESOOOO" pero pasó una chica random de otro curso, todos nos reímos y Mau se tapó la cara de vergüenza.</p>
+      <div class="grad-section">
+        <h3>Archivo Alex</h3>
+        <div class="grad-grid">
+          <img src="../../assets/images/secundaria_fin/Alex_insta/SaveInta.com_549208422_17994666506683973_7745638450428229614_n.jpg" alt="Alex">
+          <img src="../../assets/images/secundaria_fin/Alex_insta/SaveInta.com_563036271_18083022086486333_7894486866495344093_n.jpg" alt="Alex">
+          <img src="../../assets/images/secundaria_fin/Alex_insta/SaveInta.com_571271793_18310349125221173_6924220762846994933_n.jpg" alt="Alex">
+          <video controls onclick="event.stopPropagation()"><source src="../../assets/images/secundaria_fin/Alex_insta/SaveInta.com_AQNLCBjdaq2ikpaBry6xMzRsTUMwWAdwmiAJItzw-rYhsuB7y2w0dchfNNqJJ6o0RHxSaXahTTXp7Fri5GukZiU3rl7-BBv_TzKQSyw.mp4" type="video/mp4"></video>
+        </div>
+      </div>
+      <div class="grad-section">
+        <h3>Archivo Danilo</h3>
+        <div class="grad-grid">
+          <img src="../../assets/images/secundaria_fin/Danilo_insta/SaveInta.com_649237347_18082458203341345_8161652195436845398_n.jpg" alt="Danilo">
+          <img src="../../assets/images/secundaria_fin/Danilo_insta/SaveInta.com_650410756_18074752649408186_2398214171299752954_n.jpg" alt="Danilo">
+          <img src="../../assets/images/secundaria_fin/Danilo_insta/SaveInta.com_651273496_18158293198440988_228227295180893767_n.jpg" alt="Danilo">
+          <img src="../../assets/images/secundaria_fin/Danilo_insta/SaveInta.com_651854135_18100803937938786_6158151967912533287_n.jpg" alt="Danilo">
+          <img src="../../assets/images/secundaria_fin/Danilo_insta/SaveInta.com_651855197_18088366939933767_1393184052792674810_n.jpg" alt="Danilo">
+          <img src="../../assets/images/secundaria_fin/Danilo_insta/SaveInta.com_652765381_18103617646906611_5975468065568824878_n.jpg" alt="Danilo">
+          <img src="../../assets/images/secundaria_fin/Danilo_insta/SaveInta.com_653459164_18095863643079411_4582337102424175325_n.jpg" alt="Danilo">
+          <img src="../../assets/images/secundaria_fin/Danilo_insta/SaveInta.com_656272218_18178937692378564_1461784092421482638_n.jpg" alt="Danilo">
+          <video controls onclick="event.stopPropagation()"><source src="../../assets/images/secundaria_fin/Danilo_insta/SaveInta.com_AQNfltIWVw7sAoHc_5WEfPTdR99EcHlrzZntA0-cpU7Ovz90uLHbRAqraI14pk5F5wHnHH3Y_Clw6THcnxa22C3BPiwbFk3-wsrUUAI.mp4" type="video/mp4"></video>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="image-modal" id="juntaModal" onclick="closeJuntaModal(event)">
+    <div class="grad-gallery">
+      <button class="close-modal" onclick="playCloseSound(); closeJuntaModalBtn()">Cerrar</button>
+      <h2 class="grad-title">Juntadovic - 16/07/26</h2>
+      <div class="grad-grid">
+        <img src="../../assets/images/juntadas/Juntadovic/junta1.jpeg" alt="Juntada">
+        <img src="../../assets/images/juntadas/Juntadovic/junta 2.jpeg" alt="Juntada">
+        <img src="../../assets/images/juntadas/Juntadovic/junta3.jpeg" alt="Juntada">
+        <img src="../../assets/images/juntadas/Juntadovic/junta4.jpeg" alt="Juntada">
+        <img src="../../assets/images/juntadas/Juntadovic/junta5.jpeg" alt="Juntada">
+        <img src="../../assets/images/juntadas/Juntadovic/junta6.jpeg" alt="Juntada">
+        <img src="../../assets/images/juntadas/Juntadovic/junta7.jpeg" alt="Juntada">
+        <img src="../../assets/images/juntadas/Juntadovic/junta8.jpeg" alt="Juntada">
+        <img src="../../assets/images/juntadas/Juntadovic/junta9.jpeg" alt="Juntada">
+        <img src="../../assets/images/juntadas/Juntadovic/junta10.jpeg" alt="Juntada">
+        <img src="../../assets/images/juntadas/Juntadovic/junta11.jpeg" alt="Juntada">
+        <img src="../../assets/images/juntadas/Juntadovic/junta12.jpeg" alt="Juntada">
+        <img src="../../assets/images/juntadas/Juntadovic/junta13.jpeg" alt="Juntada">
+      </div>
+    </div>
+  </div>
+  
+  <div class="image-modal" id="chillModal" onclick="closeChillModal(event)">
+    <div class="grad-gallery">
+      <button class="close-modal" onclick="playCloseSound(); closeChillModalBtn()">Cerrar</button>
+      <h2 class="grad-title">Juntadita chill de cojones - 11/08/26</h2>
+      <div class="grad-grid">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/0.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.0.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.08.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.1.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.10.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.111.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.1111.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.111212.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.11222.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.113.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.1132.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.11321.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.11377.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.114.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.115.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.116.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.1165.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.117.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.118.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.119.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.12111111.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.123232.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.124141.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.124424.jpeg" alt="Chill">
+        <img src="../../assets/images/juntadas/Juntadita chill de cojones/WhatsApp Image 2026-08-11 at 00.01.jpeg" alt="Chill">
+      </div>
+    </div>
+  </div>
+
+  <div class="timeline-container">
+    <h1 class="timeline-title"><span style="animation-delay: 0s">L</span><span style="animation-delay: 0.1s">a</span><span style="animation-delay: 0.2s">&nbsp;</span><span style="animation-delay: 0.3s">H</span><span style="animation-delay: 0.4s">i</span><span style="animation-delay: 0.5s">s</span><span style="animation-delay: 0.6s">t</span><span style="animation-delay: 0.7s">o</span><span style="animation-delay: 0.8s">r</span><span style="animation-delay: 0.9s">i</span><span style="animation-delay: 1s">a</span></h1>
+    
+    <div class="search-container">
+      <input type="text" class="search-box" id="searchInput" placeholder="Buscar..." onkeypress="if(event.key==='Enter')searchTimeline()">
+      <button class="search-btn" onclick="searchTimeline()">Buscar</button>
+    </div>
+    
+    <div class="timeline-item" data-content="17/08/2026 agosto 2026 apokalipso server 33">
+      <div class="timeline-date">17/08/26</div>
+      <div class="timeline-content">
+        <h3>Apokalipso</h3>
+        <p>Se creó el server dirigido por el 33</p>
+      </div>
+    </div>
+
+    <div class="timeline-item" data-content="11/08/2026 agosto 2026 juntadita chill papubanda elficticio colectivo planetario futuro viene" style="position: relative;">
+      <div class="timeline-date">11/08/26</div>
+      <div class="timeline-content">
+        <h3>Juntadita chill de cojones</h3>
+        <p>La Papubanda y Elficticio se encontraron en el mismo colectivo de ida hacia el planetario, el futuro viene</p>
+      </div>
+      <button class="ver-btn" onclick="openChillModal()" style="position: absolute; right: -100px; top: 50%; transform: translateY(-50%);">Ver</button>
+    </div>
+
+    <div class="timeline-item" data-content="16/07/2026 julio 2026 juntadovic tobi mau axel juntada galletitas paisajes recuerdos" style="position: relative;">
+      <div class="timeline-date">16/07/26</div>
+      <div class="timeline-content">
+        <h3>Juntadovic</h3>
+        <p>Tobi, Mau y Axel se juntaron, caminaron un rato, comieron galletitas y guardaron paisajes y recuerdos en sus ladrillos digitales.</p>
+      </div>
+      <button class="ver-btn" onclick="openJuntaModal()" style="position: absolute; right: -100px; top: 50%; transform: translateY(-50%);">Ver</button>
+    </div>
+    
+    <div class="timeline-item" data-content="11/06/2026 junio 2026 axel godtorias balatro familia" style="position: relative;">
+      <div class="timeline-date">11/06/2026</div>
+      <div class="timeline-content">
+        <h3>Balatro</h3>
+        <p>Axel y Godtorias añadieron Balatro a la Familia</p>
+      </div>
+    </div>
+    
+    <div class="timeline-item" data-content="27/4/2026 abril 2026 Trajano familia" style="position: relative;">
+      <div class="timeline-date">27/4/2026</div>
+      <div class="timeline-content">
+        <h3>Trajano</h3>
+        <p>Trajano se unió a la familia</p>
+      </div>
+    </div>
+    
+    <div class="timeline-item" data-content="22/03/2026 marzo 2026 clash alex danilo eterna eternidad" style="position: relative;">
+      <div class="timeline-date">22/03/2026</div>
+      <div class="timeline-content">
+        <h3>Esta locuraaaaa...</h3>
+        <p>Alex y Danilo se coronaron para toda la eternidad en el Clash</p>
+      </div>
+      <button class="ver-btn" onclick="openClashModal()" style="position: absolute; right: -100px; top: 50%; transform: translateY(-50%);">Ver</button>
+    </div>
+    
+    <div class="timeline-item" data-content="20/03/2026 marzo 2026 goty game of the year godtorias axel" style="position: relative;">
+      <div class="timeline-date">20/03/2026</div>
+      <div class="timeline-content">
+        <h3>El GOTY</h3>
+        <p>Godtorias y Axel empezaron a crear el GOTY</p>
+      </div>
+    </div>
+    
+    <div class="timeline-item" data-content="17/3/2026 marzo 2026 venezuela beisbol mundial champion world series ardaul stream" style="position: relative;">
+      <div class="timeline-date">17/3/2026</div>
+      <div class="timeline-content">
+        <h3>Venezuela Campeón del Mundo</h3>
+        <p>Venezuela ganó el mundial de beisbol vs EE.UU. Ardaul strimeo la final, dejandonos el mejor clip del año. Felicidades Venezuela</p>
+      </div>
+      <button class="ver-btn" onclick="window.open('https://kick.com/arrdauul/clips/clip_01KKZAHRKF4SXAZFAS05976089', '_blank')" style="position: absolute; right: -100px; top: 50%; transform: translateY(-50%);">Ver</button>
+    </div>
+    
+    <div class="timeline-item" data-content="17/2/2026 febrero 2026 ogost familia" style="position: relative;">
+      <div class="timeline-date">17/2/2026</div>
+      <div class="timeline-content">
+        <h3>Ogost</h3>
+        <p>Ogost se unió a la familia</p>
+      </div>
+    </div>
+    
+    <div class="timeline-item" data-content="febrero 2026 clash aram fama axel final" style="position: relative;">
+      <div class="timeline-date">Febrero 2026</div>
+      <div class="timeline-content">
+        <h3>Clash de Aram</h3>
+        <p>Fama y Axel jugaron el clash de aram, perdieron en la final.</p>
+      </div>
+    </div>
+    
+    <div class="timeline-item" data-content="aram 25 enero 2026" style="position: relative;">
+      <div class="timeline-date">Enero 2026</div>
+      <div class="timeline-content">
+        <h3>Clash</h3>
+        <p>Se jugaron 2 veces el CLASH. La primera vez llegamos a la final, la segunda perdimos la primera ronda y ganamos las otras 2. A Tobi le salió una skin de Akali y a Alex una de Garen.</p>
+      </div>
+      <button class="ver-btn" onclick="window.location.href='../personajes/aram1.html'" style="position: absolute; right: -100px; top: 50%; transform: translateY(-50%);">Ver</button>
+    </div>
+    
+    <div class="timeline-item" data-content="4/7/2025 julio 2025 nace pero calipso" style="position: relative;">
+      <div class="timeline-date">4/7/2025</div>
+      <div class="timeline-content">
+        <h3>Calipso</h3>
+        <p>Nace Pero calipso</p>
+      </div>
+      <button class="ver-btn" onclick="openModal()" style="position: absolute; right: -100px; top: 50%; transform: translateY(-50%);">Ver</button>
+    </div>
+    
+    <div class="timeline-item" data-content="6/1/2023 enero 2023 creacion grupo lolcitos">
+      <div class="timeline-date">6/1/2023</div>
+      <div class="timeline-content">
+        <h3>Reunión</h3>
+        <p>Se creó el grupo de "lolcitos nazis"</p>
+      </div>
+    </div>
+    
+    <div class="timeline-item" data-content="11/2021 noviembre 2021 graduacion secundaria diploma celebracion" style="position: relative;">
+      <div class="timeline-date">11/2021</div>
+      <div class="timeline-content">
+        <h3>Graduación</h3>
+        <p>Uno de los días más recordados de la Papubanda, celebración y entrega de diplomas por el final de la secundaria.</p>
+      </div>
+      <button class="ver-btn" onclick="openGradModal()" style="position: absolute; right: -100px; top: 50%; transform: translateY(-50%);">Ver</button>
+    </div>
+    
+    <div class="timeline-item" data-content="marzo 2018 3/2018 godtorias venezuela artorias" style="position: relative;">
+      <div class="timeline-date">Marzo 2018</div>
+      <div class="timeline-content" style="display: flex; justify-content: space-between; align-items: center; gap: 20px;">
+        <div>
+          <h3>Godtorias</h3>
+          <p>Se vino desde <span style="color: #FFD700;">Ven</span><span style="color: #4169E1;">ez</span><span style="color: #DC143C;">uela</span></p>
+        </div>
+        <img src="../../assets/images/imagenes/artorias.png" alt="Artorias" style="width: 120px; height: 170px; object-fit: contain; border-radius: 10px; flex-shrink: 0; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+    <button class="lightbox-nav prev" onclick="event.stopPropagation(); lightboxPrev()">&#10094;</button>
+    <img id="lightbox-img" src="" alt="Fullscreen" onclick="event.stopPropagation()">
+    <button class="lightbox-nav next" onclick="event.stopPropagation(); lightboxNext()">&#10095;</button>
+    <div class="lightbox-counter" id="lightbox-counter"></div>
+  </div>
+
+  <script>
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * window.innerWidth + 'px';
+      particle.style.animationDuration = (Math.random() * 5 + 8) + 's';
+      particle.style.animationDelay = Math.random() * 5 + 's';
+      document.body.appendChild(particle);
+      setTimeout(() => particle.remove(), 15000);
+    }
+    
+    // Crear partículas iniciales distribuidas en toda la pantalla
+    for(let i = 0; i < 60; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * window.innerWidth + 'px';
+      particle.style.top = Math.random() * window.innerHeight + 'px';
+      particle.style.animationDuration = (Math.random() * 10 + 12) + 's';
+      particle.style.animationDelay = Math.random() * 15 + 's';
+      document.body.appendChild(particle);
+    }
+    
+    // Seguir creando partículas nuevas desde abajo
+    setInterval(() => {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * window.innerWidth + 'px';
+      particle.style.top = window.innerHeight + 20 + 'px';
+      particle.style.animationDuration = (Math.random() * 10 + 12) + 's';
+      document.body.appendChild(particle);
+      
+      setTimeout(() => particle.remove(), 25000);
+    }, 400);
+    
+    function playCloseSound() {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+      oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
+      gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.15);
+    }
+    
+    function searchTimeline() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+      if (!searchTerm) return;
+      
+      document.querySelectorAll('.timeline-content').forEach(item => {
+        item.classList.remove('highlight');
+      });
+      
+      const items = document.querySelectorAll('.timeline-item');
+      let found = false;
+      
+      for (let item of items) {
+        const content = item.getAttribute('data-content') + ' ' + item.textContent.toLowerCase();
+        if (content.includes(searchTerm)) {
+          item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          item.querySelector('.timeline-content').classList.add('highlight');
+          found = true;
+          break;
+        }
+      }
+      
+      if (!found) {
+        alert('No se encontró la palabra: ' + searchTerm);
+      }
+    }
+    
+    function openModal() {
+      document.getElementById('calipsoModal').classList.add('active');
+    }
+    
+    function closeModal(event) {
+      if (event.target.id === 'calipsoModal') {
+        document.getElementById('calipsoModal').classList.remove('active');
+      }
+    }
+    
+    function closeModalBtn() {
+      document.getElementById('calipsoModal').classList.remove('active');
+    }
+    
+    function openClashModal() {
+      document.getElementById('clashModal').classList.add('active');
+    }
+    
+    function closeClashModal(event) {
+      if (event.target.id === 'clashModal') {
+        document.getElementById('clashModal').classList.remove('active');
+      }
+    }
+    
+    function closeClashModalBtn() {
+      document.getElementById('clashModal').classList.remove('active');
+    }
+    
+    function openGradModal() {
+      document.getElementById('gradModal').classList.add('active');
+    }
+    
+    function closeGradModal(event) {
+      if (event.target.id === 'gradModal') {
+        document.getElementById('gradModal').classList.remove('active');
+      }
+    }
+    
+    function closeGradModalBtn() {
+      document.getElementById('gradModal').classList.remove('active');
+    }
+    
+    function openJuntaModal() {
+      document.getElementById('juntaModal').classList.add('active');
+    }
+    
+    function closeJuntaModal(event) {
+      if (event.target.id === 'juntaModal') {
+        document.getElementById('juntaModal').classList.remove('active');
+      }
+    }
+    
+    function closeJuntaModalBtn() {
+      document.getElementById('juntaModal').classList.remove('active');
+    }
+
+    function openChillModal() {
+      document.getElementById('chillModal').classList.add('active');
+    }
+    function closeChillModal(event) {
+      if (event.target.id === 'chillModal') {
+        document.getElementById('chillModal').classList.remove('active');
+      }
+    }
+    function closeChillModalBtn() {
+      document.getElementById('chillModal').classList.remove('active');
+    }
+    
+    var lbImages = [];
+    var lbIndex = 0;
+    function openLightbox(src) {
+      var img = document.querySelector('.grad-grid img[src="' + src + '"]') || document.elementFromPoint(0,0);
+      var clicked = document.activeElement;
+      var targetImg = null;
+      document.querySelectorAll('.grad-grid img').forEach(function(el){ if(el.src===src) targetImg=el; });
+      if (targetImg) {
+        var grid = targetImg.closest('.grad-grid');
+        lbImages = Array.from(grid.querySelectorAll('img')).map(function(i){return i.src;});
+        lbIndex = lbImages.indexOf(src);
+      } else {
+        lbImages = [src];
+        lbIndex = 0;
+      }
+      updateLightbox();
+      document.getElementById('lightbox').classList.add('active');
+    }
+    function updateLightbox(){
+      document.getElementById('lightbox-img').src = lbImages[lbIndex];
+      document.getElementById('lightbox-counter').textContent = (lbIndex+1) + ' / ' + lbImages.length;
+    }
+    function lightboxPrev(){
+      lbIndex = (lbIndex - 1 + lbImages.length) % lbImages.length;
+      updateLightbox();
+    }
+    function lightboxNext(){
+      lbIndex = (lbIndex + 1) % lbImages.length;
+      updateLightbox();
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+      document.getElementById('lightbox-img').src = '';
+    }
+    document.addEventListener('keydown', function(e){
+      if(!document.getElementById('lightbox').classList.contains('active')) return;
+      if(e.key==='ArrowLeft') lightboxPrev();
+      if(e.key==='ArrowRight') lightboxNext();
+      if(e.key==='Escape') closeLightbox();
+    });
+    document.addEventListener('click', function(e) {
+      if (e.target.matches('.grad-grid img')) {
+        e.stopPropagation();
+        openLightbox(e.target.src);
+      }
+    }, true);
+    
+    // Apply saved theme
+    const themes = {
+      default: {
+        body: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+        wave1: 'rgba(100,150,255,0.4)',
+        wave2: 'rgba(80,130,235,0.3)',
+        wave3: 'rgba(60,110,215,0.25)',
+        wave4: 'rgba(45,90,195,0.2)'
+      },
+      dark: {
+        body: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0a0a0a 100%)',
+        wave1: 'rgba(100,100,100,0.4)',
+        wave2: 'rgba(80,80,80,0.3)',
+        wave3: 'rgba(60,60,60,0.25)',
+        wave4: 'rgba(40,40,40,0.2)'
+      },
+      purple: {
+        body: 'linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0f3d 100%)',
+        wave1: 'rgba(150,100,200,0.4)',
+        wave2: 'rgba(130,80,180,0.3)',
+        wave3: 'rgba(110,60,160,0.25)',
+        wave4: 'rgba(90,45,140,0.2)'
+      },
+      green: {
+        body: 'linear-gradient(135deg, #0a2e1a 0%, #1b4e2d 50%, #0f3d1a 100%)',
+        wave1: 'rgba(100,200,100,0.4)',
+        wave2: 'rgba(80,180,80,0.3)',
+        wave3: 'rgba(60,160,60,0.25)',
+        wave4: 'rgba(45,140,45,0.2)'
+      },
+      red: {
+        body: 'linear-gradient(135deg, #2e0a0a 0%, #4e1b1b 50%, #3d0f0f 100%)',
+        wave1: 'rgba(200,80,80,0.4)',
+        wave2: 'rgba(180,60,60,0.3)',
+        wave3: 'rgba(160,45,45,0.25)',
+        wave4: 'rgba(140,35,35,0.2)'
+      },
+      orange: {
+        body: 'linear-gradient(135deg, #2e1a0a 0%, #4e2d1b 50%, #3d1f0f 100%)',
+        wave1: 'rgba(200,130,50,0.4)',
+        wave2: 'rgba(180,110,40,0.3)',
+        wave3: 'rgba(160,90,30,0.25)',
+        wave4: 'rgba(140,70,25,0.2)'
+      }
+    };
+    
+    function applyTheme() {
+      const savedTheme = localStorage.getItem('selectedTheme') || 'default';
+      const theme = themes[savedTheme];
+      if (theme) {
+        document.body.style.background = theme.body;
+        const waves = document.querySelectorAll('.wave');
+        if (waves.length >= 4) {
+          waves[0].style.background = `radial-gradient(ellipse at center, ${theme.wave1} 0%, rgba(70,120,220,0.2) 30%, rgba(50,90,180,0.1) 50%, transparent 70%)`;
+          waves[1].style.background = `radial-gradient(ellipse at center, ${theme.wave2} 0%, rgba(60,100,200,0.15) 30%, rgba(40,70,150,0.08) 50%, transparent 70%)`;
+          waves[2].style.background = `radial-gradient(ellipse at center, ${theme.wave3} 0%, rgba(45,85,170,0.12) 30%, rgba(30,60,130,0.06) 50%, transparent 70%)`;
+          waves[3].style.background = `radial-gradient(ellipse at center, ${theme.wave4} 0%, rgba(35,70,140,0.1) 30%, rgba(20,50,100,0.05) 50%, transparent 70%)`;
+        }
+      }
+    }
+    applyTheme();
+  </script>
+</body>
+</html>

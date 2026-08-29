@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Teclado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            transition: background 0.8s ease-in-out;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin-top: 80px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+        
+        .keyboard-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .row {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .key {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .key:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .key.pressed {
+            background: rgba(100, 200, 100, 0.6);
+            border-color: rgba(100, 200, 100, 0.8);
+            transform: translateY(2px);
+            box-shadow: 0 0 20px rgba(100, 200, 100, 0.5);
+        }
+        
+        .key.wide {
+            width: 90px;
+        }
+        
+        .key.extra-wide {
+            width: 120px;
+        }
+        
+        .key.space {
+            width: 400px;
+        }
+        
+        .key.tab {
+            width: 100px;
+        }
+        
+        .key.caps {
+            width: 110px;
+        }
+        
+        .key.enter {
+            width: 120px;
+        }
+        
+        .key.shift {
+            width: 150px;
+        }
+        
+        .key.ctrl {
+            width: 80px;
+        }
+        
+        .status-panel {
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .status-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .last-key {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            color: #4ecdc4;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+        }
+        
+        .key-counter {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .counter-item {
+            text-align: center;
+        }
+        
+        .counter-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+        
+        .counter-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+        
+        .reset-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: rgba(255, 100, 100, 0.3);
+            border: 2px solid rgba(255, 100, 100, 0.5);
+            border-radius: 25px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .reset-btn:hover {
+            background: rgba(255, 100, 100, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+        
+        .pressed-keys {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        
+        .pressed-key-tag {
+            background: rgba(78, 205, 196, 0.3);
+            border: 1px solid rgba(78, 205, 196, 0.5);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        @media (max-width: 900px) {
+            .key {
+                width: 40px;
+                height: 40px;
+                font-size: 11px;
+            }
+            
+            .key.wide { width: 60px; }
+            .key.extra-wide { width: 80px; }
+            .key.space { width: 250px; }
+            .key.tab { width: 70px; }
+            .key.caps { width: 80px; }
+            .key.enter { width: 90px; }
+            .key.shift { width: 110px; }
+            .key.ctrl { width: 60px; }
+            
+            h1 {
+                font-size: 28px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .keyboard-container {
+                padding: 15px;
+                overflow-x: auto;
+            }
+            
+            .keyboard {
+                min-width: 600px;
+            }
+        }
+        
+        /* Hamburger Menu */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            cursor: pointer;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hamburger-menu:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(100, 150, 255, 0.3);
+        }
+
+        .hamburger-menu:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .hamburger-line {
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 5px 0;
+            border-radius: 3px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: center;
+        }
+
+        .hamburger-menu.active .hamburger-line {
+            background: #a8d8ff;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .hamburger-menu.active {
+            background: rgba(100, 150, 255, 0.2);
+            border-color: rgba(100, 150, 255, 0.4);
+            box-shadow: 0 0 25px rgba(100, 150, 255, 0.4);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100%;
+            background: rgba(5, 15, 40, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 999;
+            transition: left 0.4s ease;
+            padding: 80px 20px 100px 20px;
+            border-right: 1px solid rgba(100, 150, 255, 0.2);
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 20, 50, 0.5);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sidebar-item {
+            padding: 15px 20px;
+            margin: 10px 0;
+            color: white;
+            text-decoration: none;
+            display: block;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(10px);
+        }
+
+        /* Theme Section */
+        .theme-section {
+            margin-top: 20px;
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .theme-label {
+            color: rgba(255,255,255,0.8);
+            font-size: 16px;
+            margin: 0 0 12px 0;
+            font-weight: 500;
+        }
+
+        .theme-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .theme-btn {
+            width: 100%;
+            height: 40px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.05);
+            border-color: rgba(255,255,255,0.6);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .theme-btn:active {
+            transform: scale(0.95);
+        }
+
+        .theme-btn.active {
+            border-color: white;
+            box-shadow: 0 0 15px rgba(255,255,255,0.5);
+        }
+
+        .theme-btn.active::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Menú hamburguesa -->
+    <div class="hamburger-menu" onclick="toggleSidebar()">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+    </div>
+    
+    <!-- Overlay del sidebar -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="../../index.html" class="sidebar-item">Inicio</a>
+        <a href="ruleta.html" class="sidebar-item">Ruleta</a>
+        <a href="teclado.html" class="sidebar-item">Test Teclado</a>
+        <a href="tierlist.html" class="sidebar-item">Tier List</a>
+        <a href="https://drive.google.com/drive/folders/1KdsfAYtp-uTZXhpbL9Y9tEfNvGqx_Dtn" target="_blank" class="sidebar-item">Excels</a>
+        
+        <div class="theme-section">
+            <p class="theme-label">Modos</p>
+            <div class="theme-buttons">
+                <button class="theme-btn" data-theme="default" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);"></button>
+                <button class="theme-btn" data-theme="dark" style="background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0a0a0a 100%);"></button>
+                <button class="theme-btn" data-theme="purple" style="background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0f3d 100%);"></button>
+                <button class="theme-btn" data-theme="green" style="background: linear-gradient(135deg, #0a2e1a 0%, #1b4e2d 50%, #0f3d1a 100%);"></button>
+                <button class="theme-btn" data-theme="red" style="background: linear-gradient(135deg, #2e0a0a 0%, #4e1b1b 50%, #3d0f0f 100%);"></button>
+                <button class="theme-btn" data-theme="orange" style="background: linear-gradient(135deg, #2e1a0a 0%, #4e2d1b 50%, #3d1f0f 100%);"></button>
+            </div>
+        </div>
+    </div>
+    
+    <a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: white; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+    
+    <div class="container">
+        <h1>Test de Teclado</h1>
+        <p class="subtitle">Presiona cualquier tecla para verificar que funcione correctamente</p>
+        
+        <div class="keyboard-container">
+            <div class="keyboard">
+                <div class="row">
+                    <div class="key" data-key="Escape">Esc</div>
+                    <div class="key" data-key="F1">F1</div>
+                    <div class="key" data-key="F2">F2</div>
+                    <div class="key" data-key="F3">F3</div>
+                    <div class="key" data-key="F4">F4</div>
+                    <div class="key" data-key="F5">F5</div>
+                    <div class="key" data-key="F6">F6</div>
+                    <div class="key" data-key="F7">F7</div>
+                    <div class="key" data-key="F8">F8</div>
+                    <div class="key" data-key="F9">F9</div>
+                    <div class="key" data-key="F10">F10</div>
+                    <div class="key" data-key="F11">F11</div>
+                    <div class="key" data-key="F12">F12</div>
+                </div>
+                
+                <div class="row">
+                    <div class="key" data-key="Backquote">`</div>
+                    <div class="key" data-key="Digit1">1</div>
+                    <div class="key" data-key="Digit2">2</div>
+                    <div class="key" data-key="Digit3">3</div>
+                    <div class="key" data-key="Digit4">4</div>
+                    <div class="key" data-key="Digit5">5</div>
+                    <div class="key" data-key="Digit6">6</div>
+                    <div class="key" data-key="Digit7">7</div>
+                    <div class="key" data-key="Digit8">8</div>
+                    <div class="key" data-key="Digit9">9</div>
+                    <div class="key" data-key="Digit0">0</div>
+                    <div class="key" data-key="Minus">-</div>
+                    <div class="key" data-key="Equal">=</div>
+                    <div class="key wide" data-key="Backspace">←</div>
+                </div>
+                
+                <div class="row">
+                    <div class="key tab" data-key="Tab">Tab</div>
+                    <div class="key" data-key="KeyQ">Q</div>
+                    <div class="key" data-key="KeyW">W</div>
+                    <div class="key" data-key="KeyE">E</div>
+                    <div class="key" data-key="KeyR">R</div>
+                    <div class="key" data-key="KeyT">T</div>
+                    <div class="key" data-key="KeyY">Y</div>
+                    <div class="key" data-key="KeyU">U</div>
+                    <div class="key" data-key="KeyI">I</div>
+                    <div class="key" data-key="KeyO">O</div>
+                    <div class="key" data-key="KeyP">P</div>
+                    <div class="key" data-key="BracketLeft">[</div>
+                    <div class="key" data-key="BracketRight">]</div>
+                    <div class="key wide" data-key="Backslash">\</div>
+                </div>
+                
+                <div class="row">
+                    <div class="key caps" data-key="CapsLock">Caps</div>
+                    <div class="key" data-key="KeyA">A</div>
+                    <div class="key" data-key="KeyS">S</div>
+                    <div class="key" data-key="KeyD">D</div>
+                    <div class="key" data-key="KeyF">F</div>
+                    <div class="key" data-key="KeyG">G</div>
+                    <div class="key" data-key="KeyH">H</div>
+                    <div class="key" data-key="KeyJ">J</div>
+                    <div class="key" data-key="KeyK">K</div>
+                    <div class="key" data-key="KeyL">L</div>
+                    <div class="key" data-key="Semicolon">;</div>
+                    <div class="key" data-key="Quote">'</div>
+                    <div class="key enter" data-key="Enter">Enter</div>
+                </div>
+                
+                <div class="row">
+                    <div class="key shift" data-key="ShiftLeft">Shift</div>
+                    <div class="key" data-key="KeyZ">Z</div>
+                    <div class="key" data-key="KeyX">X</div>
+                    <div class="key" data-key="KeyC">C</div>
+                    <div class="key" data-key="KeyV">V</div>
+                    <div class="key" data-key="KeyB">B</div>
+                    <div class="key" data-key="KeyN">N</div>
+                    <div class="key" data-key="KeyM">M</div>
+                    <div class="key" data-key="Comma">,</div>
+                    <div class="key" data-key="Period">.</div>
+                    <div class="key" data-key="Slash">/</div>
+                    <div class="key shift" data-key="ShiftRight">Shift</div>
+                </div>
+                
+                <div class="row" style="align-items: flex-end;">
+                    <div class="key ctrl" data-key="ControlLeft">Ctrl</div>
+                    <div class="key wide" data-key="MetaLeft">Win</div>
+                    <div class="key wide" data-key="AltLeft">Alt</div>
+                    <div class="key space" data-key="Space"></div>
+                    <div class="key wide" data-key="AltRight">Alt</div>
+                    <div class="key wide" data-key="Fn" style="font-size: 12px;">FN</div>
+                    <div class="key" data-key="ArrowLeft" style="width: 55px; height: 55px;">←</div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <div class="key" data-key="ArrowUp" style="width: 55px; height: 55px;">↑</div>
+                        <div class="key" data-key="ArrowDown" style="width: 55px; height: 55px;">↓</div>
+                    </div>
+                    <div class="key" data-key="ArrowRight" style="width: 55px; height: 55px;">→</div>
+                    <div class="key ctrl" data-key="ControlRight">Ctrl</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-panel">
+            <div class="status-title">Última tecla presionada:</div>
+            <div class="last-key" id="lastKey">-</div>
+            
+            <div class="pressed-keys" id="pressedKeys"></div>
+            
+            <div class="key-counter">
+                <div class="counter-item">
+                    <div class="counter-value" id="totalKeys">0</div>
+                    <div class="counter-label">Total</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-value" id="uniqueKeys">0</div>
+                    <div class="counter-label">Únicas</div>
+                </div>
+            </div>
+            
+            <button class="reset-btn" onclick="resetTest()">Reiniciar Test</button>
+        </div>
+        
+        <p class="instructions">Presiona cualquier tecla de tu teclado físico o haz clic en las teclas virtuales</p>
+    </div>
+
+    <script>
+        let totalCount = 0;
+        let uniqueKeys = new Set();
+        let lastPressed = [];
+        
+        document.addEventListener('keydown', (e) => {
+            e.preventDefault();
+            
+            // Detectar tecla FN (generalmente no tiene código propio, pero puede detectarse en combinación)
+            if (e.getModifierState && e.getModifierState('Fn')) {
+                const fnKey = document.querySelector('[data-key="Fn"]');
+                if (fnKey) {
+                    fnKey.classList.add('pressed');
+                }
+            }
+            
+            const key = document.querySelector(`[data-key="${e.code}"]`);
+            if (key) {
+                key.classList.add('pressed');
+                registerKey(e.key, e.code);
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            const key = document.querySelector(`[data-key="${e.code}"]`);
+            if (key) {
+                key.classList.remove('pressed');
+            }
+            
+            // Quitar visual de FN
+            if (e.getModifierState && !e.getModifierState('Fn')) {
+                const fnKey = document.querySelector('[data-key="Fn"]');
+                if (fnKey) {
+                    fnKey.classList.remove('pressed');
+                }
+            }
+        });
+        
+        document.querySelectorAll('.key').forEach(key => {
+            key.addEventListener('mousedown', () => {
+                key.classList.add('pressed');
+                // Para la tecla FN, mostrar mensaje especial ya que no se detecta via hardware en la mayoría de los casos
+                if (key.dataset.key === 'Fn') {
+                    registerKey('FN (Hardware)', 'Fn');
+                } else {
+                    registerKey(key.textContent, key.dataset.key);
+                }
+            });
+            
+            key.addEventListener('mouseup', () => {
+                key.classList.remove('pressed');
+            });
+            
+            key.addEventListener('mouseleave', () => {
+                key.classList.remove('pressed');
+            });
+        });
+        
+        function registerKey(keyName, code) {
+            totalCount++;
+            uniqueKeys.add(code);
+            
+            document.getElementById('lastKey').textContent = keyName === ' ' ? 'Space' : keyName;
+            document.getElementById('totalKeys').textContent = totalCount;
+            document.getElementById('uniqueKeys').textContent = uniqueKeys.size;
+            
+            const pressedKeysContainer = document.getElementById('pressedKeys');
+            const tag = document.createElement('div');
+            tag.className = 'pressed-key-tag';
+            tag.textContent = keyName === ' ' ? 'Space' : keyName;
+            pressedKeysContainer.appendChild(tag);
+            
+            // Limit to last 20 keys shown
+            while (pressedKeysContainer.children.length > 20) {
+                pressedKeysContainer.removeChild(pressedKeysContainer.firstChild);
+            }
+            
+            // Auto scroll to bottom
+            pressedKeysContainer.scrollTop = pressedKeysContainer.scrollHeight;
+        }
+        
+        function resetTest() {
+            totalCount = 0;
+            uniqueKeys.clear();
+            document.getElementById('lastKey').textContent = '-';
+            document.getElementById('totalKeys').textContent = '0';
+            document.getElementById('uniqueKeys').textContent = '0';
+            document.getElementById('pressedKeys').innerHTML = '';
+        }
+        
+        // Apply saved theme
+        const themes = {
+            default: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+            dark: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0a0a0a 100%)',
+            purple: 'linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0f3d 100%)',
+            green: 'linear-gradient(135deg, #0a2e1a 0%, #1b4e2d 50%, #0f3d1a 100%)',
+            red: 'linear-gradient(135deg, #2e0a0a 0%, #4e1b1b 50%, #3d0f0f 100%)',
+            orange: 'linear-gradient(135deg, #2e1a0a 0%, #4e2d1b 50%, #3d1f0f 100%)'
+        };
+        
+        const savedTheme = localStorage.getItem('selectedTheme') || 'default';
+        if (themes[savedTheme]) {
+            document.body.style.background = themes[savedTheme];
+        }
+        // Update ripple colors
+        const rippleColors = {
+            default: '100, 180, 255',
+            dark: '150, 150, 180',
+            purple: '170, 120, 255',
+            green: '100, 220, 140',
+            red: '255, 100, 100',
+            orange: '255, 160, 80'
+        };
+        const rippleColor = rippleColors[savedTheme] || '100, 180, 255';
+        document.body.style.setProperty('--ripple-color', rippleColor);
+        
+        // Menu functions
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const isOpening = !sidebar.classList.contains('active');
+            
+            document.querySelector('.hamburger-menu').classList.toggle('active');
+            sidebar.classList.toggle('active');
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+            
+            if (isOpening) {
+                playSlideSound();
+            } else {
+                playCloseSoundMenu();
+            }
+        }
+
+        function playSlideSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(600, audioContext.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+        }
+
+        function playCloseSoundMenu() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+        }
+
+        // Add click handlers to theme buttons
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const theme = btn.dataset.theme;
+                const themes = {
+                    default: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+                    dark: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0a0a0a 100%)',
+                    purple: 'linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0f3d 100%)',
+                    green: 'linear-gradient(135deg, #0a2e1a 0%, #1b4e2d 50%, #0f3d1a 100%)',
+                    red: 'linear-gradient(135deg, #2e0a0a 0%, #4e1b1b 50%, #3d0f0f 100%)',
+                    orange: 'linear-gradient(135deg, #2e1a0a 0%, #4e2d1b 50%, #3d1f0f 100%)'
+                };
+                document.body.style.background = themes[theme];
+                localStorage.setItem('selectedTheme', theme);
+                // Update ripple colors
+                const rippleColors = {
+                    default: '100, 180, 255',
+                    dark: '150, 150, 180',
+                    purple: '170, 120, 255',
+                    green: '100, 220, 140',
+                    red: '255, 100, 100',
+                    orange: '255, 160, 80'
+                };
+                const rippleColor = rippleColors[theme] || '100, 180, 255';
+                document.body.style.setProperty('--ripple-color', rippleColor);
+                
+                document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                playSlideSound();
+            });
+        });
+        
+        function playCloseSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tier List Maker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+            transition: background 0.8s ease-in-out;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 80px;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        }
+        
+        .animated-title {
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+        
+        .animated-title span {
+            display: inline-block;
+            opacity: 0;
+            animation: 
+                letterFadeIn 0.5s ease-out forwards,
+                letterFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes letterFadeIn {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes letterFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-8px) rotate(2deg); }
+            50% { transform: translateY(0) rotate(0deg); }
+            75% { transform: translateY(-5px) rotate(-1deg); }
+        }
+        
+        .controls {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .control-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+        
+        .btn {
+            padding: 6px 12px;
+            background: rgba(100, 200, 255, 0.2);
+            border: 1px solid rgba(100, 200, 255, 0.4);
+            border-radius: 5px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: rgba(100, 200, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-danger {
+            background: rgba(255, 100, 100, 0.2);
+            border-color: rgba(255, 100, 100, 0.4);
+        }
+        
+        .btn-danger:hover {
+            background: rgba(255, 100, 100, 0.4);
+        }
+        
+        .btn-success {
+            background: rgba(100, 255, 150, 0.2);
+            border-color: rgba(100, 255, 150, 0.4);
+        }
+        
+        .btn-success:hover {
+            background: rgba(100, 255, 150, 0.4);
+        }
+        
+        input[type="text"] {
+            padding: 5px 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+            font-size: 12px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="text"]:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(100, 200, 255, 0.6);
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .file-label {
+            padding: 6px 12px;
+            background: rgba(255, 200, 100, 0.2);
+            border: 1px solid rgba(255, 200, 100, 0.4);
+            border-radius: 5px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .file-label:hover {
+            background: rgba(255, 200, 100, 0.4);
+        }
+        
+        .tierlist-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tier-row {
+            display: flex;
+            min-height: 60px;
+            margin-bottom: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .tier-label {
+            width: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 0 3px rgba(0,0,0,0.8);
+        }
+        
+        .tier-label:hover {
+            filter: brightness(1.2);
+        }
+        
+        .tier-s { background: linear-gradient(135deg, #ff6b6b, #ee5a5a); }
+        .tier-a { background: linear-gradient(135deg, #feca57, #ff9f43); }
+        .tier-b { background: linear-gradient(135deg, #48dbfb, #0abde3); }
+        .tier-c { background: linear-gradient(135deg, #1dd1a1, #10ac84); }
+        .tier-d { background: linear-gradient(135deg, #5f27cd, #341f97); }
+        .tier-e { background: linear-gradient(135deg, #ff9ff3, #f368e0); }
+        .tier-f { background: linear-gradient(135deg, #576574, #222f3e); }
+        
+        .tier-content {
+            flex: 1;
+            padding: 5px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            align-content: flex-start;
+        }
+        
+        .tier-item {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: move;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+        
+        .tier-item:hover {
+            transform: scale(1.05);
+            border-color: rgba(100, 200, 255, 0.6);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+        
+        .tier-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .tier-item .remove-btn {
+            position: absolute;
+            top: 1px;
+            right: 1px;
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 0, 0, 0.8);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 8px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tier-item:hover .remove-btn {
+            opacity: 1;
+        }
+        
+        .image-pool {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 75px;
+        }
+        
+        .image-pool h2 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .pool-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            min-height: 50px;
+        }
+        
+        .pool-item {
+            width: 52px;
+            height: 52px;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: move;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .pool-item:hover {
+            transform: scale(1.1);
+            border-color: rgba(100, 200, 255, 0.6);
+        }
+        
+        .pool-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .dragging {
+            opacity: 0.5;
+        }
+        
+        .drag-over {
+            background: rgba(100, 200, 255, 0.2);
+            border: 2px dashed rgba(100, 200, 255, 0.6);
+        }
+        
+        /* Selection Mode Styles */
+        .select-mode .pool-item,
+        .select-mode .tier-item {
+            cursor: pointer;
+        }
+        
+        .select-mode .pool-item:hover,
+        .select-mode .tier-item:hover {
+            transform: scale(1.05);
+            border-color: rgba(100, 200, 255, 0.8);
+        }
+        
+        .pool-item.selected,
+        .tier-item.selected {
+            border: 3px solid #ff6b6b;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+        }
+        
+        .pool-item.selected::after,
+        .tier-item.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 16px;
+            height: 16px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            color: white;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .sync-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 25px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sync-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ecdc4;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .btn.active {
+            background: rgba(255, 107, 107, 0.4);
+            border-color: rgba(255, 107, 107, 0.6);
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 28px;
+            }
+            
+            .tier-label {
+                width: 44px;
+                font-size: 15px;
+            }
+            
+            .tier-item {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .control-group {
+                justify-content: center;
+            }
+        }
+        
+        /* Partículas */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9998;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFloat 15s infinite linear;
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+        }
+        
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            5% {
+                opacity: 0.8;
+                transform: translateY(95vh) translateX(10px) scale(1);
+            }
+            95% {
+                opacity: 0.8;
+                transform: translateY(5vh) translateX(-10px) scale(1);
+            }
+            100% {
+                transform: translateY(-5vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+        }
+        
+        /* Animaciones de entrada */
+        .tier-row {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .tier-row:nth-child(1) { animation-delay: 0.1s; }
+        .tier-row:nth-child(2) { animation-delay: 0.2s; }
+        .tier-row:nth-child(3) { animation-delay: 0.3s; }
+        .tier-row:nth-child(4) { animation-delay: 0.4s; }
+        .tier-row:nth-child(5) { animation-delay: 0.5s; }
+        .tier-row:nth-child(6) { animation-delay: 0.6s; }
+        .tier-row:nth-child(7) { animation-delay: 0.7s; }
+        
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .controls {
+            animation: fadeIn 0.8s ease-out 0.5s forwards;
+            opacity: 0;
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        .image-pool {
+            animation: fadeIn 0.8s ease-out 0.7s forwards;
+            opacity: 0;
+        }
+        
+        /* Hamburger Menu */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            cursor: pointer;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hamburger-menu:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(100, 150, 255, 0.3);
+        }
+
+        .hamburger-menu:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .hamburger-line {
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 5px 0;
+            border-radius: 3px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: center;
+        }
+
+        .hamburger-menu.active .hamburger-line {
+            background: #a8d8ff;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .hamburger-menu.active {
+            background: rgba(100, 150, 255, 0.2);
+            border-color: rgba(100, 150, 255, 0.4);
+            box-shadow: 0 0 25px rgba(100, 150, 255, 0.4);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100%;
+            background: rgba(5, 15, 40, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 999;
+            transition: left 0.4s ease;
+            padding: 80px 20px 100px 20px;
+            border-right: 1px solid rgba(100, 150, 255, 0.2);
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 20, 50, 0.5);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sidebar-item {
+            padding: 15px 20px;
+            margin: 10px 0;
+            color: white;
+            text-decoration: none;
+            display: block;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(10px);
+        }
+
+        /* Theme Section */
+        .theme-section {
+            margin-top: 20px;
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .theme-label {
+            color: rgba(255,255,255,0.8);
+            font-size: 16px;
+            margin: 0 0 12px 0;
+            font-weight: 500;
+        }
+
+        .theme-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .theme-btn {
+            width: 100%;
+            height: 40px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.05);
+            border-color: rgba(255,255,255,0.6);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .theme-btn:active {
+            transform: scale(0.95);
+        }
+
+        .theme-btn.active {
+            border-color: white;
+            box-shadow: 0 0 15px rgba(255,255,255,0.5);
+        }
+
+        .theme-btn.active::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Partículas flotantes -->
+    <div class="particles-container" id="particlesContainer"></div>
+    
+    <!-- Menú hamburguesa -->
+    <div class="hamburger-menu" onclick="toggleSidebar()">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+    </div>
+    
+    <!-- Overlay del sidebar -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="../../index.html" class="sidebar-item">Inicio</a>
+        <a href="ruleta.html" class="sidebar-item">Ruleta</a>
+        <a href="teclado.html" class="sidebar-item">Test Teclado</a>
+        <a href="tierlist.html" class="sidebar-item">Tier List</a>
+        
+        <div class="theme-section">
+            <p class="theme-label">Modos</p>
+            <div class="theme-buttons">
+                <button class="theme-btn" data-theme="default" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);"></button>
+                <button class="theme-btn" data-theme="dark" style="background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0a0a0a 100%);"></button>
+                <button class="theme-btn" data-theme="purple" style="background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0f3d 100%);"></button>
+                <button class="theme-btn" data-theme="green" style="background: linear-gradient(135deg, #0a2e1a 0%, #1b4e2d 50%, #0f3d1a 100%);"></button>
+                <button class="theme-btn" data-theme="red" style="background: linear-gradient(135deg, #2e0a0a 0%, #4e1b1b 50%, #3d0f0f 100%);"></button>
+                <button class="theme-btn" data-theme="orange" style="background: linear-gradient(135deg, #2e1a0a 0%, #4e2d1b 50%, #3d1f0f 100%);"></button>
+            </div>
+        </div>
+        
+        <div class="links-section" style="margin-top: 20px; padding: 15px 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <p class="links-label" style="color: rgba(255,255,255,0.8); font-size: 16px; margin: 0 0 12px 0; font-weight: 500;">Links</p>
+            <a href="https://drive.google.com/drive/folders/1KdsfAYtp-uTZXhpbL9Y9tEfNvGqx_Dtn" target="_blank" class="sidebar-item" style="margin: 5px 0; font-size: 14px;">Excels</a>
+            <a href="https://balatro-mod-manager.dasguney.com/download" target="_blank" class="sidebar-item" style="margin: 5px 0; font-size: 14px;">Balatro Mod</a>
+            <a href="https://fast.com/es/" target="_blank" class="sidebar-item" style="margin: 5px 0; font-size: 14px;">Internet Velocidad</a>
+        </div>
+    </div>
+    
+    <a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: white; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+    
+    <div class="container">
+        <h1 class="animated-title">
+            <span style="animation-delay: 0s">T</span><span style="animation-delay: 0.1s">i</span><span style="animation-delay: 0.2s">e</span><span style="animation-delay: 0.3s">r</span><span style="animation-delay: 0.35s">&nbsp;</span><span style="animation-delay: 0.4s">L</span><span style="animation-delay: 0.5s">i</span><span style="animation-delay: 0.6s">s</span><span style="animation-delay: 0.7s">t</span><span style="animation-delay: 0.75s">&nbsp;</span><span style="animation-delay: 0.8s">M</span><span style="animation-delay: 0.9s">a</span><span style="animation-delay: 1s">k</span><span style="animation-delay: 1.1s">e</span><span style="animation-delay: 1.2s">r</span>
+        </h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <span class="control-label">Filas:</span>
+                <button class="btn" onclick="addRow()">➕ Añadir</button>
+                <button class="btn btn-danger" onclick="removeLastRow()">➖ Eliminar</button>
+            </div>
+            <div class="control-group">
+                <span class="control-label">Imágenes:</span>
+                <label for="imageUpload" class="file-label">Subir</label>
+                <input type="file" id="imageUpload" multiple accept="image/*" onchange="handleImageUpload(event)">
+                <button class="btn" id="selectModeBtn" onclick="toggleSelectMode()">Seleccionar</button>
+                <button class="btn btn-danger" id="deleteSelectedBtn" onclick="deleteSelectedImages()" style="display: none;">Eliminar seleccionadas</button>
+                <button class="btn btn-danger" onclick="clearAllImages()">Limpiar todo</button>
+                <button class="btn" onclick="resetToDefault()">Reset</button>
+                <button class="btn" onclick="exportTierList()">Exportar</button>
+            </div>
+        </div>
+        
+        <div class="tierlist-container" id="tierlist">
+            <!-- Las filas se generan dinámicamente -->
+        </div>
+        
+        <div class="image-pool">
+            <h2>📦 Imágenes Disponibles</h2>
+            <div class="pool-content" id="imagePool">
+                <!-- Las imágenes subidas aparecen aquí -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="sync-status" style="display: none;">
+        <div class="sync-indicator"></div>
+        <span>Modo local</span>
+    </div>
+
+    <script>
+        // Firebase está desactivado - usando solo localStorage
+        const tierlistRef = {
+            set: function() { return Promise.resolve(); },
+            remove: function() { return Promise.resolve(); },
+            on: function() { /* No-op */ }
+        };
+        console.log('Firebase desactivado - Usando localStorage únicamente');
+        
+        let rowCount = 0;
+        let currentPool = [];
+        
+        // Colores predeterminados para las filas
+        const defaultColors = ['tier-s', 'tier-a', 'tier-b', 'tier-c', 'tier-d', 'tier-e', 'tier-f'];
+        const defaultLabels = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
+        
+        let hasLoadedFromLocalStorage = false;
+        
+        function initTierList() {
+            // Intentar cargar desde localStorage
+            const savedData = localStorage.getItem('tierlistData');
+            console.log('InitTierList - savedData:', savedData);
+            
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    console.log('InitTierList - parsed data:', data);
+                    if (data && data.rows && data.rows.length > 0) {
+                        loadTierListData(data);
+                        hasLoadedFromLocalStorage = true;
+                        console.log('Tier List cargada desde localStorage con ' + data.rows.length + ' filas');
+                    } else {
+                        createDefaultRows();
+                    }
+                } catch (err) {
+                    console.error('Error al cargar desde localStorage:', err);
+                    createDefaultRows();
+                }
+            } else {
+                createDefaultRows();
+            }
+        }
+        
+        function createDefaultRows() {
+            console.log('No data found, creating default rows');
+            document.getElementById('tierlist').innerHTML = '';
+            document.getElementById('imagePool').innerHTML = '';
+            currentPool = [];
+            rowCount = 0;
+            
+            for (let i = 0; i < 4; i++) {
+                createRow(defaultLabels[i], defaultColors[i]);
+            }
+            
+            // Guardar el estado inicial
+            setTimeout(() => {
+                saveTierList();
+            }, 100);
+            hasLoadedFromLocalStorage = true;
+        }
+        
+        // Variables para debounce
+        let saveTimeout = null;
+        let isProcessing = false;
+        let isLoadingData = false;
+        
+        function debouncedSave() {
+            if (isLoadingData) return; // No guardar mientras se cargan datos
+            if (saveTimeout) {
+                clearTimeout(saveTimeout);
+            }
+            saveTimeout = setTimeout(() => {
+                saveTierList();
+                saveTimeout = null;
+            }, 300); // Esperar 300ms después del último cambio
+        }
+        
+        function addRow() {
+            const nextIndex = rowCount % defaultLabels.length;
+            console.log('Adding row:', defaultLabels[nextIndex]);
+            createRow(defaultLabels[nextIndex], defaultColors[nextIndex]);
+            
+            // Guardar inmediatamente después de agregar la fila
+            console.log('Saving after adding row...');
+            saveTierList();
+        }
+        
+        function removeLastRow() {
+            if (isProcessing) return;
+            
+            const tierlist = document.getElementById('tierlist');
+            if (tierlist.lastChild && tierlist.children.length > 1) {
+                isProcessing = true;
+                tierlist.removeChild(tierlist.lastChild);
+                rowCount--;
+                debouncedSave();
+                
+                setTimeout(() => {
+                    isProcessing = false;
+                }, 100);
+            }
+        }
+        
+        function createRow(label, colorClass = 'tier-s') {
+            rowCount++;
+            const tierlist = document.getElementById('tierlist');
+            
+            const row = document.createElement('div');
+            row.className = 'tier-row';
+            row.dataset.rowId = rowCount;
+            
+            const labelDiv = document.createElement('div');
+            labelDiv.className = `tier-label ${colorClass}`;
+            labelDiv.textContent = label;
+            labelDiv.dataset.originalText = label;
+            labelDiv.title = "Clic para editar texto • Clic derecho para cambiar color";
+            
+            // Clic simple: editar texto
+            labelDiv.onclick = (e) => {
+                if (!labelDiv.isEditing) {
+                    editLabelText(labelDiv);
+                }
+            };
+            
+            // Clic derecho: cambiar color
+            labelDiv.oncontextmenu = (e) => {
+                e.preventDefault();
+                changeLabelColor(labelDiv);
+            };
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'tier-content';
+            contentDiv.dataset.rowId = rowCount;
+            
+            // Eventos de drag and drop
+            contentDiv.addEventListener('dragover', handleDragOver);
+            contentDiv.addEventListener('dragleave', handleDragLeave);
+            contentDiv.addEventListener('drop', handleDrop);
+            
+            row.appendChild(labelDiv);
+            row.appendChild(contentDiv);
+            tierlist.appendChild(row);
+        }
+        
+        function changeLabelColor(labelDiv) {
+            const classes = ['tier-s', 'tier-a', 'tier-b', 'tier-c', 'tier-d', 'tier-e', 'tier-f'];
+            let currentIndex = 0;
+            
+            classes.forEach((cls, index) => {
+                if (labelDiv.classList.contains(cls)) {
+                    currentIndex = index;
+                    labelDiv.classList.remove(cls);
+                }
+            });
+            
+            const nextIndex = (currentIndex + 1) % classes.length;
+            labelDiv.classList.add(classes[nextIndex]);
+            debouncedSave();
+        }
+        
+        function editLabelText(labelDiv) {
+            if (labelDiv.isEditing) return;
+            
+            labelDiv.isEditing = true;
+            const currentText = labelDiv.textContent;
+            
+            // Crear input
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = currentText;
+            input.style.cssText = `
+                width: 44px;
+                height: 30px;
+                font-size: 14px;
+                text-align: center;
+                border: 2px solid rgba(255, 255, 255, 0.5);
+                border-radius: 4px;
+                background: rgba(0, 0, 0, 0.5);
+                color: white;
+                font-weight: bold;
+                outline: none;
+            `;
+            input.maxLength = 3;
+            
+            // Reemplazar el texto con el input
+            labelDiv.textContent = '';
+            labelDiv.appendChild(input);
+            input.focus();
+            input.select();
+            
+            // Guardar al perder foco o presionar Enter
+            const saveEdit = () => {
+                const newText = input.value.toUpperCase().trim();
+                if (newText) {
+                    labelDiv.textContent = newText;
+                    labelDiv.dataset.originalText = newText;
+                } else {
+                    labelDiv.textContent = labelDiv.dataset.originalText || '?';
+                }
+                labelDiv.isEditing = false;
+                debouncedSave();
+            };
+            
+            input.addEventListener('blur', saveEdit);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    input.blur();
+                } else if (e.key === 'Escape') {
+                    labelDiv.textContent = labelDiv.dataset.originalText || currentText;
+                    labelDiv.isEditing = false;
+                }
+            });
+        }
+        
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    addImageToPool(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function addImageToPool(imageData) {
+            // Verificar si la imagen ya existe en el pool
+            const existingIndex = currentPool.indexOf(imageData);
+            if (existingIndex !== -1) {
+                console.log('Imagen ya existe en el pool, índice:', existingIndex);
+                return; // No agregar duplicados
+            }
+            
+            currentPool.push(imageData);
+            const newIndex = currentPool.length - 1;
+            
+            const pool = document.getElementById('imagePool');
+            const item = document.createElement('div');
+            item.className = 'pool-item';
+            item.dataset.imageId = newIndex;
+            
+            // Si está en modo selección, no hacerlo arrastrable
+            if (isSelectMode) {
+                item.draggable = false;
+                item.onclick = (e) => toggleImageSelection(e, item);
+            } else {
+                item.draggable = true;
+            }
+            
+            const img = document.createElement('img');
+            img.src = imageData;
+            img.draggable = false;
+            
+            item.appendChild(img);
+            
+            // Eventos de drag (solo si no está en modo selección)
+            if (!isSelectMode) {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+            }
+            
+            pool.appendChild(item);
+            console.log('Imagen agregada al pool, índice:', newIndex);
+            saveTierList();
+        }
+        
+        function handleDragStart(e) {
+            // Asegurar que obtenemos el elemento pool-item o tier-item, no la imagen
+            const item = e.target.closest('.pool-item') || e.target.closest('.tier-item');
+            if (!item) return;
+            
+            e.dataTransfer.setData('text/plain', item.dataset.imageId);
+            e.dataTransfer.setData('source', item.parentElement.id);
+            e.dataTransfer.effectAllowed = 'move';
+            item.classList.add('dragging');
+        }
+        
+        function handleDragEnd(e) {
+            const item = e.target.closest('.pool-item') || e.target.closest('.tier-item');
+            if (item) {
+                item.classList.remove('dragging');
+            }
+            // Limpiar cualquier estado de drag-over
+            document.querySelectorAll('.drag-over').forEach(el => {
+                el.classList.remove('drag-over');
+            });
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+        
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            // Prevenir múltiples drops rápidos
+            if (e.currentTarget.dataset.dropProcessing === 'true') return;
+            e.currentTarget.dataset.dropProcessing = 'true';
+            
+            const imageId = e.dataTransfer.getData('text/plain');
+            const source = e.dataTransfer.getData('source');
+            
+            console.log('Drop - imageId:', imageId, 'source:', source);
+            
+            // Buscar el elemento arrastrado
+            let draggedElement = null;
+            let imageData = null;
+            
+            // Buscar en el pool primero
+            if (source === 'imagePool') {
+                const poolItems = document.querySelectorAll('#imagePool .pool-item');
+                draggedElement = poolItems[imageId];
+                if (draggedElement) {
+                    const img = draggedElement.querySelector('img');
+                    if (img) {
+                        imageData = img.src;
+                    }
+                }
+            } else {
+                // Buscar en todas las filas
+                const allItems = document.querySelectorAll('.tier-item');
+                allItems.forEach(item => {
+                    if (item.dataset.imageId === imageId) {
+                        draggedElement = item;
+                        const img = item.querySelector('img');
+                        if (img) {
+                            imageData = img.src;
+                        }
+                    }
+                });
+            }
+            
+            console.log('Found draggedElement:', draggedElement, 'imageData:', imageData ? 'yes' : 'no');
+            
+            if (imageData) {
+                // Verificar que no estemos soltando en el mismo contenedor
+                const targetRow = e.currentTarget.closest('.tier-row');
+                const sourceRow = draggedElement ? draggedElement.closest('.tier-row') : null;
+                
+                if (targetRow && sourceRow && targetRow === sourceRow) {
+                    console.log('Same row, skipping');
+                    e.currentTarget.dataset.dropProcessing = 'false';
+                    return;
+                }
+                
+                // Crear elemento en el destino
+                const item = document.createElement('div');
+                item.className = 'tier-item';
+                item.draggable = true;
+                item.dataset.imageId = imageId;
+                
+                const img = document.createElement('img');
+                img.src = imageData;
+                img.draggable = false;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.textContent = '×';
+                removeBtn.onclick = () => {
+                    item.remove();
+                    debouncedSave();
+                };
+                
+                item.appendChild(img);
+                item.appendChild(removeBtn);
+                
+                // Eventos de drag
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+                
+                e.currentTarget.appendChild(item);
+                
+                // Si viene de otra fila, eliminar el original
+                if (source && source !== 'imagePool' && draggedElement) {
+                    draggedElement.remove();
+                }
+                
+                debouncedSave();
+                console.log('Item added successfully');
+            } else {
+                console.error('No image data found for imageId:', imageId);
+            }
+            
+            // Liberar el flag después de un momento
+            setTimeout(() => {
+                e.currentTarget.dataset.dropProcessing = 'false';
+            }, 100);
+        }
+        
+        function clearAllImages() {
+            document.getElementById('imagePool').innerHTML = '';
+            document.querySelectorAll('.tier-content').forEach(content => {
+                content.innerHTML = '';
+            });
+            currentPool = [];
+            saveTierList();
+            localStorage.removeItem('tierlistData');
+        }
+        
+        let isSaving = false;
+        
+        function saveTierList() {
+            if (isSaving) return; // Evitar guardados simultáneos
+            
+            try {
+                isSaving = true;
+                
+                const data = {
+                    rows: [],
+                    pool: currentPool,
+                    timestamp: Date.now()
+                };
+                
+                const rows = document.querySelectorAll('.tier-row');
+                console.log('Found rows to save:', rows.length);
+                
+                rows.forEach(row => {
+                    const label = row.querySelector('.tier-label').textContent;
+                    const colorClass = row.querySelector('.tier-label').className;
+                    const images = [];
+                    
+                    row.querySelectorAll('.tier-item img').forEach(img => {
+                        images.push(img.src);
+                    });
+                    
+                    data.rows.push({ label, colorClass, images });
+                });
+                
+                // Guardar en localStorage únicamente (Firebase desactivado)
+                try {
+                    const dataString = JSON.stringify(data);
+                    const dataSize = new Blob([dataString]).size;
+                    console.log('Data size:', (dataSize / 1024).toFixed(2) + ' KB');
+                    
+                    if (dataSize > 5 * 1024 * 1024) { // 5MB límite aproximado
+                        console.warn('Advertencia: Los datos son muy grandes (' + (dataSize / 1024 / 1024).toFixed(2) + ' MB)');
+                    }
+                    
+                    localStorage.setItem('tierlistData', dataString);
+                    console.log('Saved to localStorage:', data.rows.length + ' rows');
+                } catch (storageErr) {
+                    console.error('Error al guardar en localStorage:', storageErr);
+                    if (storageErr.name === 'QuotaExceededError') {
+                        alert('Has alcanzado el límite de almacenamiento. Intenta eliminar algunas imágenes.');
+                    }
+                }
+                
+                isSaving = false;
+                    
+            } catch (err) {
+                console.error('Error en saveTierList:', err);
+                isSaving = false;
+            }
+        }
+        
+        function loadTierListData(data) {
+            console.log('Loading tier list data:', data);
+            console.log('Number of rows to load:', data.rows ? data.rows.length : 0);
+            
+            // Limpiar todo primero
+            document.getElementById('tierlist').innerHTML = '';
+            document.getElementById('imagePool').innerHTML = '';
+            currentPool = data.pool || [];
+            rowCount = 0;
+            
+            // Recrear filas
+            if (data.rows && data.rows.length > 0) {
+                console.log('Recreating', data.rows.length, 'rows...');
+                data.rows.forEach((rowData, index) => {
+                    console.log('Creating row', index + 1, 'of', data.rows.length, '- Label:', rowData.label);
+                    // Extraer la clase de color de forma segura
+                    let colorClass = 'tier-s';
+                    if (rowData.colorClass && typeof rowData.colorClass === 'string') {
+                        const parts = rowData.colorClass.split(' ');
+                        if (parts.length > 1) {
+                            colorClass = parts[1];
+                        }
+                    }
+                    createRow(rowData.label, colorClass);
+                    const lastRow = document.querySelector('.tier-row:last-child .tier-content');
+                    
+                    if (rowData.images) {
+                        rowData.images.forEach(imageSrc => {
+                            // Buscar el índice de la imagen en currentPool
+                            const imageId = currentPool.indexOf(imageSrc);
+                            
+                            const item = document.createElement('div');
+                            item.className = 'tier-item';
+                            item.draggable = true;
+                            item.dataset.imageId = imageId >= 0 ? imageId : 0;
+                            
+                            const img = document.createElement('img');
+                            img.src = imageSrc;
+                            
+                            const removeBtn = document.createElement('button');
+                            removeBtn.className = 'remove-btn';
+                            removeBtn.textContent = '×';
+                            removeBtn.onclick = () => {
+                                item.remove();
+                                saveTierList();
+                            };
+                            
+                            item.appendChild(img);
+                            item.appendChild(removeBtn);
+                            
+                            item.addEventListener('dragstart', handleDragStart);
+                            item.addEventListener('dragend', handleDragEnd);
+                            
+                            lastRow.appendChild(item);
+                        });
+                    }
+                });
+                console.log('Finished recreating', data.rows.length, 'rows');
+            } else {
+                console.log('No rows to recreate');
+            }
+            
+            // Recrear pool
+            console.log('Recreating pool with', currentPool.length, 'images');
+            currentPool.forEach((imageData, index) => {
+                const pool = document.getElementById('imagePool');
+                const item = document.createElement('div');
+                item.className = 'pool-item';
+                item.draggable = true;
+                item.dataset.imageId = index;
+                
+                const img = document.createElement('img');
+                img.src = imageData;
+                
+                item.appendChild(img);
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+                pool.appendChild(item);
+            });
+            
+            console.log('LoadTierListData complete. Final row count:', rowCount);
+            console.log('DOM rows:', document.querySelectorAll('.tier-row').length);
+        }
+        
+        function resetToDefault() {
+            // Limpiar localStorage
+            localStorage.removeItem('tierlistData');
+            
+            // Limpiar la vista
+            document.getElementById('tierlist').innerHTML = '';
+            document.getElementById('imagePool').innerHTML = '';
+            currentPool = [];
+            rowCount = 0;
+            
+            // Crear las 4 filas por defecto
+            for (let i = 0; i < 4; i++) {
+                createRow(defaultLabels[i], defaultColors[i]);
+            }
+            
+            // Guardar el estado inicial
+            setTimeout(() => {
+                saveTierList();
+            }, 100);
+        }
+        
+        function exportTierList() {
+            try {
+                const container = document.querySelector('.tierlist-container');
+                if (!container) {
+                    alert('Error: No se encontró el contenedor de la tier list');
+                    return;
+                }
+                
+                html2canvas(container, {
+                    backgroundColor: null,
+                    scale: 2
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'tierlist.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                }).catch(err => {
+                    console.error('Error al exportar:', err);
+                    alert('Error al exportar la imagen');
+                });
+            } catch (err) {
+                console.error('Error en exportTierList:', err);
+                alert('Error al exportar: ' + err.message);
+            }
+        }
+        
+        // Selection Mode Functions
+        let isSelectMode = false;
+        let selectedImages = new Set();
+        
+        function toggleSelectMode() {
+            isSelectMode = !isSelectMode;
+            const btn = document.getElementById('selectModeBtn');
+            const deleteBtn = document.getElementById('deleteSelectedBtn');
+            const body = document.body;
+            
+            if (isSelectMode) {
+                btn.textContent = 'Cancelar selección';
+                btn.classList.add('active');
+                deleteBtn.style.display = 'inline-block';
+                body.classList.add('select-mode');
+                
+                // Add click handlers to pool items
+                document.querySelectorAll('.pool-item').forEach(item => {
+                    item.onclick = (e) => toggleImageSelection(e, item);
+                    item.draggable = false; // Disable drag in select mode
+                });
+                
+                // Add click handlers to tier items
+                document.querySelectorAll('.tier-item').forEach(item => {
+                    item.onclick = (e) => toggleImageSelection(e, item);
+                    item.draggable = false; // Disable drag in select mode
+                });
+                
+                alert('Modo selección activado. Haz clic en las imágenes para seleccionarlas.');
+            } else {
+                exitSelectMode();
+            }
+        }
+        
+        function exitSelectMode() {
+            isSelectMode = false;
+            selectedImages.clear();
+            
+            const btn = document.getElementById('selectModeBtn');
+            const deleteBtn = document.getElementById('deleteSelectedBtn');
+            const body = document.body;
+            
+            btn.textContent = 'Seleccionar';
+            btn.classList.remove('active');
+            deleteBtn.style.display = 'none';
+            body.classList.remove('select-mode');
+            
+            // Remove selection styling
+            document.querySelectorAll('.pool-item.selected, .tier-item.selected').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Restore drag functionality
+            document.querySelectorAll('.pool-item').forEach(item => {
+                item.onclick = null;
+                item.draggable = true;
+                // Re-add drag event listeners
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+            
+            document.querySelectorAll('.tier-item').forEach(item => {
+                item.onclick = null;
+                item.draggable = true;
+                // Re-add drag event listeners
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+        }
+        
+        function toggleImageSelection(event, item) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const imgSrc = item.querySelector('img').src;
+            
+            if (selectedImages.has(imgSrc)) {
+                selectedImages.delete(imgSrc);
+                item.classList.remove('selected');
+            } else {
+                selectedImages.add(imgSrc);
+                item.classList.add('selected');
+            }
+            
+            console.log('Selected images:', selectedImages.size);
+        }
+        
+        function deleteSelectedImages() {
+            if (selectedImages.size === 0) {
+                alert('No hay imágenes seleccionadas');
+                return;
+            }
+            
+            if (!confirm(`¿Eliminar ${selectedImages.size} imagen(es) seleccionada(s)?`)) {
+                return;
+            }
+            
+            // Remove from pool
+            document.querySelectorAll('.pool-item').forEach(item => {
+                const imgSrc = item.querySelector('img').src;
+                if (selectedImages.has(imgSrc)) {
+                    item.remove();
+                    // Remove from currentPool
+                    const index = currentPool.indexOf(imgSrc);
+                    if (index > -1) {
+                        currentPool.splice(index, 1);
+                    }
+                }
+            });
+            
+            // Remove from tier rows
+            document.querySelectorAll('.tier-item').forEach(item => {
+                const imgSrc = item.querySelector('img').src;
+                if (selectedImages.has(imgSrc)) {
+                    item.remove();
+                }
+            });
+            
+            // Save changes
+            saveTierList();
+            
+            // Exit selection mode
+            exitSelectMode();
+            
+            alert('Imágenes eliminadas correctamente');
+        }
+        
+        // Crear partículas flotantes
+        function createFloatingParticles() {
+            const container = document.getElementById('particlesContainer');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDuration = (10 + Math.random() * 20) + 's';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.width = (2 + Math.random() * 3) + 'px';
+                particle.style.height = particle.style.width;
+                container.appendChild(particle);
+            }
+        }
+        
+        // Inicializar con manejo de errores
+        try {
+            initTierList();
+            createFloatingParticles();
+            console.log('Tier List inicializada correctamente');
+        } catch (err) {
+            console.error('Error al inicializar Tier List:', err);
+        }
+        
+        // Menu functions
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const isOpening = !sidebar.classList.contains('active');
+            
+            document.querySelector('.hamburger-menu').classList.toggle('active');
+            sidebar.classList.toggle('active');
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+            
+            if (isOpening) {
+                playSlideSound();
+            } else {
+                playCloseSoundMenu();
+            }
+        }
+
+        function playSlideSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(600, audioContext.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+        }
+
+        function playCloseSoundMenu() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+        }
+
+        // Theme management
+        const themes = {
+            default: {
+                body: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
+            },
+            dark: {
+                body: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0a0a0a 100%)'
+            },
+            purple: {
+                body: 'linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0f3d 100%)'
+            },
+            green: {
+                body: 'linear-gradient(135deg, #0a2e1a 0%, #1b4e2d 50%, #0f3d1a 100%)'
+            },
+            red: {
+                body: 'linear-gradient(135deg, #2e0a0a 0%, #4e1b1b 50%, #3d0f0f 100%)'
+            },
+            orange: {
+                body: 'linear-gradient(135deg, #2e1a0a 0%, #4e2d1b 50%, #3d1f0f 100%)'
+            }
+        };
+
+        function setTheme(themeName) {
+            const theme = themes[themeName];
+            document.body.style.background = theme.body;
+            localStorage.setItem('selectedTheme', themeName);
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.theme === themeName) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Update ripple colors
+            const rippleColors = {
+                default: '100, 180, 255',
+                dark: '150, 150, 180',
+                purple: '170, 120, 255',
+                green: '100, 220, 140',
+                red: '255, 100, 100',
+                orange: '255, 160, 80'
+            };
+            const rippleColor = rippleColors[themeName] || '100, 180, 255';
+            document.body.style.setProperty('--ripple-color', rippleColor);
+        }
+
+        // Initialize theme
+        const savedTheme = localStorage.getItem('selectedTheme') || 'default';
+        setTheme(savedTheme);
+
+        // Add click handlers to theme buttons
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setTheme(btn.dataset.theme);
+                playSlideSound();
+            });
+        });
+
+        function playCloseSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+        }
+        
+        // Guardar antes de cerrar la página
+        window.addEventListener('beforeunload', function(e) {
+            console.log('Page is closing, saving data...');
+            saveTierList();
+        });
+    </script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</body>
+</html>
