@@ -115,6 +115,11 @@ a{color:inherit}
   padding:16px;font-size:9px;color:#373737;line-height:1.6
 }
 .error{color:#9b0000}
+.search{font-family:'Press Start 2P',monospace;font-size:7px;padding:8px;border:3px solid #373737;box-shadow:inset 2px 2px 0 #8b8b8b;background:#fff;color:#373737;min-width:180px}
+.search::placeholder{color:#8b8b8b}
+.card.sel{outline:3px solid #55ff55;outline-offset:-3px}
+.cb{width:18px;height:18px;accent-color:#5aaa3a;cursor:pointer}
+.sel-bar{max-width:920px;margin:0 auto 10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;background:#c6c6c6;border:3px solid #000;box-shadow:inset -2px -2px 0 #555, inset 2px 2px 0 #fff;padding:8px}
 .grass-bar{height:14px;background:repeating-linear-gradient(90deg,#5aaa3a 0 16px,#4a962f 16px 32px);border:3px solid #2d631d;box-shadow:2px 2px 0 #000;margin:0 auto 14px;max-width:920px}
 </style>
 </head>
@@ -130,6 +135,7 @@ a{color:inherit}
 <div class="toolbar">
 <span id="count" class="count"></span>
 <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+<input id="search" class="search" placeholder="BUSCAR MOD..." oninput="render()">
 <button class="btn-mc" id="pickFolderBtn" onclick="pickFolder()">📁 CARPETA</button>
 <span id="folderName" class="folder" style="display:none"></span>
 <button class="btn-mc green" onclick="downloadAllSequential()" id="dlAllBtn">⬇ TODOS</button>
@@ -138,10 +144,75 @@ a{color:inherit}
 </div>
 </div>
 </div>
+<div class="sel-bar" id="selBar" style="display:none">
+<div style="display:flex;gap:8px;align-items:center">
+<button class="btn-mc" onclick="selectAll(true)">☑ TODOS</button>
+<button class="btn-mc" onclick="selectAll(false)">☐ NINGUNO</button>
+<span class="count" id="selCount">0 seleccionados</span>
+</div>
+<button class="btn-mc green" onclick="downloadSelected()" id="dlSelBtn">⬇ SELECCIÓN (0)</button>
+</div>
 <div id="progress" class="state" style="display:none"></div>
 <div id="state" class="state">Cargando mods...</div>
 <div id="grid" class="grid" style="display:none"></div>
 <script>
+let selected=new Set();
+function render(){
+  const grid=document.getElementById('grid');
+  const count=document.getElementById('count');
+  const state=document.getElementById('state');
+  const q=(document.getElementById('search').value||'').toLowerCase().trim();
+  const filtered=cachedMods.filter(m=>!q||m.name.toLowerCase().includes(q)||m.filename.toLowerCase().includes(q));
+  if(!filtered.length){
+    grid.style.display='none';
+    if(cachedMods.length) { state.style.display='block'; state.textContent='Sin resultados para "'+q+'"'; }
+    count.textContent=cachedMods.length+' MODS';
+    document.getElementById('selBar').style.display=cachedMods.length?'flex':'none';
+    updateSel();
+    return;
+  }
+  state.style.display='none'; grid.style.display='grid';
+  grid.innerHTML=filtered.map(m=>{
+    const sel=selected.has(m.filename);
+    return `<div class="card ${sel?'sel':''}">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" class="cb" ${sel?'checked':''} onchange="toggleSel('${m.filename.replace(/'/g,"\\'")}')"><h3 style="flex:1">${m.name}</h3></label>
+        <div class="mc-inv"><div class="slot">📦</div><span class="meta">${m.filename}<br>${m.size}</span></div>
+        <a class="download-mc" href="#" onclick="downloadOne('${m.filename.replace(/'/g,"\\'")}');return false">DESCARGAR</a>
+      </div>`;
+  }).join('');
+  count.textContent=filtered.length+' / '+cachedMods.length+' MODS';
+  document.getElementById('selBar').style.display='flex';
+  updateSel();
+}
+function toggleSel(f){ if(selected.has(f)) selected.delete(f); else selected.add(f); render(); }
+function selectAll(v){
+  const q=(document.getElementById('search').value||'').toLowerCase().trim();
+  const filtered=cachedMods.filter(m=>!q||m.name.toLowerCase().includes(q)||m.filename.toLowerCase().includes(q));
+  filtered.forEach(m=> v?selected.add(m.filename):selected.delete(m.filename));
+  render();
+}
+function updateSel(){
+  const n=selected.size;
+  document.getElementById('selCount').textContent=n+' seleccionados';
+  document.getElementById('dlSelBtn').textContent='⬇ SELECCIÓN ('+n+')';
+  document.getElementById('dlSelBtn').style.display=n?'':'none';
+}
+async function downloadSelected(){
+  const list=[...selected];
+  if(!list.length) return alert('Selecciona al menos 1 mod');
+  const useFolder=dirHandle||await ensureFolder();
+  const prog=document.getElementById('progress');
+  if(useFolder && dirHandle){
+    prog.style.display='block';
+    for(let i=0;i<list.length;i++){
+      prog.textContent='Guardando '+(i+1)+'/'+list.length+': '+list[i];
+      try{ const r=await fetch('/.netlify/functions/download-mod?file='+encodeURIComponent(list[i])); const b=await r.blob(); await saveToFolder(list[i], b);}catch(e){}
+    }
+    prog.textContent='✓ '+list.length+' mods en '+dirHandle.name; setTimeout(()=>prog.style.display='none',3000); return;
+  }
+  if(!confirm('Descargar '+list.length+' mods?')) return;
+  for(const f of list){ fallbackDownload(f); await new Promise(r=>setTimeout(r,600)); }
+}
 async function loadMods(){
   const state=document.getElementById('state');
   const grid=document.getElementById('grid');
@@ -156,23 +227,16 @@ async function loadMods(){
     }
     const mods=await res.json();
     cachedMods=Array.isArray(mods)?mods:[];
+    selected.clear();
     if(!Array.isArray(mods)||mods.length===0){
       state.textContent='No hay mods instalados';
       count.textContent='';
       document.getElementById('dlAllBtn').style.display='none';
+      document.getElementById('selBar').style.display='none';
       return;
     }
     document.getElementById('dlAllBtn').style.display='';
-    state.style.display='none';
-    grid.style.display='grid';
-    count.textContent=mods.length+' MODS';
-    grid.innerHTML=mods.map(m=>`
-      <div class="card">
-        <h3>${m.name}</h3>
-        <div class="mc-inv"><div class="slot">📦</div><span class="meta">${m.filename}<br>${m.size}</span></div>
-        <a class="download-mc" href="#" onclick="downloadOne('${m.filename.replace(/'/g,"\\'")}');return false">DESCARGAR</a>
-      </div>
-    `).join('');
+    render();
   }catch(e){
     state.textContent='Error: '+e.message;
     state.className='state error';
