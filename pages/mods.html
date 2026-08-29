@@ -31,6 +31,25 @@ body::before{
     repeating-linear-gradient(0deg,rgba(0,0,0,.06) 0 2px,transparent 2px 4px);
   pointer-events:none;z-index:-1;
 }
+.clouds{position:fixed;top:0;left:0;width:100%;height:42%;overflow:hidden;pointer-events:none;z-index:0}
+.cloud{
+  position:absolute;top:0;
+  width:96px;height:32px;
+  background:#fff;
+  box-shadow:
+    16px 0 0 #fff, 32px 0 0 #fff, 48px 0 0 #fff,
+    8px 8px 0 #fff, 24px 8px 0 #fff, 40px 8px 0 #fff, 56px 8px 0 #fff,
+    0 16px 0 #e8e8e8, 16px 16px 0 #e8e8e8, 32px 16px 0 #e8e8e8, 48px 16px 0 #e8e8e8, 64px 16px 0 #e8e8e8,
+    8px 24px 0 #d6d6d6, 24px 24px 0 #d6d6d6, 40px 24px 0 #d6d6d6;
+  image-rendering:pixelated;
+  opacity:.9;
+  animation:drift linear infinite;
+}
+.cloud:nth-child(1){top:18px;animation-duration:55s;animation-delay:-5s;scale:.9}
+.cloud:nth-child(2){top:58px;animation-duration:70s;animation-delay:-22s;scale:1.1}
+.cloud:nth-child(3){top:38px;animation-duration:62s;animation-delay:-38s;scale:.8}
+.cloud:nth-child(4){top:78px;animation-duration:80s;animation-delay:-48s;scale:1}
+@keyframes drift{from{transform:translateX(-140px)}to{transform:translateX(110vw)}}
 a{color:inherit}
 .back{
   position:fixed;top:14px;left:14px;text-decoration:none;
@@ -100,6 +119,7 @@ a{color:inherit}
 </style>
 </head>
 <body>
+<div class="clouds"><div class="cloud"></div><div class="cloud"></div><div class="cloud"></div><div class="cloud"></div></div>
 <a class="back" href="../index.html">‹ INICIO</a>
 <div class="header">
 <h1>◼ <span>MODS</span> DEL SERVIDOR ◼</h1>
