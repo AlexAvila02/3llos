@@ -22,15 +22,28 @@ exports.handler = async () => {
 
     // Intento 1: comprimir lista filtrada
     let archiveName=null, lastErr='';
+    // Intento 1 spec: wildcard *
     let cr = await fetchFn(`${base}/api/client/servers/${MINEHOST_SERVER_ID}/files/compress`, {
       method:'POST', headers:{ Authorization:`Bearer ${MINEHOST_API_KEY}`, 'Content-Type':'application/json', Accept:'application/json' },
-      body: JSON.stringify({ root:'/mods', files: jars })
+      body: JSON.stringify({ root:'/mods', files: ['*'] })
     });
     let ct = await cr.text();
     if(cr.ok){
       try{ const cj=JSON.parse(ct); archiveName=cj?.attributes?.name||cj?.name||cj?.file; }catch{}
       if(!archiveName){ const m=ct.match(/archive[^"\s]*\.(zip|tar\.gz)/i); if(m) archiveName=m[0]; }
-    } else lastErr='intento1 '+cr.status+' '+ct.slice(0,400);
+    } else lastErr='intento1 * '+cr.status+' '+ct.slice(0,400);
+    // Intento 2: lista filtrada
+    if(!archiveName){
+      cr = await fetchFn(`${base}/api/client/servers/${MINEHOST_SERVER_ID}/files/compress`, {
+        method:'POST', headers:{ Authorization:`Bearer ${MINEHOST_API_KEY}`, 'Content-Type':'application/json', Accept:'application/json' },
+        body: JSON.stringify({ root:'/mods', files: jars })
+      });
+      ct = await cr.text();
+      if(cr.ok){
+        try{ const cj=JSON.parse(ct); archiveName=cj?.attributes?.name||cj?.name||cj?.file; }catch{}
+        if(!archiveName){ const m=ct.match(/archive[^"\s]*\.(zip|tar\.gz)/i); if(m) archiveName=m[0]; }
+      } else lastErr+=' | intento2 lista '+cr.status+' '+ct.slice(0,400);
+    }
 
     // Fallback: comprimir carpeta mods completa
     if(!archiveName){
