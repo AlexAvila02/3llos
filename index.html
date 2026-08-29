@@ -82,6 +82,34 @@
   <h1 class="welcome-text">
     <span style="animation-delay: 0s">p</span><span style="animation-delay: 0.05s">a</span><span style="animation-delay: 0.1s">p</span><span style="animation-delay: 0.15s">u</span><span style="animation-delay: 0.2s">b</span><span style="animation-delay: 0.25s">a</span><span style="animation-delay: 0.3s">n</span><span style="animation-delay: 0.35s">d</span><span style="animation-delay: 0.4s">a</span>
   </h1>
+
+  <!-- Widget Estado Minecraft -->
+  <div id="mc-widget" class="mc-widget">
+    <div class="mc-widget-header">
+      <span class="mc-dot" id="mc-dot"></span>
+      <span class="mc-status" id="mc-status">Consultando...</span>
+      <span class="mc-players" id="mc-players"></span>
+    </div>
+    <div class="mc-ip-box">
+      <span class="mc-ip" id="mc-ip">sv21.minehost.pro:25476</span>
+      <button class="mc-copy" id="mc-copy" onclick="copyMcIp()">⎘ Copiar IP</button>
+    </div>
+  </div>
+  <style>
+    .mc-widget{max-width:420px;margin:14px auto 10px;background:rgba(20,20,30,.75);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:12px 14px;box-shadow:0 6px 20px rgba(0,0,0,.35);font-family:Inter,system-ui,sans-serif}
+    .mc-widget-header{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+    .mc-dot{width:10px;height:10px;border-radius:50%;background:#555;box-shadow:0 0 0 0 rgba(0,0,0,0);transition:all .3s}
+    .mc-dot.online{background:#2ecc71;box-shadow:0 0 8px #2ecc71, 0 0 16px rgba(46,204,113,.5)}
+    .mc-dot.offline{background:#e74c3c;box-shadow:0 0 8px #e74c3c}
+    .mc-status{flex:1}
+    .mc-players{opacity:.7;font-weight:400;font-size:12px}
+    .mc-ip-box{margin-top:8px;display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:6px 8px}
+    .mc-ip{flex:1;font-family:monospace;font-size:13px;letter-spacing:.3px;overflow:hidden;text-overflow:ellipsis}
+    .mc-copy{border:none;background:#4ecdc4;color:#0a1a1e;padding:7px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .mc-copy:hover{background:#3bb8ad}
+    .mc-copy.copied{background:#2ecc71;color:#fff}
+    @media(max-width:480px){.mc-widget{margin:10px 12px}}
+  </style>
   
   <!-- Logos -->
   <div class="logos-container">
@@ -254,6 +282,42 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   
+  <script>
+    const MC_IP='sv21.minehost.pro:25476';
+    const MC_API='https://api.mcsrvstat.us/3/'+MC_IP;
+    async function refreshMc(){
+      const dot=document.getElementById('mc-dot');
+      const status=document.getElementById('mc-status');
+      const players=document.getElementById('mc-players');
+      try{
+        const r=await fetch(MC_API);
+        const j=await r.json();
+        if(j.online){
+          dot.className='mc-dot online';
+          status.textContent='🟢 En línea';
+          const o=j.players?.online??0, m=j.players?.max??'?';
+          players.textContent=o+' / '+m+' jugadores';
+        } else {
+          dot.className='mc-dot offline';
+          status.textContent='🔴 Servidor desconectado';
+          players.textContent='';
+        }
+      }catch(e){
+        dot.className='mc-dot offline';
+        status.textContent='🔴 Servidor desconectado';
+        players.textContent='';
+      }
+    }
+    function copyMcIp(){
+      navigator.clipboard.writeText(MC_IP).then(()=>{
+        const b=document.getElementById('mc-copy');
+        const prev=b.textContent;
+        b.textContent='¡Copiado! ✓'; b.classList.add('copied');
+        setTimeout(()=>{ b.textContent=prev; b.classList.remove('copied'); },2000);
+      });
+    }
+    refreshMc(); setInterval(refreshMc,60000);
+  </script>
   <!-- Scripts -->
   <script src="js/utils.js"></script>
   <script src="js/firebase-config.js"></script>
