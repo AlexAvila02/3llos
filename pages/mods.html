@@ -130,6 +130,24 @@ a{color:inherit}
 <h1>◼ <span>MODS</span> DEL SERVIDOR ◼</h1>
 <p>◆ Sincronizado en tiempo real desde Minehost / Pterodactyl ◆<br>Coloca los .jar en /mods y dale a Actualizar</p>
 </div>
+<div id="mc-widget" class="mc-widget-mc">
+  <div class="mcw-head">
+    <span class="mc-dot" id="mc-dot"></span>
+    <span id="mc-status">Consultando...</span>
+    <span id="mc-players" style="margin-left:auto;font-size:7px"></span>
+  </div>
+  <div class="mcw-ip">
+    <span id="mc-ip" style="flex:1;font-size:8px;overflow:hidden;text-overflow:ellipsis">sv21.minehost.pro:25476</span>
+    <button class="btn-mc green" id="mc-copy" onclick="copyMcIp()" style="font-size:7px;padding:6px 8px">⎘ COPIAR IP</button>
+  </div>
+</div>
+<style>.mc-widget-mc{max-width:920px;margin:0 auto 14px;background:#c6c6c6;border:4px solid #000;box-shadow:inset -4px -4px 0 #555,inset 4px 4px 0 #fff,4px 4px 0 rgba(0,0,0,.5);padding:10px}
+.mcw-head{display:flex;align-items:center;gap:8px;font-size:8px;color:#373737}
+.mc-dot{width:12px;height:12px;border:2px solid #000;box-shadow:inset 1px 1px 0 #fff;background:#555}
+.mc-dot.online{background:#2ecc71;box-shadow:0 0 6px #2ecc71, inset 1px 1px 0 #fff}
+.mc-dot.offline{background:#e74c3c;box-shadow:0 0 6px #e74c3c, inset 1px 1px 0 #fff}
+.mcw-ip{margin-top:8px;display:flex;gap:8px;align-items:center;background:#8b8b8b;border:2px solid #373737;box-shadow:inset 2px 2px 0 #fff, inset -2px -2px 0 #555;padding:6px}
+</style>
 <div class="grass-bar"></div>
 <div class="mc-panel">
 <div class="toolbar">
@@ -315,6 +333,26 @@ async function downloadZip(){
   }
   window.location.href=url;
 }
+const MC_IP='sv21.minehost.pro:25476';
+const MC_API='https://api.mcsrvstat.us/3/'+MC_IP;
+async function refreshMc(){
+  const dot=document.getElementById('mc-dot');
+  const st=document.getElementById('mc-status');
+  const pl=document.getElementById('mc-players');
+  if(!dot) return;
+  try{
+    const r=await fetch(MC_API); const j=await r.json();
+    if(j.online){ dot.className='mc-dot online'; st.textContent='🟢 En línea'; const o=j.players?.online??0, m=j.players?.max??'?'; pl.textContent=o+' / '+m+' jugadores'; }
+    else { dot.className='mc-dot offline'; st.textContent='🔴 Servidor desconectado'; pl.textContent=''; }
+  }catch(e){ dot.className='mc-dot offline'; st.textContent='🔴 Servidor desconectado'; pl.textContent=''; }
+}
+function copyMcIp(){
+  navigator.clipboard.writeText(MC_IP).then(()=>{
+    const b=document.getElementById('mc-copy'); const prev=b.textContent;
+    b.textContent='¡COPIADO! ✓'; setTimeout(()=>b.textContent=prev,2000);
+  });
+}
+refreshMc(); setInterval(refreshMc,60000);
 loadMods();
 </script>
 </body>
