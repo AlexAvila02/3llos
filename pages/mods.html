@@ -162,8 +162,8 @@ a{color:inherit}
 <input id="search" class="search" placeholder="BUSCAR MOD..." oninput="render()">
 <button class="btn-mc" id="pickFolderBtn" onclick="pickFolder()">📁 CARPETA</button>
 <span id="folderName" class="folder" style="display:none"></span>
-<button class="btn-mc green" onclick="downloadAllSequential()" id="dlAllBtn">⬇ TODOS</button>
-<button class="btn-mc green" onclick="downloadZip()">⬇ ZIP</button>
+<button class="btn-mc green" onclick="downloadZipServer()" id="dlAllBtn">⬇ TODOS</button>
+<button class="btn-mc green" onclick="downloadZipServer()" id="zipBtn">⬇ ZIP</button>
 <button class="btn-mc" onclick="loadMods()">↻ ACTUALIZAR</button>
 </div>
 </div>
@@ -353,34 +353,52 @@ async function downloadOne(filename){
   }
   fallbackDownload(filename);
 }
-async function downloadAllSequential(){
-  const list=getClientMods();
-  if(!list.length) return alert('No hay mods necesarios');
-  const useFolder=dirHandle||await ensureFolder();
-  if(useFolder && dirHandle){
-    const prog=document.getElementById('progress'); prog.style.display='block';
-    for(let i=0;i<list.length;i++){
-      const f=list[i].filename; prog.textContent='Guardando '+(i+1)+'/'+list.length+': '+f;
-      try{ const res=await fetch('/.netlify/functions/download-mod?file='+encodeURIComponent(f)); const blob=await res.blob(); await saveToFolder(f, blob);}catch(e){}
+async function downloadZipServer(){
+  const btnAll=document.getElementById('dlAllBtn');
+  const btnZip=document.getElementById('zipBtn');
+  const origAll=btnAll?btnAll.textContent:'';
+  const origZip=btnZip?btnZip.textContent:'';
+  const prog=document.getElementById('progress');
+  if(btnAll) btnAll.textContent='📦 Generando ZIP del servidor...';
+  if(btnZip) btnZip.textContent='📦 Generando...';
+  prog.style.display='block'; prog.textContent='📦 Generando ZIP del servidor...';
+  try{
+    const res=await fetch('/.netlify/functions/download-zip', {redirect:'manual'});
+    if(res.status===302 || res.status===301){
+      const loc=res.headers.get('Location');
+      if(loc){ window.location.href=loc; prog.textContent='✓ Redirigiendo a descarga...'; }
+      else window.location.href='/.netlify/functions/download-zip';
+    } else if(res.ok){
+      const ct=res.headers.get('Content-Type')||'';
+      if(ct.includes('application/json')){
+        const j=await res.json();
+        throw new Error(j.error||JSON.stringify(j));
+      } else {
+        const blob=await res.blob();
+        if(dirHandle){
+          const ok=await saveToFolder('mods.zip', blob);
+          prog.textContent=ok?'ZIP en '+dirHandle.name+'/mods.zip':'Descargando...';
+          if(ok){ setTimeout(()=>prog.style.display='none',2500); return; }
+        }
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a'); a.href=url; a.download='mods.zip'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+        prog.textContent='✓ ZIP descargado';
+      }
+    } else {
+      const j=await res.json().catch(()=>({error:res.statusText}));
+      throw new Error(j.error||j.details||res.statusText);
     }
-    prog.textContent='✓ '+list.length+' mods (obligatorios+opcionales) en '+dirHandle.name; setTimeout(()=>prog.style.display='none',3000); return;
+  }catch(e){
+    prog.textContent='Error: '+e.message;
+    alert('Error al generar ZIP: '+e.message);
+  } finally {
+    if(btnAll) btnAll.textContent=origAll;
+    if(btnZip) btnZip.textContent=origZip;
+    setTimeout(()=>{ if(prog.textContent.startsWith('✓')) prog.style.display='none'; },3000);
   }
-  if(!confirm('Se descargaran '+list.length+' mods (sin servidor) .jar. ¿Continuar?')) return;
-  for(let i=0;i<list.length;i++){ fallbackDownload(list[i].filename); await new Promise(r=>setTimeout(r,600)); }
 }
-async function downloadZip(){
-  const useFolder=dirHandle||await ensureFolder();
-  const url='/.netlify/functions/download-all';
-  if(useFolder && dirHandle){
-    const prog=document.getElementById('progress'); prog.style.display='block'; prog.textContent='Descargando ZIP...';
-    try{
-      const res=await fetch(url); if(!res.ok) throw new Error('Error '+res.status);
-      const blob=await res.blob(); const ok=await saveToFolder('mods.zip', blob);
-      prog.textContent=ok?'ZIP en '+dirHandle.name+'/mods.zip':'Error'; setTimeout(()=>prog.style.display='none',2500); if(ok) return;
-    }catch(e){ prog.textContent='Error: '+e.message; }
-  }
-  window.location.href=url;
-}
+const downloadAllSequential=downloadZipServer;
+const downloadZip=downloadZipServer;
 const MC_IP='sv21.minehost.pro:25476';
 const MC_API='https://api.mcsrvstat.us/3/'+MC_IP;
 async function refreshMc(){
