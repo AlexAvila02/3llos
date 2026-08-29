@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mods - Papubanda</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 html{zoom:1.2}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -126,6 +127,12 @@ a{color:inherit}
 .badge-srv{background:#8b8b8b;color:#fff;border-color:#373737}
 .filter-bar{max-width:920px;margin:0 auto 10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .filter-bar .btn-mc.active{background:#fff;color:#373737;border-color:#373737;box-shadow:inset 2px 2px 0 #555}
+.zip-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:9999}
+.zip-modal.active{display:flex}
+.zip-box{background:#c6c6c6;border:4px solid #000;box-shadow:inset -4px -4px 0 #555,inset 4px 4px 0 #fff,6px 6px 0 rgba(0,0,0,.5);padding:16px;max-width:420px;width:90%;text-align:center}
+.zip-bar{height:18px;background:#8b8b8b;border:3px solid #000;box-shadow:inset 2px 2px 0 #373737;position:relative;overflow:hidden;margin:10px 0}
+.zip-fill{height:100%;background:linear-gradient(90deg,#5aaa3a,#7bd555);width:0%;transition:width .25s;box-shadow:inset 0 2px 0 rgba(255,255,255,.4)}
+.zip-text{font-size:7px;color:#373737;line-height:1.6;word-break:break-all}
 .grass-bar{height:14px;background:repeating-linear-gradient(90deg,#5aaa3a 0 16px,#4a962f 16px 32px);border:3px solid #2d631d;box-shadow:2px 2px 0 #000;margin:0 auto 14px;max-width:920px}
 </style>
 </head>
@@ -181,6 +188,15 @@ a{color:inherit}
 <span class="count" id="selCount">0 seleccionados</span>
 </div>
 <button class="btn-mc green" onclick="downloadSelected()" id="dlSelBtn">⬇ SELECCIÓN (0)</button>
+</div>
+<div id="zipModal" class="zip-modal" onclick="if(event.target===this) cancelZip()">
+<div class="zip-box">
+<div style="font-size:9px;color:#373737;margin-bottom:6px">⬢ GENERANDO ZIP ⬢</div>
+<div id="zipStatus" class="zip-text">Preparando descarga...</div>
+<div class="zip-bar"><div id="zipFill" class="zip-fill"></div></div>
+<div id="zipPct" class="zip-text">0%</div>
+<button class="btn-mc" onclick="cancelZip()" style="margin-top:8px">✕ CANCELAR</button>
+</div>
 </div>
 <div id="progress" class="state" style="display:none"></div>
 <div id="state" class="state">Cargando mods...</div>
@@ -353,40 +369,60 @@ async function downloadOne(filename){
   }
   fallbackDownload(filename);
 }
+let zipCancelled=false;
+function cancelZip(){ zipCancelled=true; document.getElementById('zipModal').classList.remove('active'); }
 async function downloadZipServer(){
-  const btnAll=document.getElementById('dlAllBtn');
-  const btnZip=document.getElementById('zipBtn');
-  const origAll=btnAll?btnAll.textContent:'';
-  const origZip=btnZip?btnZip.textContent:'';
-  const prog=document.getElementById('progress');
-  if(btnAll) btnAll.textContent='📦 Generando ZIP...';
-  if(btnZip) btnZip.textContent='📦 Generando...';
-  prog.style.display='block'; prog.textContent='📦 Generando ZIP del servidor...';
-  try{
-    const res=await fetch('/.netlify/functions/download-zip');
-    const ct=res.headers.get('Content-Type')||'';
-    if(res.ok && ct.includes('application/json')){
-      const j=await res.json();
-      if(j.url){ prog.textContent='✓ ZIP listo, iniciando descarga...'; window.location.href=j.url; }
-      else throw new Error(j.error||j.details||JSON.stringify(j));
-    } else if(res.ok){
-      const blob=await res.blob();
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a'); a.href=url; a.download='mods.zip'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-      prog.textContent='✓ ZIP descargado';
-    } else {
-      const j=await res.json().catch(async()=>({error:await res.text()}));
-      const msg=j.error||j.details||j.raw||res.statusText||'Error desconocido';
-      throw new Error(msg + (j.details?(' - '+j.details):''));
+  const list=getClientMods();
+  if(!list.length) return alert('No hay mods cliente');
+  zipCancelled=false;
+  const modal=document.getElementById('zipModal');
+  const status=document.getElementById('zipStatus');
+  const fill=document.getElementById('zipFill');
+  const pct=document.getElementById('zipPct');
+  modal.classList.add('active');
+  status.textContent='Preparando descarga...'; fill.style.width='0%'; pct.textContent='0%';
+  const zip=new JSZip();
+  const total=list.length;
+  let done=0;
+  const concurrency=4;
+  let idx=0;
+  async function fetchWithRetry(filename){
+    for(let attempt=0;attempt<2;attempt++){
+      try{
+        const r=await fetch('/.netlify/functions/download-mod?file='+encodeURIComponent(filename));
+        if(!r.ok) throw new Error(r.statusText);
+        return await r.blob();
+      }catch(e){ if(attempt===1) throw e; await new Promise(rr=>setTimeout(rr,400)); }
     }
+  }
+  const queue=[...list];
+  async function worker(){
+    while(queue.length && !zipCancelled){
+      const mod=queue.shift();
+      const cur=++idx;
+      status.textContent='Descargando '+mod.filename+' ('+cur+' / '+total+')';
+      try{
+        const blob=await fetchWithRetry(mod.filename);
+        zip.file(mod.filename, blob);
+      }catch(e){ console.warn('skip',mod.filename,e); }
+      done++;
+      const p=Math.round(done/total*85);
+      fill.style.width=p+'%'; pct.textContent=p+'%';
+    }
+  }
+  const workers=Array(Math.min(concurrency,total)).fill(0).map(()=>worker());
+  await Promise.all(workers);
+  if(zipCancelled){ status.textContent='Cancelado'; fill.style.width='0%'; return; }
+  status.textContent='Comprimiendo archivo ZIP final...'; pct.textContent='90%'; fill.style.width='90%';
+  try{
+    const content=await zip.generateAsync({type:'blob', compression:'STORE'});
+    fill.style.width='100%'; pct.textContent='100%'; status.textContent='✓ ZIP listo';
+    const url=URL.createObjectURL(content);
+    const a=document.createElement('a'); a.href=url; a.download='mods-servidor.zip'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    setTimeout(()=>modal.classList.remove('active'),1500);
   }catch(e){
-    const msg=e.message||String(e)||'Error desconocido';
-    prog.textContent='Error: '+msg;
-    alert('Error al generar ZIP: '+msg);
-  } finally {
-    if(btnAll) btnAll.textContent=origAll;
-    if(btnZip) btnZip.textContent=origZip;
-    setTimeout(()=>{ if(prog.textContent.startsWith('✓')||prog.textContent.startsWith('Error')) prog.style.display='none'; },4000);
+    status.textContent='Error: '+e.message; alert('Error comprimiendo: '+e.message);
   }
 }
 const downloadAllSequential=downloadZipServer;
