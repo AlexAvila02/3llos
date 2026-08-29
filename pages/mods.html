@@ -120,6 +120,12 @@ a{color:inherit}
 .card.sel{outline:3px solid #55ff55;outline-offset:-3px}
 .cb{width:18px;height:18px;accent-color:#5aaa3a;cursor:pointer}
 .sel-bar{max-width:920px;margin:0 auto 10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;background:#c6c6c6;border:3px solid #000;box-shadow:inset -2px -2px 0 #555, inset 2px 2px 0 #fff;padding:8px}
+.badge{display:inline-block;font-size:6px;padding:3px 6px;border:2px solid #000;box-shadow:2px 2px 0 rgba(0,0,0,.4);margin-bottom:4px}
+.badge-obl{background:#5aaa3a;color:#fff;border-color:#2d631d}
+.badge-opt{background:#f7d51d;color:#373737;border-color:#8a6d00}
+.badge-srv{background:#8b8b8b;color:#fff;border-color:#373737}
+.filter-bar{max-width:920px;margin:0 auto 10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.filter-bar .btn-mc.active{background:#fff;color:#373737;border-color:#373737;box-shadow:inset 2px 2px 0 #555}
 .grass-bar{height:14px;background:repeating-linear-gradient(90deg,#5aaa3a 0 16px,#4a962f 16px 32px);border:3px solid #2d631d;box-shadow:2px 2px 0 #000;margin:0 auto 14px;max-width:920px}
 </style>
 </head>
@@ -162,6 +168,12 @@ a{color:inherit}
 </div>
 </div>
 </div>
+<div class="filter-bar" id="filterBar">
+<button class="btn-mc" data-f="todos" onclick="setFilter('todos')">TODOS</button>
+<button class="btn-mc active" data-f="necesarios" onclick="setFilter('necesarios')">OBLIGATORIOS</button>
+<button class="btn-mc" data-f="opcional" onclick="setFilter('opcional')">OPCIONALES</button>
+<button class="btn-mc" data-f="servidor" onclick="setFilter('servidor')">SOLO SERVIDOR</button>
+</div>
 <div class="sel-bar" id="selBar" style="display:none">
 <div style="display:flex;gap:8px;align-items:center">
 <button class="btn-mc" onclick="selectAll(true)">☑ TODOS</button>
@@ -174,13 +186,39 @@ a{color:inherit}
 <div id="state" class="state">Cargando mods...</div>
 <div id="grid" class="grid" style="display:none"></div>
 <script>
+const SERVER_KW=['chunky','ftbbackups','ftb-ranks','ftb-essentials','spark','skinrestorer','daytimecontrol','madeinsleep'];
+const OPTIONAL_KW=['xaerominimap','xaeroworldmap','mousetweaks','jade','enhanced_boss_bars','emotecraft'];
+function classify(filename){
+  const n=filename.toLowerCase();
+  if(SERVER_KW.some(k=>n.includes(k))) return 'servidor';
+  if(OPTIONAL_KW.some(k=>n.includes(k))) return 'opcional';
+  return 'obligatorio';
+}
+function badgeHtml(type){
+  if(type==='servidor') return '<span class="badge badge-srv">[ SERVIDOR ]</span>';
+  if(type==='opcional') return '<span class="badge badge-opt">[ OPCIONAL ]</span>';
+  return '<span class="badge badge-obl">[ OBLIGATORIO ]</span>';
+}
+let currentFilter='necesarios';
+function setFilter(f){
+  currentFilter=f;
+  document.querySelectorAll('#filterBar .btn-mc').forEach(b=>b.classList.toggle('active', b.dataset.f===f));
+  render();
+}
+function passesFilter(type){
+  if(currentFilter==='todos') return true;
+  if(currentFilter==='necesarios') return type!=='servidor';
+  return type===currentFilter;
+}
+function getClientMods(){ return cachedMods.filter(m=> classify(m.filename)!=='servidor'); }
 let selected=new Set();
 function render(){
   const grid=document.getElementById('grid');
   const count=document.getElementById('count');
   const state=document.getElementById('state');
   const q=(document.getElementById('search').value||'').toLowerCase().trim();
-  const filtered=cachedMods.filter(m=>!q||m.name.toLowerCase().includes(q)||m.filename.toLowerCase().includes(q));
+  let filtered=cachedMods.filter(m=>!q||m.name.toLowerCase().includes(q)||m.filename.toLowerCase().includes(q));
+  filtered=filtered.filter(m=> passesFilter(classify(m.filename)));
   if(!filtered.length){
     grid.style.display='none';
     if(cachedMods.length) { state.style.display='block'; state.textContent='Sin resultados para "'+q+'"'; }
@@ -192,8 +230,10 @@ function render(){
   state.style.display='none'; grid.style.display='grid';
   grid.innerHTML=filtered.map(m=>{
     const sel=selected.has(m.filename);
+    const type=classify(m.filename);
     return `<div class="card ${sel?'sel':''}">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" class="cb" ${sel?'checked':''} onchange="toggleSel('${m.filename.replace(/'/g,"\\'")}')"><h3 style="flex:1">${m.name}</h3></label>
+        ${badgeHtml(type)}
         <div class="mc-inv"><div class="slot">📦</div><span class="meta">${m.filename}<br>${m.size}</span></div>
         <a class="download-mc" href="#" onclick="downloadOne('${m.filename.replace(/'/g,"\\'")}');return false">DESCARGAR</a>
       </div>`;
@@ -205,8 +245,15 @@ function render(){
 function toggleSel(f){ if(selected.has(f)) selected.delete(f); else selected.add(f); render(); }
 function selectAll(v){
   const q=(document.getElementById('search').value||'').toLowerCase().trim();
-  const filtered=cachedMods.filter(m=>!q||m.name.toLowerCase().includes(q)||m.filename.toLowerCase().includes(q));
-  filtered.forEach(m=> v?selected.add(m.filename):selected.delete(m.filename));
+  let filtered=cachedMods.filter(m=>!q||m.name.toLowerCase().includes(q)||m.filename.toLowerCase().includes(q));
+  filtered=filtered.filter(m=> passesFilter(classify(m.filename)));
+  if(v){
+    const clientFiltered=filtered.filter(m=> classify(m.filename)!=='servidor');
+    const toAdd = clientFiltered.length ? clientFiltered : filtered;
+    toAdd.forEach(m=> selected.add(m.filename));
+  } else {
+    filtered.forEach(m=> selected.delete(m.filename));
+  }
   render();
 }
 function updateSel(){
@@ -307,18 +354,19 @@ async function downloadOne(filename){
   fallbackDownload(filename);
 }
 async function downloadAllSequential(){
-  if(!cachedMods.length) return alert('No hay mods');
+  const list=getClientMods();
+  if(!list.length) return alert('No hay mods necesarios');
   const useFolder=dirHandle||await ensureFolder();
   if(useFolder && dirHandle){
     const prog=document.getElementById('progress'); prog.style.display='block';
-    for(let i=0;i<cachedMods.length;i++){
-      const f=cachedMods[i].filename; prog.textContent='Guardando '+(i+1)+'/'+cachedMods.length+': '+f;
+    for(let i=0;i<list.length;i++){
+      const f=list[i].filename; prog.textContent='Guardando '+(i+1)+'/'+list.length+': '+f;
       try{ const res=await fetch('/.netlify/functions/download-mod?file='+encodeURIComponent(f)); const blob=await res.blob(); await saveToFolder(f, blob);}catch(e){}
     }
-    prog.textContent='✓ '+cachedMods.length+' mods en '+dirHandle.name; setTimeout(()=>prog.style.display='none',3000); return;
+    prog.textContent='✓ '+list.length+' mods (obligatorios+opcionales) en '+dirHandle.name; setTimeout(()=>prog.style.display='none',3000); return;
   }
-  if(!confirm('Se descargaran '+cachedMods.length+' .jar. ¿Continuar?')) return;
-  for(let i=0;i<cachedMods.length;i++){ fallbackDownload(cachedMods[i].filename); await new Promise(r=>setTimeout(r,600)); }
+  if(!confirm('Se descargaran '+list.length+' mods (sin servidor) .jar. ¿Continuar?')) return;
+  for(let i=0;i<list.length;i++){ fallbackDownload(list[i].filename); await new Promise(r=>setTimeout(r,600)); }
 }
 async function downloadZip(){
   const useFolder=dirHandle||await ensureFolder();

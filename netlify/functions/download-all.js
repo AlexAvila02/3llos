@@ -14,8 +14,10 @@ exports.handler = async () => {
     if (!r.ok) return { statusCode: r.status, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Error listando mods' }) };
     const j = await r.json();
     const raw = j.data || j;
-    const jars = (Array.isArray(raw) ? raw : []).map(x => (x.attributes || x).name || (x.attributes || x).filename).filter(n => n && n.endsWith('.jar'));
-    if (!jars.length) return { statusCode: 404, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'No hay mods .jar' }) };
+    let jars = (Array.isArray(raw) ? raw : []).map(x => (x.attributes || x).name || (x.attributes || x).filename).filter(n => n && n.endsWith('.jar'));
+    const SERVER_KW=['chunky','ftbbackups','ftb-ranks','ftb-essentials','spark','skinrestorer','daytimecontrol','madeinsleep'];
+    jars = jars.filter(n => !SERVER_KW.some(k => n.toLowerCase().includes(k)));
+    if (!jars.length) return { statusCode: 404, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'No hay mods .jar (cliente)' }) };
 
     const zip = new JSZip();
     for (const filename of jars) {
