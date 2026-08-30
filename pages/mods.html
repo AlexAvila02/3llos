@@ -286,7 +286,7 @@ async function downloadSelected(){
     prog.style.display='block';
     for(let i=0;i<list.length;i++){
       prog.textContent='Guardando '+(i+1)+'/'+list.length+': '+list[i];
-      try{ const r=await fetch('/.netlify/functions/download-mod?file='+encodeURIComponent(list[i])); const b=await r.blob(); await saveToFolder(list[i], b);}catch(e){}
+      try{ const r=await fetch('/api/download-mod?file='+encodeURIComponent(list[i])); const b=await r.blob(); await saveToFolder(list[i], b);}catch(e){}
     }
     prog.textContent='✓ '+list.length+' mods en '+dirHandle.name; setTimeout(()=>prog.style.display='none',3000); return;
   }
@@ -300,7 +300,7 @@ async function loadMods(){
   state.style.display='block'; state.textContent='Cargando mods...'; state.className='state';
   grid.style.display='none'; grid.innerHTML='';
   try{
-    const res=await fetch('/.netlify/functions/mods');
+    const res=await fetch('/api/mods');
     if(!res.ok){
       const j=await res.json().catch(()=>({error:res.statusText}));
       throw new Error(j.error||j.details||res.statusText);
@@ -350,7 +350,7 @@ async function saveToFolder(filename, blob){
   }catch(e){ alert('Error guardando '+filename+': '+e.message); return false; }
 }
 function fallbackDownload(filename){
-  const a=document.createElement('a'); a.href='/.netlify/functions/download-mod?file='+encodeURIComponent(filename); a.download=filename;
+  const a=document.createElement('a'); a.href='/api/download-mod?file='+encodeURIComponent(filename); a.download=filename;
   document.body.appendChild(a); a.click(); a.remove();
 }
 async function downloadOne(filename){
@@ -359,7 +359,7 @@ async function downloadOne(filename){
   if(useFolder && dirHandle){
     prog.style.display='block'; prog.textContent='Descargando '+filename+'...';
     try{
-      const res=await fetch('/.netlify/functions/download-mod?file='+encodeURIComponent(filename));
+      const res=await fetch('/api/download-mod?file='+encodeURIComponent(filename));
       if(!res.ok) throw new Error('Error '+res.status);
       const blob=await res.blob(); const ok=await saveToFolder(filename, blob);
       prog.textContent=ok?'Guardado en '+dirHandle.name+'/'+filename:'Error';
@@ -377,7 +377,7 @@ async function downloadZipServer(){
   const orig=btn?btn.textContent:'';
   if(btn) btn.textContent='📦 Generando...';
   try{
-    window.location.href='/.netlify/functions/download-all-zip';
+    window.location.href='/api/download-all-zip';
     setTimeout(()=>{ prog.textContent='Si no inicia la descarga, revisa los logs de Netlify.'; },4000);
   }catch(e){ prog.textContent='Error: '+e.message; }
   finally{ if(btn) setTimeout(()=>btn.textContent=orig,3000); }
@@ -401,7 +401,7 @@ async function downloadZipServerLegacy(){
   async function fetchWithRetry(filename){
     for(let attempt=0;attempt<2;attempt++){
       try{
-        const r=await fetch('/.netlify/functions/download-mod?file='+encodeURIComponent(filename));
+        const r=await fetch('/api/download-mod?file='+encodeURIComponent(filename));
         if(!r.ok) throw new Error(r.statusText);
         return await r.blob();
       }catch(e){ if(attempt===1) throw e; await new Promise(rr=>setTimeout(rr,400)); }
