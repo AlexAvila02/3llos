@@ -383,16 +383,34 @@ let zipCancelled=false;
 function cancelZip(){ zipCancelled=true; document.getElementById('zipModal').classList.remove('active'); }
 async function downloadZipServer(){
   const prog=document.getElementById('progress');
-  prog.style.display='block'; prog.textContent='Generando archivo en el servidor...';
   const btn=document.getElementById('zipBtn');
   const orig=btn?btn.textContent:'';
+  if(dirHandle){
+    prog.style.display='block'; prog.textContent='Generando ZIP en el servidor...';
+    if(btn) btn.textContent='📦 Generando...';
+    try{
+      const res=await fetch('/api/download-all-zip');
+      if(!res.ok){ const j=await res.json().catch(()=>({error:res.statusText})); throw new Error(j.error||j.details||res.statusText); }
+      const ct=res.headers.get('Content-Type')||'';
+      let blob;
+      if(ct.includes('application/json')){
+        const j=await res.json();
+        if(j.url){ const r2=await fetch(j.url); blob=await r2.blob(); }
+        else throw new Error(j.error||'Sin URL');
+      } else blob=await res.blob();
+      const fh=await dirHandle.getFileHandle('mods.zip',{create:true});
+      const w=await fh.createWritable(); await w.write(blob); await w.close();
+      prog.textContent='¡ZIP instalado en '+dirHandle.name+'/mods.zip ✓';
+      setTimeout(()=>prog.style.display='none',3500);
+    }catch(e){ prog.textContent='Error: '+e.message; alert('Error ZIP: '+e.message); }
+    finally{ if(btn) setTimeout(()=>btn.textContent=orig,3000); }
+    return;
+  }
+  prog.style.display='block'; prog.textContent='Generando archivo en el servidor...';
   if(btn) btn.textContent='📦 Generando...';
-  try{
-    window.location.href='/api/download-all-zip';
-    setTimeout(()=>{ prog.textContent='Si no inicia la descarga, revisa los logs de Netlify.'; },4000);
-  }catch(e){ prog.textContent='Error: '+e.message; }
-  finally{ if(btn) setTimeout(()=>btn.textContent=orig,3000); }
-  return;
+  window.location.href='/api/download-all-zip';
+  setTimeout(()=>{ prog.textContent='Si no inicia, revisa logs.'; },4000);
+  setTimeout(()=>{ if(btn) btn.textContent=orig; },3000);
 }
 async function downloadZipServerLegacy(){
   const list=getClientMods();
