@@ -184,9 +184,9 @@ a{color:inherit}
 <div style="display:flex;gap:8px;align-items:center">
 <button class="btn-mc" onclick="selectAll(true)">☑ TODOS</button>
 <button class="btn-mc" onclick="selectAll(false)">☐ NINGUNO</button>
-<span class="count" id="selCount">0 seleccionados</span>
+<span class="count" id="selCount" style="display:flex;align-items:center;gap:6px"><span style="font-size:14px">📦</span>.JAR <span id="selNum">0</span></span>
 </div>
-<button class="btn-mc green" onclick="downloadSelected()" id="dlSelBtn">⬇ SELECCIÓN (0)</button>
+<button class="btn-mc green" onclick="downloadSelected()" id="dlSelBtn" style="display:flex;align-items:center;gap:6px"><span style="font-size:14px">⬇</span> .JAR (<span id="dlNum">0</span>)</button>
 </div>
 <div id="zipModal" class="zip-modal" onclick="if(event.target===this) cancelZip()">
 <div class="zip-box">
@@ -273,9 +273,9 @@ function selectAll(v){
 }
 function updateSel(){
   const n=selected.size;
-  document.getElementById('selCount').textContent=n+' seleccionados';
-  document.getElementById('dlSelBtn').textContent='⬇ SELECCIÓN ('+n+')';
-  document.getElementById('dlSelBtn').style.display=n?'':'none';
+  const sn=document.getElementById('selNum'); if(sn) sn.textContent=n;
+  const dn=document.getElementById('dlNum'); if(dn) dn.textContent=n;
+  document.getElementById('dlSelBtn').style.display=n?'flex':'none';
 }
 async function downloadSelected(){
   const list=[...selected];
