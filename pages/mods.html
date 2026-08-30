@@ -169,7 +169,7 @@ a{color:inherit}
 <input id="search" class="search" placeholder="BUSCAR MOD..." oninput="render()">
 <button class="btn-mc" id="pickFolderBtn" onclick="pickFolder()">📁 CARPETA</button>
 <span id="folderName" class="folder" style="display:none"></span>
-<button class="btn-mc green" onclick="downloadZipServer()" id="zipBtn">⬇ ZIP</button>
+<button class="btn-mc green" onclick="downloadZipServer()" id="zipBtn">📦 .ZIP</button>
 <button class="btn-mc" onclick="loadMods()">↻ ACTUALIZAR</button>
 </div>
 </div>
@@ -186,7 +186,7 @@ a{color:inherit}
 <button class="btn-mc" onclick="selectAll(false)">☐ NINGUNO</button>
 <span class="count" id="selCount" style="display:flex;align-items:center;gap:6px;font-size:14px"><span style="font-size:16px">📦</span>.JAR <span id="selNum">0</span> <span id="selDetail" style="font-size:12px;opacity:.8"></span></span>
 </div>
-<button class="btn-mc green" onclick="downloadSelected()" id="dlSelBtn" style="display:flex;align-items:center;gap:6px"><span style="font-size:14px">⬇</span> .JAR (<span id="dlNum">0</span>)</button>
+<button class="btn-mc green" onclick="downloadSelected()" id="dlSelBtn" style="display:flex;align-items:center;gap:6px"><span style="font-size:14px">📦</span> .JAR (<span id="dlNum">0</span>)</button>
 </div>
 <div id="zipModal" class="zip-modal" onclick="if(event.target===this) cancelZip()">
 <div class="zip-box">
