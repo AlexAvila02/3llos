@@ -445,7 +445,6 @@ async function downloadZipServer(){
     alert('Error ZIP: '+msg);
   } finally{ if(btn) setTimeout(()=>{btn.textContent=orig; if(prog.textContent.startsWith('✓')) prog.style.display='none';},3000); }
 }
-}
 async function downloadZipClientFallback(){
   const list=getClientMods();
   if(!list.length) return;
