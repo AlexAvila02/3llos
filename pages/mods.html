@@ -184,7 +184,7 @@ a{color:inherit}
 <div style="display:flex;gap:8px;align-items:center">
 <button class="btn-mc" onclick="selectAll(true)">☑ TODOS</button>
 <button class="btn-mc" onclick="selectAll(false)">☐ NINGUNO</button>
-<span class="count" id="selCount" style="display:flex;align-items:center;gap:6px"><span style="font-size:14px">📦</span>.JAR <span id="selNum">0</span></span>
+<span class="count" id="selCount" style="display:flex;align-items:center;gap:6px"><span style="font-size:14px">📦</span>.JAR <span id="selNum">0</span> <span id="selDetail" style="font-size:6px;opacity:.7"></span></span>
 </div>
 <button class="btn-mc green" onclick="downloadSelected()" id="dlSelBtn" style="display:flex;align-items:center;gap:6px"><span style="font-size:14px">⬇</span> .JAR (<span id="dlNum">0</span>)</button>
 </div>
@@ -276,6 +276,20 @@ function updateSel(){
   const sn=document.getElementById('selNum'); if(sn) sn.textContent=n;
   const dn=document.getElementById('dlNum'); if(dn) dn.textContent=n;
   document.getElementById('dlSelBtn').style.display=n?'flex':'none';
+  const det=document.getElementById('selDetail');
+  if(det){
+    const clientCount=getClientMods().length;
+    if(n>0 && n===clientCount){
+      const obl=[...selected].filter(f=>classify(f)==='obligatorio').length;
+      const opt=[...selected].filter(f=>classify(f)==='opcional').length;
+      det.textContent=`(${obl}+${opt})`;
+    } else if(n>0){
+      const obl=[...selected].filter(f=>classify(f)==='obligatorio').length;
+      const opt=[...selected].filter(f=>classify(f)==='opcional').length;
+      if(obl||opt) det.textContent=`(${obl} oblig + ${opt} opc)`;
+      else det.textContent='';
+    } else det.textContent='';
+  }
 }
 async function downloadSelected(){
   const list=[...selected];
