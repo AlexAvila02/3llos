@@ -426,16 +426,27 @@ async function downloadZipServer(){
       const perm=await dirHandle.requestPermission({mode:'readwrite'});
       if(perm!=='granted'){ alert('No se otorgaron permisos de escritura en la carpeta.'); return; }
       const modsSeleccionados = selected.size ? [...selected].map(fn=> cachedMods.find(m=>m.filename===fn)).filter(Boolean) : getClientMods();
-      const modsAInstalar=listaMods;
-      for(let i=0;i<modsAInstalar.length;i++){
-        const mod=modsAInstalar[i];
-        prog.textContent=`Instalando ${i+1}/${modsAInstalar.length}: ${mod.name}...`;
-        try{ await guardarModEnDisco(dirHandle, mod); }catch(err){
-          console.warn(`Reintentando ${mod.filename} por bloqueo de disco...`);
-          try{ await new Promise(r=>setTimeout(r,300)); await guardarModEnDisco(dirHandle, mod); }catch(retryErr){ console.error(`Error definitivo con ${mod.filename}:`,retryErr); }
-        }
-      }
-      prog.textContent='¡Todos los mods se guardaron correctamente en la carpeta! ✓';
+      prog.textContent='Generando ZIP en el servidor...';
+      const zipRes=await fetch('/api/download-all-zip', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({files: modsSeleccionados.map(m=>m.filename)})
+      });
+      const zipData=await zipRes.json();
+      if(!zipRes.ok) throw new Error(zipData.error||zipData.details||JSON.stringify(zipData));
+      const zipUrl=zipData.downloadUrl||zipData.url;
+      if(!zipUrl) throw new Error('No downloadUrl');
+      prog.textContent='Descargando ZIP...';
+      const fileRes=await fetch(zipUrl);
+      if(!fileRes.ok) throw new Error('ZIP fetch '+fileRes.status);
+      const blob=await fileRes.blob();
+      try{ await dirHandle.removeEntry('mods.zip'); }catch(e){}
+      const fileHandle=await dirHandle.getFileHandle('mods.zip',{create:true});
+      const writable=await fileHandle.createWritable({keepExistingData:false});
+      await writable.write(blob);
+      await writable.close();
+      await new Promise(r=>setTimeout(r,100));
+      prog.textContent='¡ZIP guardado en '+dirHandle.name+'/mods.zip ✓';
       setTimeout(()=>prog.style.display='none',3500);
       return;
     }
