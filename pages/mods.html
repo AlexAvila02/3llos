@@ -280,15 +280,22 @@ function updateSel(){
 async function downloadSelected(){
   const list=[...selected];
   if(!list.length) return alert('Selecciona al menos 1 mod');
-  const useFolder=dirHandle||await ensureFolder();
-  const prog=document.getElementById('progress');
-  if(useFolder && dirHandle){
+  if(dirHandle){
+    const prog=document.getElementById('progress');
     prog.style.display='block';
     for(let i=0;i<list.length;i++){
-      prog.textContent='Guardando '+(i+1)+'/'+list.length+': '+list[i];
-      try{ const r=await fetch('/api/download-mod?file='+encodeURIComponent(list[i])); const b=await r.blob(); await saveToFolder(list[i], b);}catch(e){}
+      prog.textContent='Instalando en tu carpeta de Minecraft: '+(i+1)+' de '+list.length+'...';
+      try{
+        const r=await fetch('/api/download-mod?file='+encodeURIComponent(list[i]));
+        if(!r.ok) throw new Error(r.statusText);
+        const b=await r.blob();
+        const fh=await dirHandle.getFileHandle(list[i], {create:true});
+        const w=await fh.createWritable(); await w.write(b); await w.close();
+      }catch(e){ console.warn(e); }
     }
-    prog.textContent='✓ '+list.length+' mods en '+dirHandle.name; setTimeout(()=>prog.style.display='none',3000); return;
+    prog.textContent='¡Mods instalados directamente en tu Minecraft con éxito! ✓ ('+list.length+' en '+dirHandle.name+')';
+    setTimeout(()=>prog.style.display='none',3500);
+    return;
   }
   if(!confirm('Descargar '+list.length+' mods?')) return;
   for(const f of list){ fallbackDownload(f); await new Promise(r=>setTimeout(r,600)); }
@@ -329,9 +336,10 @@ async function pickFolder(){
   if(!window.showDirectoryPicker){ alert('Tu navegador no soporta elegir carpeta (usa Chrome/Edge). Se usara Descargas.'); return; }
   try{
     dirHandle=await window.showDirectoryPicker({mode:'readwrite'});
-    const el=document.getElementById('folderName'); el.textContent='📁 '+dirHandle.name; el.style.display='block';
+    const el=document.getElementById('folderName'); el.textContent='📁 '+dirHandle.name; el.style.display='block'; el.style.color='#2d631d';
+    const btn=document.getElementById('pickFolderBtn'); if(btn){ btn.textContent='✓ CARPETA LISTA'; btn.classList.add('green'); }
     const perm=await dirHandle.requestPermission({mode:'readwrite'});
-    if(perm!=='granted') dirHandle=null;
+    if(perm!=='granted'){ dirHandle=null; if(btn){ btn.textContent='📁 CARPETA'; btn.classList.remove('green'); } el.style.display='none'; }
   }catch(e){ if(e.name!=='AbortError') alert(e.message); }
 }
 async function ensureFolder(){
@@ -354,17 +362,20 @@ function fallbackDownload(filename){
   document.body.appendChild(a); a.click(); a.remove();
 }
 async function downloadOne(filename){
-  const useFolder=dirHandle||await ensureFolder();
-  const prog=document.getElementById('progress');
-  if(useFolder && dirHandle){
-    prog.style.display='block'; prog.textContent='Descargando '+filename+'...';
+  if(dirHandle){
+    const prog=document.getElementById('progress');
+    prog.style.display='block'; prog.textContent='Instalando en tu carpeta de Minecraft: '+filename+'...';
     try{
       const res=await fetch('/api/download-mod?file='+encodeURIComponent(filename));
       if(!res.ok) throw new Error('Error '+res.status);
-      const blob=await res.blob(); const ok=await saveToFolder(filename, blob);
-      prog.textContent=ok?'Guardado en '+dirHandle.name+'/'+filename:'Error';
-      setTimeout(()=>prog.style.display='none',2000); if(ok) return;
-    }catch(e){ prog.textContent='Error: '+e.message; }
+      const blob=await res.blob();
+      const fh=await dirHandle.getFileHandle(filename, {create:true});
+      const w=await fh.createWritable(); await w.write(blob); await w.close();
+      prog.textContent='¡Mod instalado en '+dirHandle.name+'/'+filename+' ✓';
+      setTimeout(()=>prog.style.display='none',2500);
+      return;
+    }catch(e){ prog.textContent='Error: '+e.message; setTimeout(()=>prog.style.display='none',2500); }
+    return;
   }
   fallbackDownload(filename);
 }
