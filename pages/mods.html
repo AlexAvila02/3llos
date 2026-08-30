@@ -385,32 +385,85 @@ async function downloadZipServer(){
   const prog=document.getElementById('progress');
   const btn=document.getElementById('zipBtn');
   const orig=btn?btn.textContent:'';
-  if(dirHandle){
-    prog.style.display='block'; prog.textContent='Generando ZIP en el servidor...';
-    if(btn) btn.textContent='📦 Generando...';
-    try{
-      const res=await fetch('/api/download-all-zip');
-      if(!res.ok){ const j=await res.json().catch(()=>({error:res.statusText})); throw new Error(j.error||j.details||res.statusText); }
-      const ct=res.headers.get('Content-Type')||'';
-      let blob;
-      if(ct.includes('application/json')){
-        const j=await res.json();
-        if(j.url){ const r2=await fetch(j.url); blob=await r2.blob(); }
-        else throw new Error(j.error||'Sin URL');
-      } else blob=await res.blob();
-      const fh=await dirHandle.getFileHandle('mods.zip',{create:true});
-      const w=await fh.createWritable(); await w.write(blob); await w.close();
-      prog.textContent='¡ZIP instalado en '+dirHandle.name+'/mods.zip ✓';
-      setTimeout(()=>prog.style.display='none',3500);
-    }catch(e){ prog.textContent='Error: '+e.message; alert('Error ZIP: '+e.message); }
-    finally{ if(btn) setTimeout(()=>btn.textContent=orig,3000); }
-    return;
-  }
-  prog.style.display='block'; prog.textContent='Generando archivo en el servidor...';
   if(btn) btn.textContent='📦 Generando...';
-  window.location.href='/api/download-all-zip';
-  setTimeout(()=>{ prog.textContent='Si no inicia, revisa logs.'; },4000);
-  setTimeout(()=>{ if(btn) btn.textContent=orig; },3000);
+  prog.style.display='block'; prog.textContent='Generando ZIP en el servidor...';
+  try{
+    const res=await fetch('/api/download-all-zip');
+    if(!res.ok){
+      const j=await res.json().catch(async()=>({error:await res.text()}));
+      throw new Error(j.error||j.details||JSON.stringify(j).slice(0,300));
+    }
+    const ct=res.headers.get('Content-Type')||'';
+    if(ct.includes('application/json')){
+      const j=await res.json();
+      if(j.url){
+        if(dirHandle){
+          prog.textContent='Descargando ZIP...';
+          const r2=await fetch(j.url); const blob=await r2.blob();
+          const fh=await dirHandle.getFileHandle('mods.zip',{create:true});
+          const w=await fh.createWritable(); await w.write(blob); await w.close();
+          prog.textContent='¡ZIP en '+dirHandle.name+'/mods.zip ✓';
+          setTimeout(()=>prog.style.display='none',3500);
+        } else { window.location.href=j.url; prog.textContent='✓ Redirigiendo...'; }
+        return;
+      }
+      throw new Error(j.error||'Sin URL');
+    } else {
+      const blob=await res.blob();
+      if(dirHandle){
+        const fh=await dirHandle.getFileHandle('mods.zip',{create:true});
+        const w=await fh.createWritable(); await w.write(blob); await w.close();
+        prog.textContent='¡ZIP en '+dirHandle.name+'/mods.zip ✓';
+      } else {
+        const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='mods.zip'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),5000);
+        prog.textContent='✓ ZIP descargado';
+      }
+    }
+  }catch(e){
+    const msg=e.message||String(e);
+    if(msg.includes('Failed to fetch')){
+      prog.textContent='Servidor saturado, generando ZIP local...';
+      await downloadZipClientFallback();
+      return;
+    }
+    prog.textContent='Error: '+msg;
+    alert('Error ZIP: '+msg);
+  } finally{ if(btn) setTimeout(()=>{btn.textContent=orig; if(prog.textContent.startsWith('✓')) prog.style.display='none';},3000); }
+}
+async function downloadZipClientFallback(){
+  const list=getClientMods();
+  if(!list.length) return;
+  const modal=document.getElementById('zipModal');
+  const status=document.getElementById('zipStatus');
+  const fill=document.getElementById('zipFill');
+  const pct=document.getElementById('zipPct');
+  modal.classList.add('active');
+  status.textContent='Servidor ocupado, generando ZIP local...';
+  const zip=new JSZip(); let done=0, idx=0; const total=list.length;
+  const queue=[...list];
+  async function worker(){
+    while(queue.length && !zipCancelled){
+      const mod=queue.shift(); const cur=++idx;
+      status.textContent='Descargando '+mod.filename+' ('+cur+'/'+total+')';
+      try{ const r=await fetch('/api/download-mod?file='+encodeURIComponent(mod.filename)); if(!r.ok) throw new Error(r.statusText); const b=await r.blob(); zip.file(mod.filename,b);}catch(e){}
+      done++; const p=Math.round(done/total*85); fill.style.width=p+'%'; pct.textContent=p+'%';
+    }
+  }
+  await Promise.all(Array(4).fill(0).map(()=>worker()));
+  if(zipCancelled) return;
+  status.textContent='Comprimiendo...'; pct.textContent='90%'; fill.style.width='90%';
+  const content=await zip.generateAsync({type:'blob', compression:'STORE', mimeType:'application/zip'});
+  const blob=new Blob([content],{type:'application/zip'});
+  if(dirHandle){
+    const fh=await dirHandle.getFileHandle('mods.zip',{create:true});
+    const w=await fh.createWritable(); await w.write(blob); await w.close();
+    status.textContent='¡ZIP en '+dirHandle.name+'/mods.zip ✓';
+  } else {
+    const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='mods-servidor.zip'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),5000);
+    status.textContent='✓ ZIP local listo';
+  }
+  fill.style.width='100%'; pct.textContent='100%';
+  setTimeout(()=>modal.classList.remove('active'),1500);
 }
 async function downloadZipServerLegacy(){
   const list=getClientMods();
