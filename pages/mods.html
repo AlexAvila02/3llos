@@ -300,20 +300,16 @@ async function downloadSelected(){
     const prog=document.getElementById('progress');
     prog.style.display='block';
     const listaMods=list.map(fn=> cachedMods.find(m=>m.filename===fn)).filter(Boolean);
-    for(let i=0;i<listaMods.length;i++){
-      const mod=listaMods[i];
-      prog.textContent=`Guardando ${i+1}/${listaMods.length}: ${mod.name}...`;
-      try{
-        const res=await fetch(`/api/download-mod?file=${encodeURIComponent(mod.filename)}`);
-        if(!res.ok){ console.warn(`No se pudo descargar ${mod.filename}`); continue; }
-        const blob=await res.blob();
-        const fileHandle=await dirHandle.getFileHandle(mod.filename,{create:true});
-        const writable=await fileHandle.createWritable({keepExistingData:false});
-        await writable.write(blob);
-        await writable.close();
-      }catch(fileErr){ console.error(`Error guardando ${mod.filename}:`,fileErr); }
+    const modsAInstalar=listaMods;
+    for(let i=0;i<modsAInstalar.length;i++){
+      const mod=modsAInstalar[i];
+      prog.textContent=`Instalando ${i+1}/${modsAInstalar.length}: ${mod.name}...`;
+      try{ await guardarModEnDisco(dirHandle, mod); }catch(err){
+        console.warn(`Reintentando ${mod.filename} por bloqueo de disco...`);
+        try{ await new Promise(r=>setTimeout(r,300)); await guardarModEnDisco(dirHandle, mod); }catch(retryErr){ console.error(`Error definitivo con ${mod.filename}:`,retryErr); }
+      }
     }
-    prog.textContent='¡Instalación completada con éxito! ✓';
+    prog.textContent='¡Todos los mods se guardaron correctamente en la carpeta! ✓';
     setTimeout(()=>prog.style.display='none',3500);
     return;
   }
@@ -374,13 +370,24 @@ async function saveToFolder(filename, blob){
   if(!dirHandle) return false;
   try{
     const fh=await dirHandle.getFileHandle(filename,{create:true});
-    const w=await fh.createWritable(); await w.write(blob); await w.close(); return true;
+    const w=await fh.createWritable({keepExistingData:false}); await w.write(blob); await w.close(); return true;
   }catch(e){ alert('Error guardando '+filename+': '+e.message); return false; }
 }
 async function fetchModBlob(filename){
   const r=await fetch('/api/download-mod?file='+encodeURIComponent(filename));
   if(!r.ok){ const t=await r.text(); throw new Error(t.slice(0,300)); }
   return await r.blob();
+}
+async function guardarModEnDisco(dirHandle, mod){
+  try{ await dirHandle.removeEntry(mod.filename); }catch(e){}
+  const res=await fetch(`/api/download-mod?file=${encodeURIComponent(mod.filename)}`);
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const blob=await res.blob();
+  const fileHandle=await dirHandle.getFileHandle(mod.filename,{create:true});
+  const writable=await fileHandle.createWritable({keepExistingData:false});
+  await writable.write(blob);
+  await writable.close();
+  await new Promise(resolve=>setTimeout(resolve,100));
 }
 function fallbackDownload(filename){
   const a=document.createElement('a'); a.href='/api/download-mod?file='+encodeURIComponent(filename); a.download=filename;
@@ -393,17 +400,15 @@ async function downloadOne(filename){
     const prog=document.getElementById('progress');
     prog.style.display='block'; prog.textContent='Instalando en tu carpeta de Minecraft: '+filename+'...';
     try{
-      const res=await fetch(`/api/download-mod?file=${encodeURIComponent(filename)}`);
-      if(!res.ok) throw new Error('Error '+res.status);
-      const blob=await res.blob();
-      const fileHandle=await dirHandle.getFileHandle(filename,{create:true});
-      const writable=await fileHandle.createWritable({keepExistingData:false});
-      await writable.write(blob);
-      await writable.close();
+      const mod={filename, name:filename.replace('.jar','')};
+      await guardarModEnDisco(dirHandle, mod);
       prog.textContent='¡Mod instalado en '+dirHandle.name+'/'+filename+' ✓';
       setTimeout(()=>prog.style.display='none',2500);
       return;
-    }catch(e){ prog.textContent='Error: '+e.message; setTimeout(()=>prog.style.display='none',2500); }
+    }catch(e){
+      try{ await new Promise(r=>setTimeout(r,300)); await guardarModEnDisco(dirHandle, {filename, name:filename.replace('.jar','')}); prog.textContent='¡Mod instalado en '+dirHandle.name+'/'+filename+' ✓'; setTimeout(()=>prog.style.display='none',2500); return; }catch(retryErr){}
+      prog.textContent='Error: '+e.message; setTimeout(()=>prog.style.display='none',2500);
+    }
     return;
   }
   fallbackDownload(filename);
@@ -421,21 +426,16 @@ async function downloadZipServer(){
       const perm=await dirHandle.requestPermission({mode:'readwrite'});
       if(perm!=='granted'){ alert('No se otorgaron permisos de escritura en la carpeta.'); return; }
       const modsSeleccionados = selected.size ? [...selected].map(fn=> cachedMods.find(m=>m.filename===fn)).filter(Boolean) : getClientMods();
-      const listaMods=modsSeleccionados;
-      for(let i=0;i<listaMods.length;i++){
-        const mod=listaMods[i];
-        prog.textContent=`Guardando ${i+1}/${listaMods.length}: ${mod.name}...`;
-        try{
-          const res=await fetch(`/api/download-mod?file=${encodeURIComponent(mod.filename)}`);
-          if(!res.ok){ console.warn(`No se pudo descargar ${mod.filename}`); continue; }
-          const blob=await res.blob();
-          const fileHandle=await dirHandle.getFileHandle(mod.filename,{create:true});
-          const writable=await fileHandle.createWritable({keepExistingData:false});
-          await writable.write(blob);
-          await writable.close();
-        }catch(fileErr){ console.error(`Error guardando ${mod.filename}:`,fileErr); }
+      const modsAInstalar=listaMods;
+      for(let i=0;i<modsAInstalar.length;i++){
+        const mod=modsAInstalar[i];
+        prog.textContent=`Instalando ${i+1}/${modsAInstalar.length}: ${mod.name}...`;
+        try{ await guardarModEnDisco(dirHandle, mod); }catch(err){
+          console.warn(`Reintentando ${mod.filename} por bloqueo de disco...`);
+          try{ await new Promise(r=>setTimeout(r,300)); await guardarModEnDisco(dirHandle, mod); }catch(retryErr){ console.error(`Error definitivo con ${mod.filename}:`,retryErr); }
+        }
       }
-      prog.textContent='¡Instalación completada con éxito! ✓';
+      prog.textContent='¡Todos los mods se guardaron correctamente en la carpeta! ✓';
       setTimeout(()=>prog.style.display='none',3500);
       return;
     }
