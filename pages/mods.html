@@ -371,6 +371,19 @@ async function downloadOne(filename){
 let zipCancelled=false;
 function cancelZip(){ zipCancelled=true; document.getElementById('zipModal').classList.remove('active'); }
 async function downloadZipServer(){
+  const prog=document.getElementById('progress');
+  prog.style.display='block'; prog.textContent='Generando archivo en el servidor...';
+  const btn=document.getElementById('zipBtn');
+  const orig=btn?btn.textContent:'';
+  if(btn) btn.textContent='📦 Generando...';
+  try{
+    window.location.href='/.netlify/functions/download-all-zip';
+    setTimeout(()=>{ prog.textContent='Si no inicia la descarga, revisa los logs de Netlify.'; },4000);
+  }catch(e){ prog.textContent='Error: '+e.message; }
+  finally{ if(btn) setTimeout(()=>btn.textContent=orig,3000); }
+  return;
+}
+async function downloadZipServerLegacy(){
   const list=getClientMods();
   if(!list.length) return alert('No hay mods cliente');
   zipCancelled=false;
