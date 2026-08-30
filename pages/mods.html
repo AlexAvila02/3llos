@@ -295,17 +295,25 @@ async function downloadSelected(){
   const list=[...selected];
   if(!list.length) return alert('Selecciona al menos 1 mod');
   if(dirHandle){
+    const perm=await dirHandle.requestPermission({mode:'readwrite'});
+    if(perm!=='granted'){ alert('No se otorgaron permisos de escritura en la carpeta.'); return; }
     const prog=document.getElementById('progress');
     prog.style.display='block';
-    for(let i=0;i<list.length;i++){
-      prog.textContent='Instalando en tu carpeta de Minecraft: '+(i+1)+' de '+list.length+'...';
+    const listaMods=list.map(fn=> cachedMods.find(m=>m.filename===fn)).filter(Boolean);
+    for(let i=0;i<listaMods.length;i++){
+      const mod=listaMods[i];
+      prog.textContent=`Guardando ${i+1}/${listaMods.length}: ${mod.name}...`;
       try{
-        const b=await fetchModBlob(list[i]);
-        const fh=await dirHandle.getFileHandle(list[i], {create:true});
-        const w=await fh.createWritable(); await w.write(b); await w.close();
-      }catch(e){ console.warn(e); }
+        const res=await fetch(`/api/download-mod?file=${encodeURIComponent(mod.filename)}`);
+        if(!res.ok){ console.warn(`No se pudo descargar ${mod.filename}`); continue; }
+        const blob=await res.blob();
+        const fileHandle=await dirHandle.getFileHandle(mod.filename,{create:true});
+        const writable=await fileHandle.createWritable({keepExistingData:false});
+        await writable.write(blob);
+        await writable.close();
+      }catch(fileErr){ console.error(`Error guardando ${mod.filename}:`,fileErr); }
     }
-    prog.textContent='¡Mods instalados directamente en tu Minecraft con éxito! ✓ ('+list.length+' en '+dirHandle.name+')';
+    prog.textContent='¡Instalación completada con éxito! ✓';
     setTimeout(()=>prog.style.display='none',3500);
     return;
   }
@@ -380,12 +388,18 @@ function fallbackDownload(filename){
 }
 async function downloadOne(filename){
   if(dirHandle){
+    const perm=await dirHandle.requestPermission({mode:'readwrite'});
+    if(perm!=='granted'){ alert('No se otorgaron permisos de escritura en la carpeta.'); return; }
     const prog=document.getElementById('progress');
     prog.style.display='block'; prog.textContent='Instalando en tu carpeta de Minecraft: '+filename+'...';
     try{
-      const blob=await fetchModBlob(filename);
-      const fh=await dirHandle.getFileHandle(filename, {create:true});
-      const w=await fh.createWritable(); await w.write(blob); await w.close();
+      const res=await fetch(`/api/download-mod?file=${encodeURIComponent(filename)}`);
+      if(!res.ok) throw new Error('Error '+res.status);
+      const blob=await res.blob();
+      const fileHandle=await dirHandle.getFileHandle(filename,{create:true});
+      const writable=await fileHandle.createWritable({keepExistingData:false});
+      await writable.write(blob);
+      await writable.close();
       prog.textContent='¡Mod instalado en '+dirHandle.name+'/'+filename+' ✓';
       setTimeout(()=>prog.style.display='none',2500);
       return;
@@ -404,19 +418,24 @@ async function downloadZipServer(){
   prog.style.display='block'; prog.textContent='Generando archivo en el servidor...';
   try{
     if(dirHandle){
+      const perm=await dirHandle.requestPermission({mode:'readwrite'});
+      if(perm!=='granted'){ alert('No se otorgaron permisos de escritura en la carpeta.'); return; }
       const modsSeleccionados = selected.size ? [...selected].map(fn=> cachedMods.find(m=>m.filename===fn)).filter(Boolean) : getClientMods();
-      for(let i=0;i<modsSeleccionados.length;i++){
-        const mod=modsSeleccionados[i];
-        prog.textContent=`Guardando ${i+1}/${modsSeleccionados.length}: ${mod.name}...`;
-        const res=await fetch(`/api/download-mod?file=${encodeURIComponent(mod.filename)}`);
-        if(!res.ok) throw new Error('Error '+res.status);
-        const blob=await res.blob();
-        const fileHandle=await dirHandle.getFileHandle(mod.filename,{create:true});
-        const writable=await fileHandle.createWritable();
-        await writable.write(blob);
-        await writable.close();
+      const listaMods=modsSeleccionados;
+      for(let i=0;i<listaMods.length;i++){
+        const mod=listaMods[i];
+        prog.textContent=`Guardando ${i+1}/${listaMods.length}: ${mod.name}...`;
+        try{
+          const res=await fetch(`/api/download-mod?file=${encodeURIComponent(mod.filename)}`);
+          if(!res.ok){ console.warn(`No se pudo descargar ${mod.filename}`); continue; }
+          const blob=await res.blob();
+          const fileHandle=await dirHandle.getFileHandle(mod.filename,{create:true});
+          const writable=await fileHandle.createWritable({keepExistingData:false});
+          await writable.write(blob);
+          await writable.close();
+        }catch(fileErr){ console.error(`Error guardando ${mod.filename}:`,fileErr); }
       }
-      prog.textContent='¡Se guardaron todos los mods en tu carpeta seleccionada! ✓';
+      prog.textContent='¡Instalación completada con éxito! ✓';
       setTimeout(()=>prog.style.display='none',3500);
       return;
     }
