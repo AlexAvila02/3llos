@@ -282,7 +282,7 @@ function updateSel(){
     if(n>0 && n===clientCount){
       const obl=[...selected].filter(f=>classify(f)==='obligatorio').length;
       const opt=[...selected].filter(f=>classify(f)==='opcional').length;
-      det.textContent=`(${obl}+${opt})`;
+      det.textContent=`(${obl} oblig + ${opt} opc)`;
     } else if(n>0){
       const obl=[...selected].filter(f=>classify(f)==='obligatorio').length;
       const opt=[...selected].filter(f=>classify(f)==='opcional').length;
