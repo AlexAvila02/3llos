@@ -374,9 +374,13 @@ async function saveToFolder(filename, blob){
   }catch(e){ alert('Error guardando '+filename+': '+e.message); return false; }
 }
 async function fetchModBlob(filename){
-  const r=await fetch('/api/download-mod?file='+encodeURIComponent(filename));
-  if(!r.ok){ const t=await r.text(); throw new Error(t.slice(0,300)); }
-  return await r.blob();
+  const res=await fetch(`/api/download-mod?file=${encodeURIComponent(filename)}`);
+  if(!res.ok) throw new Error('Error al descargar: '+res.status);
+  return await res.blob();
+}
+function fallbackDownload(filename){
+  const a=document.createElement('a'); a.href='/api/download-mod?file='+encodeURIComponent(filename); a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove();
 }
 async function guardarModEnDisco(dirHandle, mod){
   try{ await dirHandle.removeEntry(mod.filename); }catch(e){}
@@ -427,19 +431,13 @@ async function downloadZipServer(){
       if(perm!=='granted'){ alert('No se otorgaron permisos de escritura en la carpeta.'); return; }
       const modsSeleccionados = selected.size ? [...selected].map(fn=> cachedMods.find(m=>m.filename===fn)).filter(Boolean) : getClientMods();
       prog.textContent='Generando ZIP en el servidor...';
-      const zipRes=await fetch('/api/download-all-zip', {
+      const res=await fetch('/api/download-all-zip', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({files: modsSeleccionados.map(m=>m.filename)})
       });
-      const zipData=await zipRes.json();
-      if(!zipRes.ok) throw new Error(zipData.error||zipData.details||JSON.stringify(zipData));
-      const zipUrl=zipData.downloadUrl||zipData.url;
-      if(!zipUrl) throw new Error('No downloadUrl');
-      prog.textContent='Descargando ZIP...';
-      const fileRes=await fetch(zipUrl);
-      if(!fileRes.ok) throw new Error('ZIP fetch '+fileRes.status);
-      const blob=await fileRes.blob();
+      if(!res.ok){ const j=await res.json().catch(async()=>({error:await res.text()})); throw new Error(j.error||j.details||JSON.stringify(j)); }
+      const blob=await res.blob();
       try{ await dirHandle.removeEntry('mods.zip'); }catch(e){}
       const fileHandle=await dirHandle.getFileHandle('mods.zip',{create:true});
       const writable=await fileHandle.createWritable({keepExistingData:false});
@@ -456,17 +454,13 @@ async function downloadZipServer(){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({files: modsSeleccionados.map(m=>m.filename)})
     });
-    const data=await res.json();
-    if(!res.ok) throw new Error(data.error||data.details||JSON.stringify(data));
-    if(data.downloadUrl){
-      const a=document.createElement('a');
-      a.href=data.downloadUrl;
-      a.download=data.archiveName || 'mods.tar.gz';
-      document.body.appendChild(a); a.click(); a.remove();
-      prog.textContent='✓ ZIP descargado';
-    } else if(data.url){
-      window.location.href=data.url;
-    } else throw new Error('No downloadUrl');
+    if(!res.ok){ const j=await res.json().catch(async()=>({error:await res.text()})); throw new Error(j.error||j.details||JSON.stringify(j)); }
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download='mods.zip';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    prog.textContent='✓ ZIP descargado';
   }catch(e){
     const msg=e.message||String(e);
     if(msg.includes('Failed to fetch')){

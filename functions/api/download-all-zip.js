@@ -27,24 +27,33 @@ export async function onRequest(context) {
       files = listData.data.filter(i => i.attributes.name.endsWith('.jar')).map(i => i.attributes.name);
     }
 
-    // Comprimir en Minehost
     const compressRes = await fetch(`${PANEL_URL}/api/client/servers/${SERVER_ID}/files/compress`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${API_KEY}`, 'Accept': 'application/json', 'Content-Type': 'application/json' },
       body: JSON.stringify({ root: '/mods', files })
     });
+    if (!compressRes.ok) {
+      const t = await compressRes.text();
+      return new Response(JSON.stringify({ error: t }), { status: 500, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
+    }
     const compressData = await compressRes.json();
     const archiveName = compressData.attributes.name;
 
-    // Obtener enlace del archivo comprimido
     const dlRes = await fetch(
       `${PANEL_URL}/api/client/servers/${SERVER_ID}/files/download?file=%2Fmods%2F${encodeURIComponent(archiveName)}`,
       { headers: { 'Authorization': `Bearer ${API_KEY}`, 'Accept': 'application/json' } }
     );
     const dlData = await dlRes.json();
+    const wingsUrl = dlData.attributes.url;
 
-    return new Response(JSON.stringify({ downloadUrl: dlData.attributes.url, archiveName }), {
-      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+    const fileRes = await fetch(wingsUrl);
+    return new Response(fileRes.body, {
+      headers: {
+        'Content-Type': 'application/zip',
+        'Content-Disposition': `attachment; filename="${encodeURIComponent(archiveName)}"`,
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      }
     });
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
