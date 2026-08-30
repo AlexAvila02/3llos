@@ -222,7 +222,7 @@ function setFilter(f){
 }
 function passesFilter(type){
   if(currentFilter==='todos') return true;
-  if(currentFilter==='necesarios') return type!=='servidor';
+  if(currentFilter==='necesarios') return type==='obligatorio';
   return type===currentFilter;
 }
 function getClientMods(){ return cachedMods.filter(m=> classify(m.filename)!=='servidor'); }
