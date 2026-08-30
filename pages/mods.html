@@ -358,19 +358,9 @@ async function saveToFolder(filename, blob){
 async function fetchModBlob(filename){
   const r=await fetch('/api/download-mod?file='+encodeURIComponent(filename));
   if(!r.ok){ const t=await r.text(); throw new Error(t.slice(0,300)); }
-  const j=await r.json();
-  const url=j.downloadUrl||j.url||j?.data?.attributes?.url;
-  if(!url) throw new Error('No downloadUrl');
-  const r2=await fetch(url);
-  if(!r2.ok) throw new Error('Fetch mod '+r2.status);
-  return await r2.blob();
+  return await r.blob();
 }
-async function fallbackDownload(filename){
-  try{
-    const j=await (await fetch('/api/download-mod?file='+encodeURIComponent(filename))).json();
-    const url=j.downloadUrl||j.url;
-    if(url){ window.location.href=url; return; }
-  }catch(e){}
+function fallbackDownload(filename){
   const a=document.createElement('a'); a.href='/api/download-mod?file='+encodeURIComponent(filename); a.download=filename;
   document.body.appendChild(a); a.click(); a.remove();
 }
@@ -404,10 +394,9 @@ async function downloadZipServer(){
       for(let i=0;i<modsSeleccionados.length;i++){
         const mod=modsSeleccionados[i];
         prog.textContent=`Guardando ${i+1}/${modsSeleccionados.length}: ${mod.name}...`;
-        const resUrl=await fetch(`/api/download-mod?file=${encodeURIComponent(mod.filename)}`);
-        const {downloadUrl}=await resUrl.json();
-        const fileRes=await fetch(downloadUrl);
-        const blob=await fileRes.blob();
+        const res=await fetch(`/api/download-mod?file=${encodeURIComponent(mod.filename)}`);
+        if(!res.ok) throw new Error('Error '+res.status);
+        const blob=await res.blob();
         const fileHandle=await dirHandle.getFileHandle(mod.filename,{create:true});
         const writable=await fileHandle.createWritable();
         await writable.write(blob);
