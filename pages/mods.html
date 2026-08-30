@@ -397,39 +397,43 @@ async function downloadZipServer(){
   const btn=document.getElementById('zipBtn');
   const orig=btn?btn.textContent:'';
   if(btn) btn.textContent='📦 Generando...';
-  prog.style.display='block'; prog.textContent='Generando ZIP en el servidor...';
+  prog.style.display='block'; prog.textContent='Generando archivo en el servidor...';
   try{
-    const res=await fetch('/api/download-all-zip');
-    if(!res.ok){
-      const j=await res.json().catch(async()=>({error:await res.text()}));
-      throw new Error(j.error||j.details||JSON.stringify(j).slice(0,300));
-    }
-    const ct=res.headers.get('Content-Type')||'';
-    if(ct.includes('application/json')){
-      const j=await res.json();
-      if(j.url){
-        if(dirHandle){
-          prog.textContent='Descargando ZIP...';
-          const r2=await fetch(j.url); const blob=await r2.blob();
-          const fh=await dirHandle.getFileHandle('mods.zip',{create:true});
-          const w=await fh.createWritable(); await w.write(blob); await w.close();
-          prog.textContent='¡ZIP en '+dirHandle.name+'/mods.zip ✓';
-          setTimeout(()=>prog.style.display='none',3500);
-        } else { window.location.href=j.url; prog.textContent='✓ Redirigiendo...'; }
-        return;
+    if(dirHandle){
+      const modsSeleccionados = selected.size ? [...selected].map(fn=> cachedMods.find(m=>m.filename===fn)).filter(Boolean) : getClientMods();
+      for(let i=0;i<modsSeleccionados.length;i++){
+        const mod=modsSeleccionados[i];
+        prog.textContent=`Guardando ${i+1}/${modsSeleccionados.length}: ${mod.name}...`;
+        const resUrl=await fetch(`/api/download-mod?file=${encodeURIComponent(mod.filename)}`);
+        const {downloadUrl}=await resUrl.json();
+        const fileRes=await fetch(downloadUrl);
+        const blob=await fileRes.blob();
+        const fileHandle=await dirHandle.getFileHandle(mod.filename,{create:true});
+        const writable=await fileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
       }
-      throw new Error(j.error||'Sin URL');
-    } else {
-      const blob=await res.blob();
-      if(dirHandle){
-        const fh=await dirHandle.getFileHandle('mods.zip',{create:true});
-        const w=await fh.createWritable(); await w.write(blob); await w.close();
-        prog.textContent='¡ZIP en '+dirHandle.name+'/mods.zip ✓';
-      } else {
-        const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='mods.zip'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),5000);
-        prog.textContent='✓ ZIP descargado';
-      }
+      prog.textContent='¡Se guardaron todos los mods en tu carpeta seleccionada! ✓';
+      setTimeout(()=>prog.style.display='none',3500);
+      return;
     }
+    const modsSeleccionados = selected.size ? [...selected].map(fn=> cachedMods.find(m=>m.filename===fn)).filter(Boolean) : getClientMods();
+    const res=await fetch('/api/download-all-zip', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({files: modsSeleccionados.map(m=>m.filename)})
+    });
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error||data.details||JSON.stringify(data));
+    if(data.downloadUrl){
+      const a=document.createElement('a');
+      a.href=data.downloadUrl;
+      a.download=data.archiveName || 'mods.tar.gz';
+      document.body.appendChild(a); a.click(); a.remove();
+      prog.textContent='✓ ZIP descargado';
+    } else if(data.url){
+      window.location.href=data.url;
+    } else throw new Error('No downloadUrl');
   }catch(e){
     const msg=e.message||String(e);
     if(msg.includes('Failed to fetch')){
@@ -440,6 +444,7 @@ async function downloadZipServer(){
     prog.textContent='Error: '+msg;
     alert('Error ZIP: '+msg);
   } finally{ if(btn) setTimeout(()=>{btn.textContent=orig; if(prog.textContent.startsWith('✓')) prog.style.display='none';},3000); }
+}
 }
 async function downloadZipClientFallback(){
   const list=getClientMods();
