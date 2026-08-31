@@ -29,14 +29,15 @@ exports.handler = async () => {
     const mods = list
       .map(item => {
         const attr = item.attributes || item;
-        return { filename: attr.name || attr.filename, sizeBytes: attr.size ?? attr.bytes ?? 0 };
+        return { filename: attr.name || attr.filename, sizeBytes: attr.size ?? attr.bytes ?? 0, updatedAt: attr.modified_at || attr.modifiedAt || attr.mtime || null };
       })
       .filter(m => m.filename && m.filename.endsWith('.jar'))
       .map(m => ({
         filename: m.filename,
         name: m.filename.replace(/\.jar$/i, ''),
         size: (m.sizeBytes / (1024 * 1024)).toFixed(2) + ' MB',
-        sizeBytes: m.sizeBytes
+        sizeBytes: m.sizeBytes,
+        updatedAt: m.updatedAt
       }));
     return {
       statusCode: 200,

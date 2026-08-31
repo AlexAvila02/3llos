@@ -134,6 +134,7 @@ a{color:inherit}
 .zip-fill{height:100%;background:linear-gradient(90deg,#5aaa3a,#7bd555);width:0%;transition:width .25s;box-shadow:inset 0 2px 0 rgba(255,255,255,.4)}
 .zip-text{font-size:7px;color:#373737;line-height:1.6;word-break:break-all}
 .grass-bar{height:14px;background:repeating-linear-gradient(90deg,#5aaa3a 0 16px,#4a962f 16px 32px);border:3px solid #2d631d;box-shadow:2px 2px 0 #000;margin:0 auto 14px;max-width:920px}
+.sort-select{font-family:'Press Start 2P',monospace;font-size:7px;padding:8px;border:3px solid #373737;box-shadow:inset 2px 2px 0 #8b8b8b;background:#fff;color:#373737;cursor:pointer;min-width:150px}
 </style>
 </head>
 <body>
@@ -166,6 +167,7 @@ a{color:inherit}
 <div class="toolbar">
 <span id="count" class="count"></span>
 <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+<select id="sortSelect" class="sort-select" onchange="setSort(this.value)"><option value="newest">↓ MAS NUEVOS</option><option value="oldest">↑ MAS VIEJOS</option><option value="az">A → Z</option><option value="za">Z → A</option></select>
 <input id="search" class="search" placeholder="BUSCAR MOD..." oninput="render()">
 <button class="btn-mc" id="pickFolderBtn" onclick="pickFolder()">📁 CARPETA</button>
 <span id="folderName" class="folder" style="display:none"></span>
@@ -227,6 +229,19 @@ function passesFilter(type){
 }
 function getClientMods(){ return cachedMods.filter(m=> classify(m.filename)!=='servidor'); }
 let selected=new Set();
+let sortMode=localStorage.getItem('modsSort')||'newest';
+function setSort(v){ sortMode=v; localStorage.setItem('modsSort',v); render(); }
+function sortMods(list){
+  const copy=[...list];
+  copy.sort((a,b)=>{
+    if(sortMode==='newest'){ const da=a.updatedAt?new Date(a.updatedAt).getTime():0; const db=b.updatedAt?new Date(b.updatedAt).getTime():0; if(db!==da) return db-da; return a.filename.localeCompare(b.filename); }
+    if(sortMode==='oldest'){ const da=a.updatedAt?new Date(a.updatedAt).getTime():0; const db=b.updatedAt?new Date(b.updatedAt).getTime():0; if(da!==db) return da-db; return a.filename.localeCompare(b.filename); }
+    if(sortMode==='az') return a.filename.localeCompare(b.filename);
+    if(sortMode==='za') return b.filename.localeCompare(a.filename);
+    return 0;
+  });
+  return copy;
+}
 function render(){
   const grid=document.getElementById('grid');
   const count=document.getElementById('count');
@@ -234,6 +249,7 @@ function render(){
   const q=(document.getElementById('search').value||'').toLowerCase().trim();
   let filtered=cachedMods.filter(m=>!q||m.name.toLowerCase().includes(q)||m.filename.toLowerCase().includes(q));
   filtered=filtered.filter(m=> passesFilter(classify(m.filename)));
+  filtered=sortMods(filtered);
   if(!filtered.length){
     grid.style.display='none';
     if(cachedMods.length) { state.style.display='block'; state.textContent='Sin resultados para "'+q+'"'; }
@@ -339,6 +355,7 @@ async function loadMods(){
       return;
     }
     const zb2=document.getElementById('zipBtn'); if(zb2) zb2.style.display='';
+    const sel=document.getElementById('sortSelect'); if(sel) sel.value=sortMode;
     render();
   }catch(e){
     state.textContent='Error: '+e.message;
@@ -348,6 +365,7 @@ async function loadMods(){
 }
 let cachedMods=[];
 let dirHandle=null;
+(function(){ const s=document.getElementById('sortSelect'); if(s) s.value=sortMode; })();
 async function pickFolder(){
   if(!window.showDirectoryPicker){ alert('Tu navegador no soporta elegir carpeta (usa Chrome/Edge). Se usara Descargas.'); return; }
   try{
