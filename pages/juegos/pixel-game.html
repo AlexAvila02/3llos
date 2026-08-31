@@ -859,8 +859,8 @@ function restartGame() {
 function die() {
   if (sunBoss) {
     sunDeath = true;
-    sunDialogue = "Lo lamento. No era mi voluntad.";
-    sunDialogueTimer = 180;
+    sunDialogue = "";
+    sunDialogueTimer = 0;
     return;
   }
   if (currentLevel >= 2 && checkpoint && checkpoint.active) {
@@ -916,32 +916,24 @@ function hitSunBoss() {
 
   if (sunBoss.hp <= 0) {
     sunBoss.hp = 0;
-    sunDialogue = "Sea. Que la oscuridad te reciba.";
-    sunDialogueTimer = 180;
+    sunDialogue = "";
+    sunDialogueTimer = 0;
     sunDeath = true;
     score += 100;
   } else if (sunBoss.hp <= 25 && sunBoss.phase < 3) {
     sunBoss.phase = 3;
     playerHp = 1;
     showPlayerHealth = true;
-    sunDialogue = "Yo SOY la luz que ilumina este mundo.";
-    sunDialogueTimer = 180;
+    sunDialogue = "";
+    sunDialogueTimer = 0;
   } else if (sunBoss.hp <= 50 && sunBoss.phase < 2) {
     sunBoss.phase = 2;
     showPlayerHealth = true;
-    sunDialogue = "¿Sabes lo que implica apagar la luz?";
-    sunDialogueTimer = 180;
+    sunDialogue = "";
+    sunDialogueTimer = 0;
   } else {
-    var msgs;
-    if (sunBoss.phase === 0) {
-      msgs = ["Has llegado lejos, mortal.", "¿Insistes en desafiar lo que no puedes comprender?", "La luz no se apaga porque una sombra lo pida.", "Todo lo que vives, lo permito yo.", "No es odio. Es simplemente... inevitable."];
-    } else if (sunBoss.phase === 1) {
-      msgs = ["Interesante. No muchos llegan hasta aquí.", "Cada golpe es una oración que no será escuchada.", "Puedo sentir tu determinación. Es... admirable.", "La luz no teme a la oscuridad. Simplemente... es."];
-    } else {
-      msgs = ["Si me apagas, todo se va conmigo.", "Cada golpe tuyo es una oración al vacío.", "No creas que soy débil. Soy paciente.", "La eternidad no teme a un mortal."];
-    }
-    sunDialogue = msgs[sunBoss.hitCount % msgs.length];
-    sunDialogueTimer = 120;
+    sunDialogue = "";
+    sunDialogueTimer = 0;
   }
 }
 
@@ -2411,7 +2403,7 @@ function render() {
     ctx.textAlign = 'left';
   }
 
-  if (sunDialogue && sunDialogueTimer > 0) {
+  if (false) {
     ctx.fillStyle = 'rgba(0,0,0,0.75)';
     ctx.fillRect(60, 250, 360, 40);
     ctx.fillStyle = '#f1c40f';
