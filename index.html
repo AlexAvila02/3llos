@@ -78,19 +78,43 @@
     <div class="wave"></div>
   </div>
   
-  <!-- Título -->
-  <h1 class="welcome-text">
-    <span style="animation-delay: 0s">p</span><span style="animation-delay: 0.05s">a</span><span style="animation-delay: 0.1s">p</span><span style="animation-delay: 0.15s">u</span><span style="animation-delay: 0.2s">b</span><span style="animation-delay: 0.25s">a</span><span style="animation-delay: 0.3s">n</span><span style="animation-delay: 0.35s">d</span><span style="animation-delay: 0.4s">a</span>
-  </h1>
+  <main class="hero">
+    <h1 class="welcome-text">
+      <span style="animation-delay: 0s">p</span><span style="animation-delay: 0.05s">a</span><span style="animation-delay: 0.1s">p</span><span style="animation-delay: 0.15s">u</span><span style="animation-delay: 0.2s">b</span><span style="animation-delay: 0.25s">a</span><span style="animation-delay: 0.3s">n</span><span style="animation-delay: 0.35s">d</span><span style="animation-delay: 0.4s">a</span>
+    </h1>
+    <p class="hero-subtitle">Juegos &middot; Historia &middot; Torneos &middot; Mods</p>
 
-
-  
-  <!-- Logos -->
-  <div class="logos-container">
-    <div class="kick-container">
-      <div class="logo-wrapper">
-        <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/kick-streaming-platform-logo-icon.png" alt="Kick Logo" class="kick-logo">
+    <div class="logos-container">
+      <div class="kick-container">
+        <div class="logo-wrapper">
+          <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/kick-streaming-platform-logo-icon.png" alt="Kick Logo" class="kick-logo">
+        </div>
+        <div class="kick-modal">
+          <div class="modal-content">
+            <p><span class="kick-channel-name">Canal de arroz</span>: <a href="https://kick.com/arroz-ngr8" target="_blank" class="kick-link">https://kick.com/arroz-ngr8</a></p>
+        <p><span class="kick-channel-name">Canal de Cobi</span>: <a href="https://kick.com/coby220" target="_blank" class="kick-link">https://kick.com/coby220</a></p>
+          </div>
+        </div>
       </div>
+      <a href="https://discord.gg/EZ4QkSUd" target="_blank" class="discord-link">
+        <div class="logo-wrapper">
+          <img src="https://logos-world.net/wp-content/uploads/2020/12/Discord-Logo.png" alt="Discord Logo" class="discord-logo">
+        </div>
+      </a>
+    </div>
+
+    <div class="center-stack main-elements">
+     <textarea id="editor" class="text-input" placeholder="¿Quién sos?" rows="1"></textarea>
+     <button class="submit-btn" aria-label="Enviar">Entrar</button>
+    </div>
+
+    <div class="buttons-container main-elements">
+      <span class="timeline-label main-btn" onclick="playPopSound(); setTimeout(() => window.location.href='pages/juegos/lineadetiempo.html', 100);">Historia</span>
+      <span class="paint-btn main-btn" onclick="playPopSound(); openPaintModal();">Pintucalipso <span class="beta-tag">Beta</span></span>
+      <span class="blood-btn main-btn" onclick="playPopSound(); window.open('https://mangaplus-creators.jp/titles/mm2412250726170290026876933', '_blank');">Blood Throne <span class="sub-text">(By Samec)</span></span>
+      <span class="torneos-btn main-btn" onclick="playPopSound(); setTimeout(() => window.location.href='pages/torneos/index.html', 100);">Torneos</span>
+    </div>
+  </main>
       <div class="kick-modal">
         <div class="modal-content">
           <p><span class="kick-channel-name">Canal de arroz</span>: <a href="https://kick.com/arroz-ngr8" target="_blank" class="kick-link">https://kick.com/arroz-ngr8</a></p>
