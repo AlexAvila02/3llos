@@ -172,18 +172,67 @@ bgmSky.volume = baseVol;
 bgmSecret.volume = baseVol;
 bgmGalaxy.volume = baseVol;
 
-var impactAudio = null;
-function initImpactAudio() {
-  if (!impactAudio) {
-    impactAudio = new Audio('../../assets/audio/sun_impact.mp3');
-    impactAudio.volume = 0.9;
-  }
+var sfxCtx = null;
+function getSfxCtx() {
+  if (!sfxCtx) sfxCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (sfxCtx.state === 'suspended') sfxCtx.resume();
+  return sfxCtx;
+}
+function sfxMuted() {
+  try { return bgm.muted; } catch(e) { return false; }
+}
+function sfxTone(f0, f1, dur, vol, type, delay) {
+  try {
+    if (sfxMuted()) return;
+    var ctx = getSfxCtx();
+    var t = ctx.currentTime + (delay || 0);
+    var o = ctx.createOscillator();
+    var g = ctx.createGain();
+    o.type = type || 'square';
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.setValueAtTime(Math.max(20, f0), t);
+    o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur);
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.01, t + dur);
+    o.start(t);
+    o.stop(t + dur + 0.02);
+  } catch(e) {}
+}
+function sfxNoise(dur, vol, freq, delay) {
+  try {
+    if (sfxMuted()) return;
+    var ctx = getSfxCtx();
+    var t = ctx.currentTime + (delay || 0);
+    var len = Math.max(1, Math.floor(ctx.sampleRate * dur));
+    var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    var d = buf.getChannelData(0);
+    for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    var src = ctx.createBufferSource();
+    src.buffer = buf;
+    var f = ctx.createBiquadFilter();
+    f.type = 'lowpass';
+    f.frequency.setValueAtTime(freq || 1200, t);
+    f.frequency.exponentialRampToValueAtTime(120, t + dur);
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.01, t + dur);
+    src.connect(f); f.connect(g); g.connect(ctx.destination);
+    src.start(t);
+  } catch(e) {}
+}
+function playJumpSound() {
+  sfxTone(240, 760, 0.13, 0.16, 'square', 0);
 }
 function playImpactSound() {
-  if (bgm.muted) return;
-  initImpactAudio();
-  impactAudio.currentTime = 0;
-  impactAudio.play().catch(function(e) { console.log('Impact sound failed:', e); });
+  sfxNoise(0.22, 0.32, 1400, 0);
+  sfxTone(170, 45, 0.2, 0.3, 'square', 0);
+}
+function playGameOverSound() {
+  var notes = [660, 523, 494, 440, 392, 330, 262];
+  for (var i = 0; i < notes.length; i++) {
+    sfxTone(notes[i], notes[i] * 0.995, i === notes.length - 1 ? 0.42 : 0.13, 0.16, 'square', i * 0.14);
+  }
+  sfxNoise(0.5, 0.1, 800, notes.length * 0.14);
 }
 var dashAudioCtx = null;
 function playDashSound() {
@@ -861,9 +910,11 @@ function die() {
     sunDeath = true;
     sunDialogue = "";
     sunDialogueTimer = 0;
+    try{ playGameOverSound(); }catch(e){}
     return;
   }
   if (currentLevel >= 2 && checkpoint && checkpoint.active) {
+    try{ playImpactSound(); }catch(e){}
     px = checkpoint.x;
     py = checkpoint.y;
     pvy = 0;
@@ -873,6 +924,7 @@ function die() {
       if (Math.abs(de.x - px) < 60) { de.x = de.ox; de.vx = Math.abs(de.vx); }
     }
   } else if (currentLevel >= 2) {
+    try{ playImpactSound(); }catch(e){}
     var L = levels[currentLevel];
     px = L.spawn[0];
     py = L.spawn[1];
@@ -884,6 +936,7 @@ function die() {
     }
   } else {
     dead = true;
+    try{ playGameOverSound(); }catch(e){}
     bgm.pause();
     bgmSky.pause();
   }
@@ -1106,6 +1159,7 @@ function update() {
     onGround = false;
     coyoteTimer = 0;
     jumpBufferTimer = 0;
+    try{ playJumpSound(); }catch(e){}
   }
 
   if (jumpHeld === false && pvy < JUMP_CUT_VEL) {
@@ -1461,6 +1515,7 @@ function update() {
         enemyList.splice(i, 1);
         killCount++;
         i--;
+        try{ playImpactSound(); }catch(e){}
       } else if (dashKillEquipped && wasDashing) {
         dashTimer += 5;
         var hx2 = e.x + 7, hy2 = e.y + 7;
@@ -1628,6 +1683,7 @@ function update() {
         pvy = -8;
         boss.hp--;
         boss.stun = 20;
+        try{ playImpactSound(); }catch(e){}
       } else {
         die();
         return;
