@@ -676,7 +676,6 @@ var i, p;
 
       if (G.boss.hp <= 0) {
         G.boss = null;
-        G.score += 100;
       } else {
         G.boss.phase = G.boss.hp <= G.boss.maxHp * 0.3 ? 2 : G.boss.hp <= G.boss.maxHp * 0.6 ? 1 : 0;
       }
