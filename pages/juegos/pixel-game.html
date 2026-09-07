@@ -8,8 +8,11 @@
   <title>Pixel Game</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; height: 100dvh; font-family: monospace; color: white; overflow: hidden; touch-action: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
-    canvas { border: 2px solid #4ecdc4; image-rendering: pixelated; max-width: 100vw; max-height: 55vh; }
+    body { background: #111; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100vh; height: 100dvh; font-family: monospace; color: white; overflow: hidden; touch-action: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; padding: 52px 8px 8px; gap: 6px; }
+    #game-wrap { flex: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; }
+    canvas#c { border: 2px solid #4ecdc4; image-rendering: pixelated; image-rendering: crisp-edges; width: min(96vw, calc((100dvh - 110px) * 1.5)); height: auto; aspect-ratio: 3 / 2; background: #1a1a2e; }
+    #fs-btn { position: fixed; top: 12px; right: 105px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; color: #fff; cursor: pointer; font-size: 15px; line-height: 1; z-index: 100; display: flex; align-items: center; justify-content: center; }
+    #fs-btn:hover { background: rgba(255,255,255,0.3); }
     .info { margin-top: 10px; font-size: 13px; color: #888; text-align: center; padding: 0 10px; }
     .info-desktop { display: block; }
     .info-mobile { display: none; }
@@ -129,10 +132,12 @@
       #touch-controls { display: block; }
       .info-desktop { display: none; }
       .info-mobile { display: block; }
-      canvas { max-height: 48vh; }
+      body { padding: 44px 4px 4px; }
+      canvas#c { width: min(98vw, calc((100dvh - 45vh - 80px) * 1.5)); }
       a.back { top: 8px; right: 12px; width: 28px; height: 28px; }
       #back-icon { width: 12px; height: 12px; }
       #volume-ctrl { top: 8px; right: 50px; gap: 4px; }
+      #fs-btn { top: 8px; right: 88px; width: 28px; height: 28px; font-size: 13px; }
       #mute-btn { width: 28px; height: 28px; }
       #mute-icon { width: 16px; height: 16px; }
       #vol-slider { width: 50px; }
@@ -149,7 +154,8 @@
     <button id="mute-btn"><canvas id="mute-icon" width="10" height="10"></canvas></button>
     <input type="range" id="vol-slider" min="0" max="100" value="70">
   </div>
-  <canvas id="c" width="480" height="320"></canvas>
+  <button id="fs-btn" title="Pantalla completa">&#x26F6;</button>
+  <div id="game-wrap"><canvas id="c" width="480" height="320"></canvas></div>
   <div class="info info-desktop">Flechas/WASD: mover | Space/Arriba: saltar | Z: dash | X: onda expansiva | R: reiniciar</div>
   <div class="info info-mobile">Usa los botones táctiles para jugar</div>
 

@@ -21,6 +21,21 @@ bctx.fillRect(0, 6, 1, 1);
 bctx.fillRect(6, 6, 1, 1);
 var canvas = document.getElementById('c');
 var ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+// Boton pantalla completa (mantiene 480x320 internos, solo escala por CSS)
+(function() {
+  var fsBtn = document.getElementById('fs-btn');
+  if (!fsBtn) return;
+  fsBtn.addEventListener('click', function() {
+    try {
+      if (!document.fullscreenElement) {
+        (document.documentElement.requestFullscreen || document.body.requestFullscreen).call(document.documentElement);
+      } else {
+        document.exitFullscreen();
+      }
+    } catch (e) {}
+  });
+})();
 
 function skyFadeT() {
   var Lf = levels[currentLevel];
