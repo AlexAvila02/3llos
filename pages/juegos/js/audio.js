@@ -335,35 +335,33 @@ function sunBattleNoise(time, dur, vol, filterType, filterFreq) {
     };
   } catch (e) {}
 }
-var dashAudioCtx = null;
 export function playDashSound() {
-  if (bgm.muted) return;
+  if (sfxMuted()) return;
   try {
-    if (!dashAudioCtx) dashAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (dashAudioCtx.state === 'suspended') dashAudioCtx.resume();
-    var o = dashAudioCtx.createOscillator();
-    var g = dashAudioCtx.createGain();
-    var f = dashAudioCtx.createBiquadFilter();
+    var ctx = getSfxCtx();
+    var o = ctx.createOscillator();
+    var g = ctx.createGain();
+    var f = ctx.createBiquadFilter();
     f.type = 'highpass'; f.frequency.value = 400;
     o.type = 'sine';
-    o.connect(f); f.connect(g); g.connect(dashAudioCtx.destination);
-    o.frequency.setValueAtTime(500, dashAudioCtx.currentTime);
-    o.frequency.linearRampToValueAtTime(1100, dashAudioCtx.currentTime + 0.08);
-    o.frequency.linearRampToValueAtTime(700, dashAudioCtx.currentTime + 0.14);
-    g.gain.setValueAtTime(0.28, dashAudioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.01, dashAudioCtx.currentTime + 0.14);
-    o.start(dashAudioCtx.currentTime);
-    o.stop(dashAudioCtx.currentTime + 0.15);
-    var o2 = dashAudioCtx.createOscillator();
-    var g2 = dashAudioCtx.createGain();
+    o.connect(f); f.connect(g); g.connect(ctx.destination);
+    o.frequency.setValueAtTime(500, ctx.currentTime);
+    o.frequency.linearRampToValueAtTime(1100, ctx.currentTime + 0.08);
+    o.frequency.linearRampToValueAtTime(700, ctx.currentTime + 0.14);
+    g.gain.setValueAtTime(0.28, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.14);
+    o.start(ctx.currentTime);
+    o.stop(ctx.currentTime + 0.15);
+    var o2 = ctx.createOscillator();
+    var g2 = ctx.createGain();
     o2.type = 'triangle';
-    o2.connect(g2); g2.connect(dashAudioCtx.destination);
-    o2.frequency.setValueAtTime(900, dashAudioCtx.currentTime);
-    o2.frequency.exponentialRampToValueAtTime(200, dashAudioCtx.currentTime + 0.12);
-    g2.gain.setValueAtTime(0.12, dashAudioCtx.currentTime);
-    g2.gain.exponentialRampToValueAtTime(0.01, dashAudioCtx.currentTime + 0.12);
-    o2.start(dashAudioCtx.currentTime);
-    o2.stop(dashAudioCtx.currentTime + 0.12);
+    o2.connect(g2); g2.connect(ctx.destination);
+    o2.frequency.setValueAtTime(900, ctx.currentTime);
+    o2.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.12);
+    g2.gain.setValueAtTime(0.12, ctx.currentTime);
+    g2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+    o2.start(ctx.currentTime);
+    o2.stop(ctx.currentTime + 0.12);
   } catch(e) {}
 }
 
@@ -436,30 +434,37 @@ export function initAudioUI() {
   });
 
 }
+function safePlay(el) {
+  try {
+    if (el.muted) return;
+    var p = el.play();
+    if (p && p.catch) p.catch(function() {});
+  } catch (e) {}
+}
 export function audioLevelMusic(kind, dead) {
   if (kind === 'secret') {
     bgm.pause();
     bgmSky.pause();
     bgmGalaxy.pause();
     bgmSecret.currentTime = 0;
-    if (!bgmSecret.muted) bgmSecret.play();
+    safePlay(bgmSecret);
   } else if (kind === 'galaxy') {
     bgm.pause();
     bgmSky.pause();
     bgmSecret.pause();
     bgmGalaxy.currentTime = 0;
-    if (!bgmGalaxy.muted) bgmGalaxy.play();
+    safePlay(bgmGalaxy);
   } else if (kind === 'sky') {
     bgm.pause();
     bgmSecret.pause();
     bgmGalaxy.pause();
     bgmSky.currentTime = 0;
-    if (!bgmSky.muted) bgmSky.play();
+    safePlay(bgmSky);
   } else {
     bgmSky.pause();
     bgmSecret.pause();
     bgmGalaxy.pause();
-    if (bgm.paused && !dead) { bgm.currentTime = 0; if (!bgm.muted) bgm.play(); }
+    if (bgm.paused && !dead) { bgm.currentTime = 0; safePlay(bgm); }
   }
 }
 export function stopAllBgm() {
@@ -474,7 +479,7 @@ export function stopGameOverBgm() {
 }
 export function resumeMainBgm() {
   bgm.currentTime = 0;
-  if (!bgm.muted) bgm.play();
+  safePlay(bgm);
 }
 export function updateAudioFrame(skyActive, fade, ambient) {
   if (skyActive) bgmSky.volume = baseVol * fade;
