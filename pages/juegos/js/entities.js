@@ -30,6 +30,7 @@ export function die() {
     return;
   }
   if (G.currentLevel >= 2 && G.checkpoint && G.checkpoint.active) {
+    if (!payRespawnCost()) return;
     try{ playImpactSound(); }catch(e){}
     G.px = G.checkpoint.x;
     G.py = G.checkpoint.y;
@@ -40,6 +41,7 @@ export function die() {
       if (Math.abs(de.x - G.px) < 60) { de.x = de.ox; de.vx = Math.abs(de.vx); }
     }
   } else if (G.currentLevel >= 2) {
+    if (!payRespawnCost()) return;
     try{ playImpactSound(); }catch(e){}
     var L = levels[G.currentLevel];
     G.px = L.spawn[0];
@@ -55,6 +57,20 @@ export function die() {
     try{ playGameOverSound(); }catch(e){}
     stopGameOverBgm();
   }
+}
+
+// Cada respawn en checkpoint/spawn cuesta 1 de oro.
+// Si al pagar llegas a 0 (o ya estabas en 0), mueres definitivamente.
+function payRespawnCost() {
+  if (G.score > 1) {
+    G.score--;
+    return true;
+  }
+  G.score = 0;
+  G.dead = true;
+  try{ playGameOverSound(); }catch(e){}
+  stopGameOverBgm();
+  return false;
 }
 
 export function hitSunBoss() {
