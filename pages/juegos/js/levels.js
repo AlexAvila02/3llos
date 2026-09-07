@@ -335,3 +335,9 @@ export const levels = [
     checkpoint: [50,730],
     sunR1: 200, sunR2: 150
   }];
+
+export function nextStoryLevel(from) {
+  var n = from + 1;
+  while (n < levels.length && levels[n].secret) n++;
+  return n;
+}

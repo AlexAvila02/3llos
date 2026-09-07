@@ -1,5 +1,5 @@
 import { G } from './state.js';
-import { levels } from './levels.js';
+import { levels, nextStoryLevel } from './levels.js';
 import { initAudioUI, audioLevelMusic, stopAllBgm, resumeMainBgm, updateAudioFrame, startSunBattleMusic, stopSunBattleMusic, syncSunBattleMusic } from './audio.js';
 import { input, initInput, updatePlayer, resetPlayerTransient } from './player.js';
 import { updateSunAmbient, updateEntities, loadLevel } from './entities.js';
@@ -99,8 +99,13 @@ function restartGame() {
 }
 
 function winContinue() {
+  var next = nextStoryLevel(G.currentLevel);
+  if (next >= levels.length) {
+    restartGame();
+    return;
+  }
   resumeMainBgm();
-  loadLevel(G.currentLevel + 1);
+  loadLevel(next);
   G.won = false;
 }
 function update() {
