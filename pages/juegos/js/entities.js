@@ -21,6 +21,7 @@ function mercForward(inp) {
   return o;
 }
 export function die() {
+  if (G.dead) return;
   if (G.sunBoss) {
     G.sunDeath = true;
     G.sunDialogue = "";

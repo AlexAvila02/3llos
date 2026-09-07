@@ -1,5 +1,6 @@
 import { G } from './state.js';
 import { playJumpSound, playDashSound } from './audio.js';
+import { die } from './entities.js';
 var SPD = 3.2;
 var ACCEL = 0.65;
 var DECEL = 0.55;
@@ -20,6 +21,7 @@ export function hitTest(ax, ay, aw, ah, bx, by, bw, bh) {
 
 export function updatePlayer() {
 var i, p;
+  if (G.dead || G.won || G.sunDeath) return;
   G.wasDashing = G.dashTimer > 0 || Math.abs(G.dashMX) > 0.5 || Math.abs(G.dashMY) > 0.5;
     var mx = 0;
     if (input.keys.ArrowLeft) mx = -1;
