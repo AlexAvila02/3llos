@@ -20,6 +20,7 @@ export async function onRequestGet(context) {
         filename: item.attributes.name,
         name: item.attributes.name.replace('.jar', ''),
         size: `${(item.attributes.size / (1024 * 1024)).toFixed(2)} MB`,
+        sizeBytes: item.attributes.size,
         updatedAt: item.attributes.modified_at
       }));
     return new Response(JSON.stringify(mods), { headers: { "Content-Type": "application/json" } });
