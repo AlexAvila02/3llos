@@ -693,16 +693,13 @@ var i, p;
     if (G.flagObj && Math.abs(G.px - G.flagObj.x) < 16 && Math.abs(G.py - G.flagObj.y) < 20) {
       if (!G.boss && !G.sunBoss) {
         if (levels[G.currentLevel] && levels[G.currentLevel].secret) {
-          G.score += 100;
           if (levels[G.currentLevel].sunBossLevel && G.sunBoss && G.sunBoss.hp > 0) {
             return;
           }
           G.won = true;
         } else if (levels[G.currentLevel] && levels[G.currentLevel].shop) {
-          G.score += 100;
           G.won = true;
         } else {
-          G.score += 50;
           var next = nextStoryLevel(G.currentLevel);
           if (next >= levels.length) {
             G.won = true;
