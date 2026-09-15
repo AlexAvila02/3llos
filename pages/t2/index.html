@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T2 - Equipo LoL</title>
+<link rel="stylesheet" href="../../css/main.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;background:#010a13;color:#f0e6d2;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;display:flex;flex-direction:column;align-items:center;padding:60px 16px;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 50% 0%,rgba(200,170,110,.12) 0%,transparent 60%),radial-gradient(ellipse at 20% 80%,rgba(10,200,185,.06) 0%,transparent 50%),#010a13}
+.wrap{position:relative;z-index:1;max-width:1100px;width:100%}
+.back{display:inline-block;padding:8px 20px;background:rgba(255,255,255,.06);border:1px solid rgba(200,170,110,.3);border-radius:50px;font-size:14px;color:#c8aa6e;text-decoration:none;margin-bottom:24px;transition:.3s}
+.back:hover{background:rgba(200,170,110,.15);color:#fff}
+.hero{text-align:center;border:1px solid rgba(200,170,110,.4);background:linear-gradient(180deg,rgba(200,170,110,.12),rgba(1,10,19,.6));border-radius:20px;padding:48px 24px;margin-bottom:28px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,#c8aa6e,transparent)}
+.hero .tag{font-size:13px;letter-spacing:5px;color:#0ac8b9;text-transform:uppercase}
+.hero h1{font-size:clamp(56px,10vw,96px);font-weight:900;letter-spacing:8px;background:linear-gradient(180deg,#f0e6d2 30%,#c8aa6e 70%,#785a28);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:8px 0}
+.hero .lema{color:rgba(240,230,210,.6);font-style:italic;margin-top:6px}
+.hero .desc{max-width:640px;margin:14px auto 0;color:rgba(240,230,210,.7);font-size:15px;line-height:1.6}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px}
+.stat-card{background:rgba(255,255,255,.03);border:1px solid rgba(200,170,110,.25);border-top:2px solid #c8aa6e;border-radius:12px;padding:18px;text-align:center}
+.stat-card b{display:block;font-size:28px;color:#fff}
+.stat-card span{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#c8aa6e}
+h2.sec{font-size:18px;letter-spacing:4px;text-transform:uppercase;color:#c8aa6e;margin:32px 0 16px;display:flex;align-items:center;gap:12px}
+h2.sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(200,170,110,.5),transparent)}
+.roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.pcard{background:linear-gradient(180deg,#0a1428,#091428);border:1px solid rgba(200,170,110,.3);border-radius:14px;overflow:hidden;transition:.3s}
+.pcard:hover{transform:translateY(-4px);border-color:#c8aa6e;box-shadow:0 8px 30px rgba(200,170,110,.15)}
+.prole{background:rgba(200,170,110,.15);color:#c8aa6e;font-size:11px;font-weight:800;letter-spacing:3px;text-align:center;padding:8px}
+.pbody{padding:18px;text-align:center}
+.pbody .sum{font-size:19px;font-weight:800;color:#fff}
+.pbody .real{font-size:12px;color:rgba(240,230,210,.5);margin-bottom:10px}
+.prank{display:inline-block;font-size:12px;font-weight:700;color:#0ac8b9;background:rgba(10,200,185,.1);border:1px solid rgba(10,200,185,.3);border-radius:20px;padding:3px 12px;margin-bottom:12px}
+.mains{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px}
+.main{font-size:11px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);padding:3px 10px;border-radius:20px}
+.pkda{font-size:13px;color:rgba(240,230,210,.75)}
+.pkda b{color:#fff}
+.pfooter{display:flex;border-top:1px solid rgba(200,170,110,.2)}
+.pfooter div{flex:1;text-align:center;padding:10px 4px;font-size:12px}
+.pfooter b{display:block;font-size:15px;color:#fff}
+.pfooter span{font-size:10px;color:rgba(240,230,210,.45);text-transform:uppercase}
+.opgg{display:block;text-align:center;font-size:12px;color:#0ac8b9;padding:10px;text-decoration:none;border-top:1px solid rgba(200,170,110,.2)}
+.opgg:hover{background:rgba(10,200,185,.08)}
+.opgg.empty{color:rgba(255,255,255,.2);pointer-events:none}
+table{width:100%;border-collapse:collapse;font-size:13px;background:rgba(255,255,255,.02);border:1px solid rgba(200,170,110,.25);border-radius:12px;overflow:hidden}
+th{background:rgba(200,170,110,.12);color:#c8aa6e;font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:12px 8px;text-align:center}
+td{padding:11px 8px;text-align:center;border-top:1px solid rgba(255,255,255,.05)}
+tr:hover td{background:rgba(200,170,110,.05)}
+.w{color:#0ac8b9;font-weight:800}.l{color:#ff6b6b;font-weight:800}
+.match{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left:4px solid #666;border-radius:10px;padding:14px 16px;margin-bottom:10px;font-size:14px;flex-wrap:wrap}
+.match.win{border-left-color:#0ac8b9}.match.loss{border-left-color:#c8332b}
+.match .vs{font-weight:800;color:#fff}.match .meta{font-size:12px;color:rgba(240,230,210,.5)}
+.badge{font-weight:900;padding:4px 12px;border-radius:6px;font-size:13px}
+.win .badge{background:rgba(10,200,185,.15);color:#0ac8b9}.loss .badge{background:rgba(200,51,43,.15);color:#ff6b6b}
+.empty-box{text-align:center;padding:30px;color:rgba(240,230,210,.4);font-size:14px;border:1px dashed rgba(200,170,110,.3);border-radius:12px}
+.champs{display:flex;flex-wrap:wrap;gap:10px}
+.champ{background:rgba(255,255,255,.04);border:1px solid rgba(200,170,110,.25);border-radius:10px;padding:10px 16px;font-size:13px}
+.champ b{color:#c8aa6e}
+.howto{margin-top:36px;background:rgba(10,200,185,.05);border:1px solid rgba(10,200,185,.25);border-radius:12px;padding:18px;font-size:13px;line-height:1.7;color:rgba(240,230,210,.7)}
+.howto code{background:#000;padding:2px 8px;border-radius:6px;color:#0ac8b9}
+.foot{text-align:center;margin:40px 0 10px;font-size:12px;letter-spacing:3px;color:rgba(200,170,110,.4)}
+@media(max-width:600px){table{font-size:11px}td,th{padding:8px 4px}.match{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="wrap">
+<a href="../../index.html" class="back">← Volver</a>
+
+<div class="hero">
+<p class="tag" id="t-region">—</p>
+<h1 id="t-name">T2</h1>
+<p class="tag" id="t-temp" style="color:#c8aa6e">—</p>
+<p class="lema" id="t-lema"></p>
+<p class="desc" id="t-desc"></p>
+</div>
+
+<div class="stats-grid" id="team-stats"></div>
+
+<h2 class="sec">Roster</h2>
+<div class="roster" id="roster"></div>
+
+<h2 class="sec">Estadísticas</h2>
+<div style="overflow-x:auto">
+<table>
+<thead><tr><th>Jugador</th><th>Rol</th><th>PJ</th><th>W-L</th><th>WR</th><th>KDA</th><th>K / D / A</th><th>CS</th><th>Vis</th></tr></thead>
+<tbody id="stats-table"></tbody>
+</table>
+</div>
+
+<h2 class="sec">Champion Pool</h2>
+<div class="champs" id="champs"></div>
+
+<h2 class="sec">Historial de partidas</h2>
+<div id="matches"></div>
+
+<div class="howto">
+<b style="color:#0ac8b9">📝 ¿Cómo actualizar?</b><br>
+Pasame por chat los datos así y los cargo yo, o edita vos el archivo <code>pages/t2/t2-data.js</code>:<br>
+• Jugadores: nick, nombre, rol, rango, mains, K/D/A, WR<br>
+• Partidas: fecha, rival, resultado, marcador, MVP<br>
+• Champs: nombre, partidas, wins, KDA
+</div>
+
+<p class="foot">T2 · PAPUBANDA 2026</p>
+</div>
+
+<script src="t2-data.js"></script>
+<script>
+const d = T2_DATA;
+document.getElementById('t-name').textContent = d.team.name;
+document.getElementById('t-region').textContent = d.team.region + ' · ' + d.team.tag;
+document.getElementById('t-temp').textContent = d.team.temporada;
+document.getElementById('t-lema').textContent = '“' + d.team.lema + '”';
+document.getElementById('t-desc').textContent = d.team.descripcion;
+
+const tot = d.team.wins + d.team.losses;
+const wr = tot ? Math.round(d.team.wins/tot*100)+'%' : '—';
+let k=0,dd=0,a=0;
+d.players.forEach(p=>{k+=p.kills;dd+=p.deaths;a+=p.assists});
+const teamKda = dd ? ((k+a)/dd).toFixed(2) : '—';
+
+document.getElementById('team-stats').innerHTML = [
+ [d.team.wins+'W - '+d.team.losses+'L','Récord'],
+ [wr,'Winrate'],
+ [teamKda,'KDA equipo'],
+ [d.team.racha,'Racha'],
+ [d.players.length+'','Jugadores'],
+ [d.team.ranking,'Ranking']
+].map(s=>'<div class="stat-card"><b>'+s[0]+'</b><span>'+s[1]+'</span></div>').join('');
+
+document.getElementById('roster').innerHTML = d.players.map(p=>{
+ const g = p.wins+p.losses || p.games;
+ const pwr = g ? Math.round(p.wins/g*100)+'%' : (p.games? '—':'—');
+ const kda = p.deaths ? ((p.kills+p.assists)/p.deaths).toFixed(2) : '—';
+ return '<div class="pcard"><div class="prole">'+p.role+'</div><div class="pbody">'+
+ '<div class="sum">'+p.summoner+'</div><div class="real">'+p.realName+'</div>'+
+ '<div class="prank">'+p.rank+' · '+p.lp+'</div>'+
+ '<div class="mains">'+p.mains.map(m=>'<span class="main">'+m+'</span>').join('')+'</div>'+
+ '<div class="pkda">KDA <b>'+kda+'</b> · '+p.kills+'/'+p.deaths+'/'+p.assists+'</div></div>'+
+ '<div class="pfooter"><div><b>'+g+'</b><span>PJ</span></div><div><b>'+pwr+'</b><span>WR</span></div><div><b>'+p.csProm+'</b><span>CS</span></div><div><b>'+p.visionProm+'</b><span>Vis</span></div></div>'+
+ (p.opgg ? '<a class="opgg" href="'+p.opgg+'" target="_blank">op.gg ↗</a>' : '<span class="opgg empty">op.gg —</span>')+'</div>';
+}).join('');
+
+document.getElementById('stats-table').innerHTML = d.players.map(p=>{
+ const g = p.wins+p.losses || p.games;
+ const pwr = g ? Math.round(p.wins/g*100)+'%' : '—';
+ const kda = p.deaths ? ((p.kills+p.assists)/p.deaths).toFixed(2) : '—';
+ return '<tr><td style="text-align:left;font-weight:700">'+p.summoner+'</td><td>'+p.role+'</td><td>'+g+'</td><td>'+p.wins+'-'+p.losses+'</td><td>'+pwr+'</td><td><b>'+kda+'</b></td><td>'+p.kills+' / '+p.deaths+' / '+p.assists+'</td><td>'+p.csProm+'</td><td>'+p.visionProm+'</td></tr>';
+}).join('');
+
+document.getElementById('champs').innerHTML = d.champs.length ? d.champs.map(c=>{
+ const cwr = c.games ? Math.round(c.wins/c.games*100)+'%' : '—';
+ return '<div class="champ"><b>'+c.name+'</b> · '+c.games+' PJ · '+cwr+' WR · KDA '+c.kda+'</div>';
+}).join('') : '<div class="empty-box">Sin datos aún — pasame los picks y los cargo.</div>';
+
+document.getElementById('matches').innerHTML = d.matches.length ? d.matches.map(m=>{
+ const win = m.resultado==='W';
+ return '<div class="match '+(win?'win':'loss')+'"><span class="badge">'+(win?'VICTORIA':'DERROTA')+'</span>'+
+ '<span class="vs">T2 vs '+m.vs+'</span><span class="meta">'+m.marcador+' · '+m.duracion+' · '+m.torneo+' · '+m.fecha+'</span>'+
+ '<span class="meta">MVP: <b style="color:#c8aa6e">'+m.mvp+'</b></span>'+
+ (m.picks?'<span class="meta" style="width:100%">Picks: '+m.picks+'</span>':'')+'</div>';
+}).join('') : '<div class="empty-box">Sin partidas cargadas — pasame fecha, rival, resultado y MVP.</div>';
+</script>
+</body>
+</html>
