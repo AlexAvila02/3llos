@@ -27,9 +27,9 @@ const T2_DATA = {
       rank: "Esmeralda IV",
       lp: "flex",
       mains: ["Por definir", "—", "—"],
-      games: 0, wins: 0, losses: 0,
+      games: 2, wins: 1, losses: 1,
       kills: 16, deaths: 16, assists: 37,
-      csProm: 0, visionProm: 0,
+      csProm: 292, visionProm: 0,
       opgg: "https://op.gg/lol/summoners/las/Susie-LAS"
     },
     {
@@ -41,7 +41,7 @@ const T2_DATA = {
       mains: ["Nunu", "Sett", "Morgana"],
       games: 21, wins: 10, losses: 11,
       kills: 18, deaths: 18, assists: 53,
-      csProm: 0, visionProm: 0,
+      csProm: 238, visionProm: 0,
       opgg: "https://op.gg/lol/summoners/las/LTA%20Pajalenta-LTAzz"
     },
     {
@@ -65,7 +65,7 @@ const T2_DATA = {
       mains: ["Kha'Zix", "Jhin", "Vayne"],
       games: 5, wins: 4, losses: 1,
       kills: 4, deaths: 26, assists: 59,
-      csProm: 0, visionProm: 0,
+      csProm: 142, visionProm: 1,
       opgg: "https://op.gg/lol/summoners/las/Fama-LAS"
     },
     {
@@ -77,7 +77,7 @@ const T2_DATA = {
       mains: ["Blitzcrank", "Brand", "Nautilus"],
       games: 165, wins: 75, losses: 90,
       kills: 12, deaths: 26, assists: 22,
-      csProm: 0, visionProm: 0,
+      csProm: 42, visionProm: 9,
       opgg: "https://op.gg/lol/summoners/las/LOKI7O-LAS"
     },
     {

@@ -88,6 +88,7 @@ tr:hover td{background:rgba(200,170,110,.05)}
 <tbody id="stats-table"></tbody>
 </table>
 </div>
+<p style="font-size:12px;color:rgba(240,230,210,.4);margin-top:8px">W-L / WR: soloQ en op.gg · KDA y K/D/A: partidas registradas del equipo · CS/Vis: última partida registrada</p>
 
 <h2 class="sec">Champion Pool</h2>
 <div class="champs" id="champs"></div>
@@ -134,12 +135,14 @@ document.getElementById('roster').innerHTML = d.players.map(p=>{
  const g = p.wins+p.losses || p.games;
  const pwr = g ? Math.round(p.wins/g*100)+'%' : (p.games? '—':'—');
  const kda = p.deaths ? ((p.kills+p.assists)/p.deaths).toFixed(2) : '—';
+ const cs = p.csProm ? p.csProm : '—';
+ const vis = p.visionProm ? p.visionProm : '—';
  return '<div class="pcard"><div class="prole">'+p.role+'</div><div class="pbody">'+
  '<div class="sum">'+p.summoner+'</div><div class="real">'+p.realName+'</div>'+
  '<div class="prank">'+p.rank+' · '+p.lp+'</div>'+
  '<div class="mains">'+p.mains.map(m=>'<span class="main">'+m+'</span>').join('')+'</div>'+
  '<div class="pkda">KDA <b>'+kda+'</b> · '+p.kills+'/'+p.deaths+'/'+p.assists+'</div></div>'+
- '<div class="pfooter"><div><b>'+g+'</b><span>PJ</span></div><div><b>'+pwr+'</b><span>WR</span></div><div><b>'+p.csProm+'</b><span>CS</span></div><div><b>'+p.visionProm+'</b><span>Vis</span></div></div>'+
+ '<div class="pfooter"><div><b>'+g+'</b><span>PJ</span></div><div><b>'+pwr+'</b><span>WR</span></div><div><b>'+cs+'</b><span>CS</span></div><div><b>'+vis+'</b><span>Vis</span></div></div>'+
  (p.opgg ? '<a class="opgg" href="'+p.opgg+'" target="_blank">op.gg ↗</a>' : '<span class="opgg empty">op.gg —</span>')+'</div>';
 }).join('');
 
@@ -147,7 +150,9 @@ document.getElementById('stats-table').innerHTML = d.players.map(p=>{
  const g = p.wins+p.losses || p.games;
  const pwr = g ? Math.round(p.wins/g*100)+'%' : '—';
  const kda = p.deaths ? ((p.kills+p.assists)/p.deaths).toFixed(2) : '—';
- return '<tr><td style="text-align:left;font-weight:700">'+p.summoner+'</td><td>'+p.role+'</td><td>'+g+'</td><td>'+p.wins+'-'+p.losses+'</td><td>'+pwr+'</td><td><b>'+kda+'</b></td><td>'+p.kills+' / '+p.deaths+' / '+p.assists+'</td><td>'+p.csProm+'</td><td>'+p.visionProm+'</td></tr>';
+ const cs = p.csProm ? p.csProm : '—';
+ const vis = p.visionProm ? p.visionProm : '—';
+ return '<tr><td style="text-align:left;font-weight:700">'+p.summoner+'</td><td>'+p.role+'</td><td>'+g+'</td><td>'+p.wins+'-'+p.losses+'</td><td>'+pwr+'</td><td><b>'+kda+'</b></td><td>'+p.kills+' / '+p.deaths+' / '+p.assists+'</td><td>'+cs+'</td><td>'+vis+'</td></tr>';
 }).join('');
 
 document.getElementById('champs').innerHTML = d.champs.length ? d.champs.map(c=>{
