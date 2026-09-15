@@ -22,15 +22,15 @@ const T2_DATA = {
   players: [
     {
       summoner: "Susie",
-      realName: "—",
+      realName: "Susie#RUDE",
       role: "TOP",
-      rank: "Esmeralda IV",
-      lp: "flex",
-      mains: ["Por definir", "—", "—"],
-      games: 2, wins: 1, losses: 1,
+      rank: "Esmeralda III",
+      lp: "6 LP flex · Oro I solo",
+      mains: ["Aurelion Sol", "Senna", "Teemo"],
+      games: 112, wins: 61, losses: 51,
       kills: 16, deaths: 16, assists: 37,
       csProm: 292, visionProm: 0,
-      opgg: "https://op.gg/lol/summoners/las/Susie-LAS"
+      opgg: "https://op.gg/lol/summoners/las/Susie-RUDE"
     },
     {
       summoner: "Pajalenta",
@@ -119,6 +119,8 @@ const T2_DATA = {
 
   champs: [
     { name: "Irelia (Elfic — 768k pts)", games: 0, wins: 0, kda: "—" },
+    { name: "Aurelion Sol (Susie — 1328k pts)", games: 0, wins: 0, kda: "—" },
+    { name: "Senna (Susie — 683k pts)", games: 0, wins: 0, kda: "—" },
     { name: "Garen (Elfic — 463k pts)", games: 0, wins: 0, kda: "—" },
     { name: "Nunu (Pajalenta — 309k pts)", games: 0, wins: 0, kda: "—" },
     { name: "Sett (Pajalenta — 245k pts)", games: 0, wins: 0, kda: "—" },
