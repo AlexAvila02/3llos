@@ -32,8 +32,9 @@ h2.sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba
 .pbody .sum{font-size:19px;font-weight:800;color:#fff}
 .pbody .real{font-size:12px;color:rgba(240,230,210,.5);margin-bottom:10px}
 .prank{display:inline-block;font-size:12px;font-weight:700;color:#0ac8b9;background:rgba(10,200,185,.1);border:1px solid rgba(10,200,185,.3);border-radius:20px;padding:3px 12px;margin-bottom:12px}
-.mains{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px}
-.main{font-size:11px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);padding:3px 10px;border-radius:20px}
+.mains{display:flex;flex-wrap:nowrap;gap:6px;justify-content:flex-start;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.mains::-webkit-scrollbar{display:none}
+.main{font-size:11px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
 .pkda{font-size:13px;color:rgba(240,230,210,.75)}
 .pkda b{color:#fff}
 .pfooter{display:flex;border-top:1px solid rgba(200,170,110,.2)}
