@@ -750,7 +750,8 @@ function render() {
 
   ctx.fillStyle = '#fff';
   ctx.font = '12px monospace';
-  ctx.fillText('Nivel: ' + (isSecret ? 0 : G.currentLevel + 1), 10, 298);
+  if (levels[G.currentLevel] && levels[G.currentLevel].route === 2) ctx.fillText('Ruta 2', 10, 298);
+  else ctx.fillText('Nivel: ' + (isSecret ? 0 : G.currentLevel + 1), 10, 298);
   ctx.fillText('Monedas: ' + G.score, 10, 312);
 
   if (levels[G.currentLevel] && levels[G.currentLevel].shop) {
