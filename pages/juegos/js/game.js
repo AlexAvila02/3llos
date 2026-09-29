@@ -50,6 +50,78 @@ function skyFadeT() {
   return t * t * (3 - 2 * t);
 }
 
+function drawRidge(par, baseY, w, h, color) {
+  var off = (G.camX * par) % (w * 2);
+  ctx.fillStyle = color;
+  for (var k = -1; k < 5; k++) {
+    var bx = k * w * 2 - off;
+    ctx.beginPath();
+    ctx.moveTo(bx, baseY + 60);
+    ctx.lineTo(bx + w, baseY - h * ((k % 2 === 0) ? 1 : 0.6));
+    ctx.lineTo(bx + w * 2, baseY + 60);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawSunsetSky() {
+  var grd = ctx.createLinearGradient(0, 0, 0, 320);
+  grd.addColorStop(0, '#160f38');
+  grd.addColorStop(0.45, '#5b2a6e');
+  grd.addColorStop(0.72, '#c94b6d');
+  grd.addColorStop(1, '#f5a65b');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, 480, 320);
+  var t = Date.now() / 1000;
+  var i;
+  for (i = 0; i < 60; i++) {
+    ctx.fillStyle = '#fff';
+    ctx.globalAlpha = 0.25 + 0.55 * Math.abs(Math.sin(t * 1.3 + i));
+    ctx.fillRect((i * 83 + 7) % 480, (i * 47 + 13) % 150, 1, 1);
+  }
+  ctx.globalAlpha = 1;
+  var sunX = 350 - G.camX * 0.03;
+  var sunY = 218;
+  var halo = ctx.createRadialGradient(sunX, sunY, 4, sunX, sunY, 90);
+  halo.addColorStop(0, 'rgba(255,214,110,0.55)');
+  halo.addColorStop(1, 'rgba(255,214,110,0)');
+  ctx.fillStyle = halo;
+  ctx.fillRect(sunX - 90, sunY - 90, 180, 180);
+  ctx.fillStyle = '#ffd66e';
+  ctx.beginPath();
+  ctx.arc(sunX, sunY, 30, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#fff3c4';
+  ctx.beginPath();
+  ctx.arc(sunX - 6, sunY - 6, 18, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,170,200,0.45)';
+  for (i = 0; i < 4; i++) {
+    var clx = ((i * 390 + t * 6) % 680) - 100 - G.camX * 0.05;
+    var cly = 36 + i * 30;
+    ctx.fillRect(clx, cly, 70, 8);
+    ctx.fillRect(clx + 12, cly - 6, 44, 8);
+  }
+  ctx.fillStyle = '#2a1e4a';
+  for (i = 0; i < 3; i++) {
+    var bdx = ((i * 260 + t * 22) % 600) - 60;
+    var bdy = 70 + i * 24 + Math.sin(t * 2 + i) * 4;
+    ctx.fillRect(bdx, bdy, 6, 2);
+    ctx.fillRect(bdx + 6, bdy - 2, 2, 2);
+    ctx.fillRect(bdx - 2, bdy - 2, 2, 2);
+  }
+  drawRidge(0.22, 235, 150, 120, '#4a3670');
+  drawRidge(0.45, 265, 190, 150, '#2c2152');
+  for (i = 0; i < 22; i++) {
+    var fwx = (i * 197 + 53) % 1600;
+    var fwy = 130 + (i * 89 + 17) % 170;
+    ctx.fillStyle = '#ffe66d';
+    ctx.globalAlpha = 0.25 + 0.6 * Math.abs(Math.sin(t * 1.8 + i * 1.7));
+    ctx.fillRect(fwx - G.camX, fwy - G.camY, 2, 2);
+  }
+  ctx.globalAlpha = 1;
+}
+
 function drawGalaxySky(alpha) {
   var a = alpha === undefined ? 1 : alpha;
   var grdG = ctx.createLinearGradient(0, 0, 0, 320);
@@ -253,6 +325,8 @@ function render() {
     }
   } else if (L.galaxy) {
     drawGalaxySky(1);
+  } else if (L.theme === 'sunset') {
+    drawSunsetSky();
   } else if (L.skyFade) {
     ctx.fillStyle = '#1a1a2e';
     ctx.fillRect(0, 0, 480, 320);
@@ -272,7 +346,7 @@ function render() {
   if (Math.abs(G.shakeX) < 0.5) G.shakeX = 0;
   if (Math.abs(G.shakeY) < 0.5) G.shakeY = 0;
 
-  if (!isSecret && !L.galaxy) {
+  if (!isSecret && !L.galaxy && L.theme !== 'sunset') {
     var starA = 1;
     if (L.skyFade) starA = 1 - skyFadeT();
     if (starA > 0) {
@@ -285,12 +359,16 @@ function render() {
     }
   }
 
-  ctx.fillStyle = isSecret ? '#2d1b4e' : (L.galaxy ? '#4a2b7a' : '#6c5ce7');
+  var platBase = '#6c5ce7', platTop = '#00b894';
+  if (isSecret) { platBase = '#2d1b4e'; platTop = '#4a2d6e'; }
+  else if (L.galaxy) { platBase = '#4a2b7a'; platTop = '#00cec9'; }
+  else if (L.theme === 'sunset') { platBase = '#6e3b5e'; platTop = '#ffd166'; }
+  ctx.fillStyle = platBase;
   for (i = 0; i < G.platList.length; i++) {
     p = G.platList[i];
     ctx.fillRect(p[0] + cx, p[1] + cy, p[2], p[3]);
   }
-  ctx.fillStyle = isSecret ? '#4a2d6e' : (L.galaxy ? '#00cec9' : '#00b894');
+  ctx.fillStyle = platTop;
   for (i = 0; i < G.platList.length; i++) {
     p = G.platList[i];
     ctx.fillRect(p[0] + cx, p[1] + cy, p[2], 3);
@@ -874,6 +952,16 @@ function render() {
 initAudioUI();
 initInput({ restart: restartGame, load: loadLevel, winContinue: winContinue }, canvas);
 restartGame();
+// Debug: abrir en un nivel concreto con #nivel=N (no afecta al juego).
+(function() {
+  try {
+    var m = (location.hash || '').match(/nivel=(\d+)/);
+    if (m) {
+      var n = parseInt(m[1], 10);
+      if (n >= 0 && n < levels.length) loadLevel(n);
+    }
+  } catch (e) {}
+})();
 registerScene('game', { update: update, render: render });
 setScene('game');
 startLoop({

@@ -697,11 +697,11 @@ var i, p;
     }
 
     if (G.currentLevel === 6 && G.px > 195 && G.px < 285 && G.py < 0 && G.pvy < 0) {
-      loadLevel(12);
+      loadLevel(13);
       return;
     }
 
-    if (G.currentLevel >= 12 && G.currentLevel <= 15 && levels[G.currentLevel].secret && G.py < 0 && !G.sunDeath) {
+    if (G.currentLevel >= 13 && G.currentLevel <= 16 && levels[G.currentLevel].secret && G.py < 0 && !G.sunDeath) {
       loadLevel(G.currentLevel + 1);
       return;
     }
