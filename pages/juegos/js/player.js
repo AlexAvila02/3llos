@@ -1,5 +1,6 @@
 import { G } from './state.js';
 import { playJumpSound, playDashSound } from './audio.js';
+import { followPlayer } from './engine/camera.js';
 import { die } from './entities.js';
 var SPD = 3.2;
 var ACCEL = 0.65;
@@ -166,14 +167,8 @@ var i, p;
       return;
     }
 
-    G.camX = G.px + 6 - 240;
-    if (G.camX < 0) G.camX = 0;
-    if (G.camX > G.levelW - 480) G.camX = G.levelW - 480;
-    if (G.levelW <= 480) G.camX = 0;
-    G.camY = G.py + 8 - 160;
-    if (G.camY < 0) G.camY = 0;
-    if (G.camY > G.levelH - 320) G.camY = G.levelH - 320;
-    if (G.levelH <= 320) G.camY = 0;
+    // La camara del motor calcula y escribe G.camX/G.camY.
+    followPlayer();
 
     if (G.checkpoint && !G.checkpoint.active) {
       if (Math.abs(G.px + 6 - G.checkpoint.x) < 24 && Math.abs(G.py + 8 - G.checkpoint.y) < 24) {

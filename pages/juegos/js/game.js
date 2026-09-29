@@ -3,6 +3,8 @@ import { levels, nextStoryLevel } from './levels.js';
 import { initAudioUI, audioLevelMusic, stopAllBgm, resumeMainBgm, updateAudioFrame, startSunBattleMusic, stopSunBattleMusic, syncSunBattleMusic } from './audio.js';
 import { input, initInput, updatePlayer, resetPlayerTransient } from './player.js';
 import { updateSunAmbient, updateEntities, loadLevel } from './entities.js';
+import { startLoop } from './engine/loop.js';
+import { registerScene, setScene, updateScene, renderScene } from './engine/scene.js';
 var backIcon = document.getElementById('back-icon');
 var bctx = backIcon.getContext('2d');
 bctx.fillStyle = '#fff';
@@ -872,33 +874,25 @@ function render() {
 initAudioUI();
 initInput({ restart: restartGame, load: loadLevel, winContinue: winContinue }, canvas);
 restartGame();
-var STEP = 1 / 60;
-var acc = 0;
-var last = performance.now();
-function frame(now) {
-  requestAnimationFrame(frame);
-  var dt = (now - last) / 1000;
-  last = now;
-  if (dt > 0.25) dt = 0.25;
-  acc += dt;
-  while (acc >= STEP) {
-    update();
-    acc -= STEP;
+registerScene('game', { update: update, render: render });
+setScene('game');
+startLoop({
+  update: updateScene,
+  render: renderScene,
+  afterFrame: function() {
+    try { syncSunBattleMusic(); } catch (e) {}
+    var L = levels[G.currentLevel];
+    if (L && L.skyFade && G.flagObj) updateAudioFrame(true, skyFadeT(), false);
+    else if (L && (L.galaxy || L.secret)) updateAudioFrame(false, 0, true);
+    else updateAudioFrame(false, 0, false);
+    if (G.frameShake > 0.5) {
+      G.frameShake *= 0.85;
+      var fsx = (Math.random() - 0.5) * G.frameShake;
+      var fsy = (Math.random() - 0.5) * G.frameShake;
+      canvas.style.transform = 'translate(' + fsx + 'px,' + fsy + 'px)';
+    } else {
+      G.frameShake = 0;
+      if (canvas.style.transform) canvas.style.transform = '';
+    }
   }
-  render();
-  try { syncSunBattleMusic(); } catch (e) {}
-  var L = levels[G.currentLevel];
-  if (L && L.skyFade && G.flagObj) updateAudioFrame(true, skyFadeT(), false);
-  else if (L && (L.galaxy || L.secret)) updateAudioFrame(false, 0, true);
-  else updateAudioFrame(false, 0, false);
-  if (G.frameShake > 0.5) {
-    G.frameShake *= 0.85;
-    var fsx = (Math.random() - 0.5) * G.frameShake;
-    var fsy = (Math.random() - 0.5) * G.frameShake;
-    canvas.style.transform = 'translate(' + fsx + 'px,' + fsy + 'px)';
-  } else {
-    G.frameShake = 0;
-    if (canvas.style.transform) canvas.style.transform = '';
-  }
-}
-requestAnimationFrame(frame);
+});
