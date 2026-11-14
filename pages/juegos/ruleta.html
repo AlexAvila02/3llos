@@ -942,6 +942,7 @@
                     if (options.length > 2) {
                         options.splice(i, 1);
                         document.getElementById('numOptions').value = options.length;
+                        document.getElementById('numOptionsSelect').value = options.length;
                         saveOptions();
                         updateOptions();
                     } else {
@@ -1103,7 +1104,7 @@
                     // El puntero está en -PI/2 (arriba)
                     const normalizedRotation = (currentRotation % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
                     const pointerAngle = (3 * Math.PI / 2 - normalizedRotation + 2 * Math.PI) % (2 * Math.PI);
-                    const winningIndex = Math.floor(pointerAngle / anglePerOption);
+                    const winningIndex = Math.floor(pointerAngle / anglePerOption) % numOptions;
                     
                     showResult(options[winningIndex]);
                 }
@@ -1133,7 +1134,7 @@
             const autoDelete = document.getElementById('autoDeleteToggle').checked;
             if (autoDelete) {
                 setTimeout(() => {
-                    if (options.length > 2) {
+                    if (!isSpinning && options.length > 2) {
                         const winnerIndex = options.indexOf(winner);
                         if (winnerIndex > -1) {
                             options.splice(winnerIndex, 1);

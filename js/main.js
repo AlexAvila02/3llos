@@ -61,7 +61,7 @@ const themes = {
 };
 
 function setTheme(themeName) {
-  const theme = themes[themeName];
+  const theme = themes[themeName] || themes.default;
   const body = document.body;
   body.style.background = theme.body;
   body.style.backgroundAttachment = 'fixed';
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.scrollBy({
       top: event.deltaY * 0.85
     });
-  });
+  }, { passive: false });
   
   // Intersection observer for animations
   const observer = new IntersectionObserver((entries) => {

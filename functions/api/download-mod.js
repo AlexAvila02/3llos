@@ -7,12 +7,18 @@ export async function onRequestGet(context) {
   const API_KEY = env.MINEHOST_API_KEY;
   const SERVER_ID = env.MINEHOST_SERVER_ID;
 
+  if (!PANEL_URL || !API_KEY || !SERVER_ID) {
+    return new Response("Faltan variables de entorno en Cloudflare", { status: 500 });
+  }
   if (!filename) return new Response("Falta el archivo", { status: 400 });
+  if (!filename.endsWith(".jar") || filename.includes("..") || filename.includes("/") || filename.includes("\\")) {
+    return new Response("Nombre de archivo inválido", { status: 400 });
+  }
 
   try {
     // 1. Pedir a Minehost la URL firmada del archivo
     const pteroRes = await fetch(
-      `${PANEL_URL}/api/client/servers/${SERVER_ID}/files/download?file=%2Fmods%2F${encodeURIComponent(filename)}`,
+      `${PANEL_URL.replace(/\/$/, '')}/api/client/servers/${SERVER_ID}/files/download?file=%2Fmods%2F${encodeURIComponent(filename)}`,
       {
         headers: {
           'Authorization': `Bearer ${API_KEY}`,
@@ -26,10 +32,16 @@ export async function onRequestGet(context) {
     }
 
     const pteroData = await pteroRes.json();
-    const wingsDownloadUrl = pteroData.attributes.url;
+    const wingsDownloadUrl = pteroData?.attributes?.url;
+    if (!wingsDownloadUrl) {
+      return new Response("No se recibió URL de descarga", { status: 502 });
+    }
 
     // 2. Cloudflare descarga el archivo directamente (entre servidores NO hay CORS)
     const fileRes = await fetch(wingsDownloadUrl);
+    if (!fileRes.ok) {
+      return new Response("Error al descargar el mod desde el nodo", { status: fileRes.status });
+    }
 
     // 3. Devolver el archivo directamente con código 200 OK y CORS permitido (¡NO HACER REDIRECT 302!)
     return new Response(fileRes.body, {

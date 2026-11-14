@@ -411,10 +411,6 @@ async function guardarModEnDisco(dirHandle, mod){
   await writable.close();
   await new Promise(resolve=>setTimeout(resolve,100));
 }
-function fallbackDownload(filename){
-  const a=document.createElement('a'); a.href='/api/download-mod?file='+encodeURIComponent(filename); a.download=filename;
-  document.body.appendChild(a); a.click(); a.remove();
-}
 async function downloadOne(filename){
   if(dirHandle){
     const perm=await dirHandle.requestPermission({mode:'readwrite'});
@@ -491,8 +487,9 @@ async function downloadZipServer(){
   } finally{ if(btn) setTimeout(()=>{btn.textContent=orig; if(prog.textContent.startsWith('✓')) prog.style.display='none';},3000); }
 }
 async function downloadZipClientFallback(){
-  const list=getClientMods();
+  const list=selected.size ? [...selected].map(fn=> cachedMods.find(m=>m.filename===fn)).filter(Boolean) : getClientMods();
   if(!list.length) return;
+  zipCancelled=false;
   const modal=document.getElementById('zipModal');
   const status=document.getElementById('zipStatus');
   const fill=document.getElementById('zipFill');

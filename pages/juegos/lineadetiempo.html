@@ -942,8 +942,6 @@
     var lbImages = [];
     var lbIndex = 0;
     function openLightbox(src) {
-      var img = document.querySelector('.grad-grid img[src="' + src + '"]') || document.elementFromPoint(0,0);
-      var clicked = document.activeElement;
       var targetImg = null;
       document.querySelectorAll('.grad-grid img').forEach(function(el){ if(el.src===src) targetImg=el; });
       if (targetImg) {

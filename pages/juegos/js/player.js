@@ -316,8 +316,8 @@ export function initInput(actions, canvas) {
       dx = (dx / dist) * maxDist;
       dy = (dy / dist) * maxDist;
     }
-    joystickKnob.style.left = (60 + dx) + 'G.px';
-    joystickKnob.style.top = (60 + dy) + 'G.px';
+    joystickKnob.style.left = (60 + dx) + 'px';
+    joystickKnob.style.top = (60 + dy) + 'px';
     joystickKnob.style.transform = 'translate(-50%, -50%)';
 
     var threshold = 15;

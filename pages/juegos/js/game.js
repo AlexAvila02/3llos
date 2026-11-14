@@ -40,9 +40,9 @@ ctx.imageSmoothingEnabled = false;
 })();
 
 function skyFadeT() {
-  var Lf = levels[currentLevel];
-  if (!Lf || !Lf.skyFade || !flagObj) return 0;
-  var d = Math.abs(px - flagObj.x);
+  var Lf = levels[G.currentLevel];
+  if (!Lf || !Lf.skyFade || !G.flagObj) return 0;
+  var d = Math.abs(G.px - G.flagObj.x);
   var r = (Lf.fadeRange || 1400) * 1.5;
   var t = 1 - Math.min(1, d / r);
   if (t < 0) return 0;
