@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Ruben: En Busca de Angelo - Metroidvania 2D</title>
+  <link rel="stylesheet" href="css/style.css?v=4">
+  <link rel="stylesheet" href="css/journal.css?v=1">
+  <link rel="stylesheet" href="css/ui-icons.css?v=3">
+  <link rel="stylesheet" href="css/world-map.css?v=1">
+  <link rel="stylesheet" href="css/multiplayer.css?v=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="game-container">
+    <!-- Canvas principal de juego -->
+    <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+    <!-- Capa de Interfaz de Usuario (HUD) -->
+    <div id="hud-overlay">
+      <!-- Vidas y Máscaras -->
+      <div class="hud-top-left">
+        <div class="character-portrait">
+          <div class="portrait-glow"></div>
+          <span class="portrait-name">RUBEN</span>
+        </div>
+        <div id="health-bar" class="health-bar" title="Salud de Ruben">
+          <!-- Generado dinámicamente -->
+        </div>
+        <div class="items-display">
+          <div id="key-indicator" class="item-slot" title="Llave del Portón">
+            <span class="slot-icon ui-icon" data-icon="key"></span>
+            <span id="key-count" class="slot-text">0/1</span>
+          </div>
+          <div id="carry-indicator" class="item-slot" title="Objeto en mano">
+            <span class="slot-icon ui-icon" data-icon="stone"></span>
+            <span id="carry-text" class="slot-text">Vacío</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nombre de zona, botón de pausa y minimapa -->
+      <div class="hud-top-right">
+        <div class="hud-top-right-header">
+          <div id="zone-tag" class="zone-tag">PRADERAS DEL REINO CAÍDO</div>
+          <button id="btn-hud-pause" class="btn-hud-pause" title="Pausa / Modificar Controles (ESC)" aria-label="Menú de pausa y controles"><span class="ui-icon" data-icon="gear"></span></button>
+        </div>
+        <div id="mini-map" class="mini-map">
+          <!-- Habitaciones visitadas -->
+        </div>
+      </div>
+
+      <!-- Diálogo / Mensaje de Lore / Carteles -->
+      <div id="dialog-box" class="dialog-box hidden">
+        <div class="dialog-speaker" id="dialog-speaker">Nota de Angelo</div>
+        <div class="dialog-text" id="dialog-text">...</div>
+        <div class="dialog-hint">[Presiona E o ESPACIO para cerrar]</div>
+      </div>
+
+      <!-- Pantalla de Inicio / Pausa -->
+      <div id="overlay-screen" class="overlay-screen">
+        <div class="title-container">
+          <h1 class="game-title">RUBEN</h1>
+          <p class="game-subtitle">EN BUSCA DE ANGELO</p>
+        </div>
+        <div class="menu-actions">
+          <button id="btn-start" class="btn-start">NUEVA PARTIDA</button>
+          <button id="btn-continue" class="btn-secondary" disabled>CONTINUAR</button>
+          <button id="btn-open-controls-menu" class="btn-secondary">OPCIONES</button>
+        </div>
+        <p class="press-hint">Presioná ENTER · <span class="ui-icon" data-icon="gamepad"></span> Cruceta para elegir, A para confirmar</p>
+      </div>
+
+      <!-- Menú de Pausa en Partida -->
+      <div id="pause-modal" class="modal-overlay hidden">
+        <div class="modal-card pause-card">
+          <h2 class="modal-title">PAUSA</h2>
+          <p class="modal-subtitle">EL REINO AGUARDA</p>
+          <div class="pause-actions">
+            <button id="btn-pause-resume" class="btn-start"><span class="ui-icon" data-icon="play"></span>CONTINUAR</button>
+            <button id="btn-pause-controls" class="btn-secondary"><span class="ui-icon" data-icon="sliders"></span>MODIFICAR CONTROLES</button>
+            <button id="btn-pause-restart" class="btn-secondary"><span class="ui-icon" data-icon="restart-room"></span>REINICIAR SALA</button>
+            <button id="btn-pause-newgame" class="btn-secondary"><span class="ui-icon" data-icon="restart-game"></span><span class="btn-label">REINICIAR JUEGO</span></button>
+            <button id="btn-pause-menu" class="btn-secondary"><span class="ui-icon" data-icon="home"></span>MENÚ PRINCIPAL</button>
+          </div>
+          <div class="pause-hint">[Presioná ESC o <span class="ui-icon" data-icon="gamepad"></span> B para continuar]</div>
+        </div>
+      </div>
+
+      <!-- Modal de Configuración y Modificación de Controles -->
+      <div id="controls-modal" class="modal-overlay hidden">
+        <div class="modal-card controls-card">
+          <div class="modal-header">
+            <div>
+              <h2 class="modal-title">MODIFICAR CONTROLES</h2>
+              <p class="modal-subtitle">PERSONALIZA TUS TECLAS PARA LA AVENTURA</p>
+            </div>
+            <button id="btn-close-controls" class="btn-close" title="Cerrar ventana">✕</button>
+          </div>
+
+          <p class="controls-instructions">
+            Haz clic en una casilla para reasignarla. Pulsa <span class="key-tag">Supr</span> o <span class="key-tag">Borrar</span> para vaciarla, o <span class="key-tag">Esc</span> para cancelar.
+          </p>
+
+          <div class="controls-table-header">
+            <span>Acción</span>
+            <div class="slot-titles">
+              <span>Principal</span>
+              <span>Alternativa</span>
+            </div>
+          </div>
+
+          <div id="controls-list" class="controls-list">
+            <!-- Filas generadas dinámicamente por ControlsManager -->
+          </div>
+
+          <div class="modal-footer">
+            <button id="btn-reset-controls" class="btn-secondary btn-danger-subtle">RESTABLECER POR DEFECTO</button>
+            <button id="btn-save-controls" class="btn-start">GUARDAR Y SALIR</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notificación flotante emergente -->
+      <div id="notification" class="notification hidden"></div>
+    </div>
+  </div>
+
+  <!-- Scripts de la arquitectura modular sin dependencias externas -->
+  <script src="js/ui-icons.js?v=3"></script>
+  <script src="js/audio.js?v=3"></script>
+  <script src="js/particles.js?v=3"></script>
+  <script src="js/code-art-engine.js?v=6"></script>
+  <script src="js/terrain-art.js?v=2"></script>
+  <script src="js/enemies.js?v=3"></script>
+  <script src="js/controls.js?v=9"></script>
+  <script src="js/player.js?v=9"></script>
+  <script src="js/world.js?v=12"></script>
+  <script src="js/menu-nav.js?v=3"></script>
+  <!-- Expansión (Claude): fondo continuo entre secciones, salas 4-10 y Diario de Ruben -->
+  <script src="js/bg-continuity.js?v=2"></script>
+  <script src="js/levels-expansion.js?v=12"></script>
+  <script src="js/journal.js?v=6"></script>
+  <script src="js/world-map.js?v=2"></script>
+  <script src="js/animation-registry.js?v=4"></script>
+  <!-- Compartidos (Claude): apuntado ratón/stick y sonidos sintetizados -->
+  <script src="js/aim.js?v=1"></script>
+  <script src="js/sound-kit.js?v=1"></script>
+  <!-- Energía elemental (Claude): barra azul compartida por Aire y Agua; va antes de los poderes -->
+  <script src="js/stamina.js?v=3"></script>
+  <script src="js/wind-pull.js?v=8"></script>
+  <!-- Ambientes, decorados, NPC y notas (Claude) -->
+  <script src="js/ambience.js?v=2"></script>
+  <script src="js/props.js?v=1"></script>
+  <script src="js/master-home.js?v=1"></script>
+  <script src="js/npcs.js?v=15"></script>
+  <script src="js/npc-reactions.js?v=1"></script>
+  <script src="js/notes.js?v=1"></script>
+  <!-- Agua (Claude): núcleo → misión de la sala 12 → Dominio del Agua -->
+  <script src="js/water-core.js?v=3"></script>
+  <script src="js/water-quest.js?v=2"></script>
+  <script src="js/water-power.js?v=5"></script>
+  <!-- Partida guardada (CONTINUAR): hooks onInit/onRoomLoad/onAfterUpdate, antes de main.js -->
+  <script src="js/save-game.js?v=3"></script>
+  <script src="js/room-shortcuts.js?v=1"></script>
+  <!-- Multijugador cooperativo (Claude): hasta 4 jugadores, el anfitrión hace de servidor (PeerJS/WebRTC) -->
+  <script src="js/multiplayer.js?v=2"></script>
+  <script src="js/main.js?v=11"></script>
+</body>
+</html>
