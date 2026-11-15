@@ -16,7 +16,7 @@
  *
  * Hooks: onInit · onBeforeUpdate · onAfterUpdate · onRoomLoad · onEnemyTarget ·
  * onRestartGame · onRenderWorld · capa 'player' de AnimationRegistry (color de cada jugador).
- * API: window.Multiplayer { isHost(), isGuest(), isActive(), open(), leave() }
+ * API: window.Multiplayer { isHost(), isGuest(), isActive(), open(), leave(), others() }
  */
 (function () {
   const PEER_SRC = 'https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js';
@@ -109,7 +109,9 @@
       x: r1(p.x), y: r1(p.y), vx: r1(p.vx), vy: r1(p.vy), f: p.facing,
       g: p.isGrounded ? 1 : 0, a: p.isAttacking ? 1 : 0, aa: r1(p.attackAim || 0),
       h: p.hp, mh: p.maxHp, d: (p.dead || g.deathTimer > 0) ? 1 : 0, iv: p.invulnerableTimer > 0 ? 1 : 0,
-      ap: r1(arm.pose || 0), am: r1(arm.aim || 0)
+      ap: r1(arm.pose || 0), am: r1(arm.aim || 0),
+      // Viento, agua y cómo le pegan a este jugador (coop-elements.js)
+      e: window.CoopElements ? window.CoopElements.pack(g) : null
     };
   }
 
@@ -160,8 +162,7 @@
     if (st.d && !gh.dead) { gh.dead = true; if (gh.startDeath) gh.startDeath(); }
     else if (!st.d && gh.dead) { gh.dead = false; gh.anim.deathY = 0; gh.anim.deathVy = 0; gh.anim.deathRot = 0; pl.snap = true; }
     if (gh.dead) { if (gh.updateDeath) gh.updateDeath(); return; }
-    if (gh.isGrounded && Math.abs(gh.vx) > 0.4) gh.walkPhase += Math.abs(gh.vx) * 0.11;
-    else gh.walkPhase = 0;
+    gh.stepWalkCycle();
     const moveDir = Math.abs(gh.vx) > 0.4 ? Math.sign(gh.vx) : 0;
     try { gh.updateAnimation(moveDir); } catch (e) { /* */ }
     try { gh.updateCapePhysics(); } catch (e) { /* */ }
@@ -988,6 +989,8 @@
     isActive: () => MP.mode === 'host' || MP.mode === 'guest',
     open: () => openModal(),
     leave: () => leave(),
+    // Los demás jugadores de esta sala: [{ id, name, slot, st, ghost }] (coop-elements.js)
+    others: () => playersInMyRoom(),
     _state: MP
   };
 })();
