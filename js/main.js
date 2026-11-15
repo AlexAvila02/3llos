@@ -1,3 +1,16 @@
+// Navegación con sonido de pop respetando apertura en nueva pestaña
+function navigateWithPop(event, url) {
+  if (event.ctrlKey || event.metaKey || event.shiftKey || event.button === 1) {
+    playPopSound();
+    return;
+  }
+  event.preventDefault();
+  playPopSound();
+  setTimeout(() => {
+    window.location.href = url;
+  }, 100);
+}
+
 // Menu sidebar toggle
 function toggleSidebar() {
   const sidebar = document.querySelector('.sidebar');
