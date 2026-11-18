@@ -5,8 +5,49 @@
 
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+const GUARD_FILE_PATH = path.join(os.tmpdir(), '3llos-antigravity-stop-guard.json');
+const GUARD_COOLDOWN_MS = 10 * 60 * 1000;
+const GUARD_TTL_MS = 60 * 60 * 1000;
+const SKIP_PUSH_REGEX = /\bno\s+(hagas\s+push|pushees|subas|despliegues|commitees)\b/i;
+
+/**
+ * Lee el registro temporal de bloqueos por turno y limpia entradas vencidas (> 1 hora).
+ */
+function loadGuardState(now) {
+  try {
+    if (!fs.existsSync(GUARD_FILE_PATH)) {
+      return {};
+    }
+    const parsed = JSON.parse(fs.readFileSync(GUARD_FILE_PATH, 'utf8'));
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return {};
+    }
+    const cleaned = {};
+    for (const [key, ts] of Object.entries(parsed)) {
+      if (typeof ts === 'number' && now - ts < GUARD_TTL_MS) {
+        cleaned[key] = ts;
+      }
+    }
+    return cleaned;
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Guarda el registro temporal de bloqueos por turno en la carpeta temporal del sistema.
+ */
+function saveGuardState(state) {
+  try {
+    fs.writeFileSync(GUARD_FILE_PATH, JSON.stringify(state), 'utf8');
+  } catch {
+    // Ignorar fallos de escritura en temp para no bloquear la terminación
+  }
+}
 
 /**
  * Imprime la respuesta JSON esperada por Antigravity y finaliza con código 0.
@@ -63,8 +104,23 @@ async function main() {
     if (
       (payload.terminationReason && payload.terminationReason !== 'NO_TOOL_CALL') ||
       payload.continuationActive === true ||
+      Number(payload.executionNum) > 0 ||
       payload.fullyIdle === false
     ) {
+      respond({ decision: 'allow' });
+    }
+
+    // Permitir salir si el usuario pidió explícitamente no subir cambios todavía
+    if (typeof payload.lastUserInput === 'string' && SKIP_PUSH_REGEX.test(payload.lastUserInput)) {
+      respond({ decision: 'allow' });
+    }
+
+    // Evitar bucles dentro del mismo turno persistiendo el bloqueo reciente en temp
+    const now = Date.now();
+    const turnKey = `${payload.conversationId || 'default'}::${payload.lastUserInput || ''}`;
+    const guardState = loadGuardState(now);
+    const entryTs = guardState[turnKey];
+    if (typeof entryTs === 'number' && now - entryTs < GUARD_COOLDOWN_MS) {
       respond({ decision: 'allow' });
     }
 
@@ -101,6 +157,8 @@ async function main() {
     }
 
     if (status.length > 0 || ahead > 0) {
+      guardState[turnKey] = now;
+      saveGuardState(guardState);
       respond({
         decision: 'continue',
         reason:
