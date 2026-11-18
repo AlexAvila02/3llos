@@ -1,0 +1,222 @@
+/* Estilos compartidos entre las páginas de juegos y herramientas */
+
+/* Título animado por letras */
+.animated-title {
+  font-weight: 800;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.animated-title span {
+  display: inline-block;
+  opacity: 0;
+  animation:
+    letterFadeIn 0.5s ease-out forwards,
+    letterFloat 3s ease-in-out infinite;
+}
+
+@keyframes letterFadeIn {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes letterFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-8px) rotate(2deg); }
+  50% { transform: translateY(0) rotate(0deg); }
+  75% { transform: translateY(-5px) rotate(-1deg); }
+}
+
+/* Botón hamburguesa */
+.hamburger-menu {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  cursor: pointer;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hamburger-menu:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(100, 150, 255, 0.3);
+}
+
+.hamburger-menu:active {
+  transform: scale(0.9);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.hamburger-line {
+  width: 25px;
+  height: 3px;
+  background: white;
+  margin: 5px 0;
+  border-radius: 3px;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transform-origin: center;
+}
+
+.hamburger-menu.active .hamburger-line {
+  background: #a8d8ff;
+}
+
+.hamburger-menu.active .hamburger-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-menu.active .hamburger-line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburger-menu.active .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+.hamburger-menu.active {
+  background: rgba(100, 150, 255, 0.2);
+  border-color: rgba(100, 150, 255, 0.4);
+  box-shadow: 0 0 25px rgba(100, 150, 255, 0.4);
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 300px;
+  height: 100%;
+  background: rgba(5, 15, 40, 0.95);
+  backdrop-filter: blur(20px);
+  z-index: 999;
+  transition: left 0.4s ease;
+  padding: 80px 20px 100px 20px;
+  border-right: 1px solid rgba(100, 150, 255, 0.2);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.sidebar.active {
+  left: 0;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 20, 50, 0.5);
+  z-index: 998;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.sidebar-item {
+  padding: 15px 20px;
+  margin: 10px 0;
+  color: white;
+  text-decoration: none;
+  display: block;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  font-size: 18px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(10px);
+}
+
+/* Selector de temas */
+.theme-section {
+  margin-top: 20px;
+  padding: 15px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.theme-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+  margin: 0 0 12px 0;
+  font-weight: 500;
+}
+
+.theme-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.theme-btn {
+  width: 100%;
+  height: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-btn:hover {
+  transform: scale(1.05);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.theme-btn:active {
+  transform: scale(0.95);
+}
+
+.theme-btn.active {
+  border-color: white;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.theme-btn.active::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}

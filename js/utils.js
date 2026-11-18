@@ -1,67 +1,6 @@
-// Web Audio API para sonidos
-let audioContext;
+// Sonido de gota y manejo de errores (las utilidades de audio base están en js/shared-ui.js)
 let waterDropAudio = null;
 let errorTimeout;
-
-function initAudio() {
-  audioContext = new (window.AudioContext || window.webkitAudioContext)();
-}
-
-function playPopSound() {
-  if (!audioContext) initAudio();
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-  oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-  oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
-  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-  oscillator.start(audioContext.currentTime);
-  oscillator.stop(audioContext.currentTime + 0.1);
-}
-
-function playErrorSound() {
-  if (!audioContext) initAudio();
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-  oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
-  oscillator.frequency.exponentialRampToValueAtTime(150, audioContext.currentTime + 0.8);
-  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
-  oscillator.start(audioContext.currentTime);
-  oscillator.stop(audioContext.currentTime + 0.8);
-}
-
-function playSlideSound() {
-  if (!audioContext) initAudio();
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-  oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
-  oscillator.frequency.linearRampToValueAtTime(600, audioContext.currentTime + 0.15);
-  gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-  oscillator.start(audioContext.currentTime);
-  oscillator.stop(audioContext.currentTime + 0.15);
-}
-
-function playCloseSound() {
-  if (!audioContext) initAudio();
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-  oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-  oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
-  gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-  oscillator.start(audioContext.currentTime);
-  oscillator.stop(audioContext.currentTime + 0.15);
-}
 
 function initWaterDropSound() {
   if (!waterDropAudio) {
@@ -356,23 +295,6 @@ function createFloatingParticles() {
     const maxOpacity = 0.4 + Math.random() * 0.5;
     particle.style.setProperty('--max-opacity', maxOpacity);
     
-    container.appendChild(particle);
-  }
-}
-
-// Crear partículas ambientales
-function createAmbientParticles() {
-  const container = document.querySelector('.wave-container');
-  if (!container) return;
-  
-  for (let i = 0; i < 20; i++) {
-    const particle = document.createElement('div');
-    particle.className = 'ambient-particle';
-    particle.style.left = Math.random() * 100 + '%';
-    particle.style.animationDuration = (18 + Math.random() * 12) + 's';
-    particle.style.animationDelay = Math.random() * 20 + 's';
-    const drift = (Math.random() - 0.5) * 80;
-    particle.style.setProperty('--drift', drift + 'px');
     container.appendChild(particle);
   }
 }

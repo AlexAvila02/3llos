@@ -1,0 +1,654 @@
+/* Estilos específicos del Test de Mando */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  min-height: 100vh;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  transition: background 0.8s ease-in-out;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  max-width: 1040px;
+  width: 100%;
+  margin-top: 80px;
+  position: relative;
+  z-index: 1;
+}
+
+h1 {
+  text-align: center;
+  font-size: 42px;
+  margin-bottom: 16px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.subtitle {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.72);
+  margin-bottom: 30px;
+  font-size: 16px;
+}
+
+/* Barra superior de estado de conexión y selector de esquema */
+.gamepad-toolbar {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  padding: 16px 22px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1 1 240px;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fbbf24;
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.55);
+  flex-shrink: 0;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.status-dot.connected {
+  background: #4ade80;
+  box-shadow: 0 0 12px rgba(74, 222, 128, 0.8);
+}
+
+.status-dot.unsupported {
+  background: #f87171;
+  box-shadow: 0 0 10px rgba(248, 113, 113, 0.65);
+}
+
+.gamepad-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mapping-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(78, 205, 196, 0.18);
+  border: 1px solid rgba(78, 205, 196, 0.45);
+  color: #8ce9e2;
+  flex-shrink: 0;
+}
+
+.mapping-badge.compat {
+  background: rgba(251, 191, 36, 0.18);
+  border-color: rgba(251, 191, 36, 0.5);
+  color: #fde68a;
+}
+
+.toolbar-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.gamepad-select {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  max-width: 240px;
+}
+
+.gamepad-select option {
+  background: #16213e;
+  color: white;
+}
+
+.layout-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.layout-btn {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.layout-btn:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.layout-btn.active {
+  background: rgba(78, 205, 196, 0.25);
+  border-color: rgba(78, 205, 196, 0.7);
+  color: #9ff3ec;
+  box-shadow: 0 0 14px rgba(78, 205, 196, 0.22);
+}
+
+/* Contenedor principal del diagrama y telemetría */
+.gamepad-container {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  padding: 28px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gamepad-svg-wrap {
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto 26px auto;
+}
+
+.gamepad-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.gamepad-body {
+  fill: rgba(255, 255, 255, 0.06);
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 2.5;
+}
+
+.dpad-center {
+  fill: rgba(255, 255, 255, 0.08);
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-width: 1.5;
+  pointer-events: none;
+}
+
+.stick-socket {
+  fill: rgba(0, 0, 0, 0.32);
+  stroke: rgba(255, 255, 255, 0.2);
+  stroke-width: 2;
+}
+
+.pad-btn {
+  fill: rgba(255, 255, 255, 0.1);
+  stroke: rgba(255, 255, 255, 0.28);
+  stroke-width: 2;
+  cursor: pointer;
+  transition: fill 0.08s ease, stroke 0.08s ease, filter 0.08s ease;
+}
+
+.pad-btn:hover {
+  fill: rgba(255, 255, 255, 0.2);
+  stroke: rgba(255, 255, 255, 0.5);
+}
+
+.pad-btn.tested {
+  fill: rgba(78, 205, 196, 0.22);
+  stroke: rgba(78, 205, 196, 0.75);
+}
+
+.pad-btn.pressed {
+  fill: rgba(100, 200, 100, 0.72);
+  stroke: rgba(120, 240, 120, 0.95);
+  filter: drop-shadow(0 0 10px rgba(100, 200, 100, 0.75));
+}
+
+.pad-btn-label {
+  fill: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+  user-select: none;
+}
+
+.pad-btn-label.small {
+  font-size: 11px;
+}
+
+.trigger-fill {
+  fill: rgba(100, 200, 100, 0.55);
+  pointer-events: none;
+}
+
+/* Telemetría analógica: sticks y gatillos */
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.telemetry-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.telemetry-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.stick-canvas {
+  width: 132px;
+  height: 132px;
+  display: block;
+}
+
+.axis-readout {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.78);
+  font-variant-numeric: tabular-nums;
+}
+
+.axis-readout span {
+  color: #4ecdc4;
+  font-weight: 700;
+}
+
+.triggers-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+  flex: 1;
+}
+
+.trigger-meter {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.trigger-meter-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  font-variant-numeric: tabular-nums;
+}
+
+.trigger-meter-value {
+  color: #4ecdc4;
+}
+
+.trigger-meter-bar {
+  width: 100%;
+  height: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.trigger-meter-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #4ecdc4 0%, #4ade80 100%);
+  border-radius: 999px;
+  transition: width 0.04s linear;
+}
+
+/* Cuadrícula completa de botones */
+.section-heading {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(255, 255, 255, 0.72);
+  margin-bottom: 12px;
+}
+
+.buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 8px;
+}
+
+.pad-chip {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 9px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: white;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.1s ease;
+  font-family: inherit;
+}
+
+.pad-chip:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.pad-chip.tested {
+  background: rgba(78, 205, 196, 0.2);
+  border-color: rgba(78, 205, 196, 0.72);
+}
+
+.pad-chip.pressed {
+  background: rgba(100, 200, 100, 0.65);
+  border-color: rgba(120, 240, 120, 0.95);
+  transform: translateY(2px);
+  box-shadow: 0 0 18px rgba(100, 200, 100, 0.5);
+}
+
+.pad-chip-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.15;
+}
+
+.pad-chip-index {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.58);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Ejes adicionales para mandos no estándar */
+.extra-axes-panel {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.extra-axes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.extra-axis-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.extra-axis-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.85);
+  font-variant-numeric: tabular-nums;
+}
+
+.extra-axis-val {
+  color: #4ecdc4;
+  font-weight: 700;
+}
+
+.extra-axis-track {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.extra-axis-center {
+  position: absolute;
+  left: 50%;
+  top: -1px;
+  bottom: -1px;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateX(-50%);
+}
+
+.extra-axis-marker {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4ecdc4;
+  box-shadow: 0 0 8px rgba(78, 205, 196, 0.8);
+  transform: translate(-50%, -50%);
+}
+
+/* Panel de estado inferior (equivalente al Test de Teclado) */
+.status-panel {
+  margin-top: 26px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-title {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.last-button {
+  font-size: 42px;
+  font-weight: bold;
+  text-align: center;
+  color: #4ecdc4;
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+  word-break: break-word;
+}
+
+.pressed-buttons {
+  margin-top: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.pressed-button-tag {
+  background: rgba(78, 205, 196, 0.3);
+  border: 1px solid rgba(78, 205, 196, 0.5);
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.button-counter {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.counter-item {
+  text-align: center;
+}
+
+.counter-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #ff6b6b;
+  font-variant-numeric: tabular-nums;
+}
+
+.counter-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 5px;
+  text-transform: uppercase;
+}
+
+.action-buttons {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.rumble-btn,
+.reset-btn {
+  padding: 12px 26px;
+  border-radius: 25px;
+  color: white;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.rumble-btn {
+  background: rgba(78, 205, 196, 0.25);
+  border: 2px solid rgba(78, 205, 196, 0.55);
+}
+
+.rumble-btn:hover {
+  background: rgba(78, 205, 196, 0.45);
+  transform: translateY(-2px);
+}
+
+.reset-btn {
+  background: rgba(255, 100, 100, 0.3);
+  border: 2px solid rgba(255, 100, 100, 0.5);
+}
+
+.reset-btn:hover {
+  background: rgba(255, 100, 100, 0.5);
+  transform: translateY(-2px);
+}
+
+.rumble-status {
+  margin-top: 10px;
+  min-height: 18px;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.instructions {
+  margin-top: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  h1 {
+    font-size: 28px;
+  }
+
+  .gamepad-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-controls {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 760px) {
+  .telemetry-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .gamepad-container {
+    padding: 16px;
+  }
+
+  .last-button {
+    font-size: 32px;
+  }
+
+  .counter-value {
+    font-size: 26px;
+  }
+
+  .buttons-grid {
+    grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
+  }
+}

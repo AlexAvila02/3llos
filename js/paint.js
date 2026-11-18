@@ -108,8 +108,11 @@ function initPaintCanvas() {
   });
   canvasContainer.addEventListener('mouseout', (e) => {
     if (e.target && e.target.classList && e.target.classList.contains('active-layer')) {
-      stopDrawing();
+      stopDrawingAndSave();
     }
+  });
+  window.addEventListener('mouseup', () => {
+    stopDrawingAndSave();
   });
   
   loadLayersData();
@@ -434,10 +437,16 @@ function closePaintModal() {
   localStorage.removeItem('paintModalOpen');
 }
 
-function startDrawing(e) {
+function getCanvasCoords(e) {
   const rect = canvas.getBoundingClientRect();
-  const clickX = (e.clientX - rect.left - translateX) / scale;
-  const clickY = (e.clientY - rect.top - translateY) / scale;
+  return {
+    x: (e.clientX - rect.left) * (canvas.width / rect.width),
+    y: (e.clientY - rect.top) * (canvas.height / rect.height)
+  };
+}
+
+function startDrawing(e) {
+  const { x: clickX, y: clickY } = getCanvasCoords(e);
   
   if (isBucketMode) {
     floodFill(clickX, clickY, currentColor);
@@ -460,9 +469,7 @@ function startDrawing(e) {
 function draw(e) {
   if (!isDrawing) return;
   
-  const rect = canvas.getBoundingClientRect();
-  const currentX = (e.clientX - rect.left - translateX) / scale;
-  const currentY = (e.clientY - rect.top - translateY) / scale;
+  const { x: currentX, y: currentY } = getCanvasCoords(e);
   
   ctx.lineWidth = brushSize;
   ctx.strokeStyle = isEraser ? '#FFFFFF' : currentColor;
@@ -673,7 +680,7 @@ function floodFill(startX, startY, fillColor) {
   const fillRgb = hexToRgb(fillColor);
   if (!fillRgb) return;
   
-  if (startR === fillRgb.r && startG === fillRgb.g && startB === fillRgb.b) {
+  if (startR === fillRgb.r && startG === fillRgb.g && startB === fillRgb.b && startA === 255) {
     return;
   }
   
@@ -691,11 +698,13 @@ function floodFill(startX, startY, fillColor) {
   }
   
   const visited = new Uint8Array(width * height);
-  const queue = [[startXInt, startYInt]];
+  const queue = [startXInt, startYInt];
+  let head = 0;
   visited[startYInt * width + startXInt] = 1;
   
-  while (queue.length > 0) {
-    const [x, y] = queue.shift();
+  while (head < queue.length) {
+    const x = queue[head++];
+    const y = queue[head++];
     const pos = (y * width + x) * 4;
     
     data[pos] = fillRgb.r;
@@ -717,7 +726,7 @@ function floodFill(startX, startY, fillColor) {
       
       if (shouldFill(nPos)) {
         visited[nIdx] = 1;
-        queue.push([nx, ny]);
+        queue.push(nx, ny);
       }
     }
   }

@@ -1,0 +1,239 @@
+/* Estilos específicos del Test de Teclado */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  min-height: 100vh;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  transition: background 0.8s ease-in-out;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  max-width: 1000px;
+  width: 100%;
+  margin-top: 80px;
+  position: relative;
+  z-index: 1;
+}
+
+h1 {
+  text-align: center;
+  font-size: 42px;
+  margin-bottom: 20px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.subtitle {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 40px;
+  font-size: 16px;
+}
+
+.keyboard-container {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.key {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.key:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.key.pressed {
+  background: rgba(100, 200, 100, 0.6);
+  border-color: rgba(100, 200, 100, 0.8);
+  transform: translateY(2px);
+  box-shadow: 0 0 20px rgba(100, 200, 100, 0.5);
+}
+
+.key.wide { width: 90px; }
+.key.extra-wide { width: 120px; }
+.key.space { width: 400px; }
+.key.tab { width: 100px; }
+.key.caps { width: 110px; }
+.key.enter { width: 120px; }
+.key.shift { width: 150px; }
+.key.ctrl { width: 80px; }
+
+.status-panel {
+  margin-top: 30px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-title {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.last-key {
+  font-size: 48px;
+  font-weight: bold;
+  text-align: center;
+  color: #4ecdc4;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+}
+
+.key-counter {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.counter-item {
+  text-align: center;
+}
+
+.counter-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #ff6b6b;
+}
+
+.counter-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 5px;
+  text-transform: uppercase;
+}
+
+.reset-btn {
+  margin-top: 20px;
+  padding: 12px 30px;
+  background: rgba(255, 100, 100, 0.3);
+  border: 2px solid rgba(255, 100, 100, 0.5);
+  border-radius: 25px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reset-btn:hover {
+  background: rgba(255, 100, 100, 0.5);
+  transform: translateY(-2px);
+}
+
+.instructions {
+  margin-top: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+}
+
+.pressed-keys {
+  margin-top: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.pressed-key-tag {
+  background: rgba(78, 205, 196, 0.3);
+  border: 1px solid rgba(78, 205, 196, 0.5);
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 900px) {
+  .key {
+    width: 40px;
+    height: 40px;
+    font-size: 11px;
+  }
+
+  .key.wide { width: 60px; }
+  .key.extra-wide { width: 80px; }
+  .key.space { width: 250px; }
+  .key.tab { width: 70px; }
+  .key.caps { width: 80px; }
+  .key.enter { width: 90px; }
+  .key.shift { width: 110px; }
+  .key.ctrl { width: 60px; }
+
+  h1 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 600px) {
+  .keyboard-container {
+    padding: 15px;
+    overflow-x: auto;
+  }
+
+  .keyboard {
+    min-width: 600px;
+  }
+}

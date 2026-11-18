@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test de Mando</title>
+  <link rel="stylesheet" href="css/juegos-common.css">
+  <link rel="stylesheet" href="css/mando.css">
+</head>
+<body>
+  <!-- Menú hamburguesa -->
+  <div class="hamburger-menu" onclick="toggleSidebar()">
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+  </div>
+
+  <!-- Overlay del sidebar -->
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="../../index.html" class="sidebar-item">Inicio</a>
+    <a href="ruleta.html" class="sidebar-item">Ruleta</a>
+    <a href="teclado.html" class="sidebar-item">Test Teclado</a>
+    <a href="mando.html" class="sidebar-item">Test Mando</a>
+    <a href="tierlist.html" class="sidebar-item">Tier List</a>
+    <a href="https://drive.google.com/drive/folders/1KdsfAYtp-uTZXhpbL9Y9tEfNvGqx_Dtn" target="_blank" class="sidebar-item">Excels</a>
+
+    <div class="theme-section">
+      <p class="theme-label">Modos</p>
+      <div class="theme-buttons">
+        <button class="theme-btn" data-theme="default" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);"></button>
+        <button class="theme-btn" data-theme="dark" style="background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0a0a0a 100%);"></button>
+        <button class="theme-btn" data-theme="purple" style="background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0f3d 100%);"></button>
+        <button class="theme-btn" data-theme="green" style="background: linear-gradient(135deg, #0a2e1a 0%, #1b4e2d 50%, #0f3d1a 100%);"></button>
+        <button class="theme-btn" data-theme="red" style="background: linear-gradient(135deg, #2e0a0a 0%, #4e1b1b 50%, #3d0f0f 100%);"></button>
+        <button class="theme-btn" data-theme="orange" style="background: linear-gradient(135deg, #2e1a0a 0%, #4e2d1b 50%, #3d1f0f 100%);"></button>
+      </div>
+    </div>
+  </div>
+
+  <a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: white; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+
+  <div class="container">
+    <h1>Test de Mando</h1>
+    <p class="subtitle">Conecta tu mando y presiona cada botón o mueve los sticks para verificar que todo funcione</p>
+
+    <!-- Barra de estado de conexión y selección de esquema -->
+    <div class="gamepad-toolbar">
+      <div class="connection-status">
+        <span class="status-dot" id="statusDot"></span>
+        <span class="gamepad-name" id="gamepadName">Esperando mando...</span>
+        <span class="mapping-badge" id="mappingBadge" hidden></span>
+      </div>
+
+      <div class="toolbar-controls">
+        <select id="gamepadSelect" class="gamepad-select" aria-label="Seleccionar mando" hidden></select>
+
+        <div class="layout-switcher" role="group" aria-label="Esquema de etiquetas del mando">
+          <button type="button" class="layout-btn active" data-layout="xbox">Xbox</button>
+          <button type="button" class="layout-btn" data-layout="playstation">PlayStation</button>
+          <button type="button" class="layout-btn" data-layout="nintendo">Nintendo</button>
+          <button type="button" class="layout-btn" data-layout="raw">Crudo</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="gamepad-container">
+      <!-- Diagrama interactivo SVG del mando -->
+      <div class="gamepad-svg-wrap">
+        <svg id="gamepadSvg" class="gamepad-svg" viewBox="0 0 760 444" role="img" aria-label="Diagrama interactivo del mando">
+          <defs>
+            <clipPath id="clipTrigger6">
+              <rect x="125" y="14" width="120" height="34" rx="10" />
+            </clipPath>
+            <clipPath id="clipTrigger7">
+              <rect x="515" y="14" width="120" height="34" rx="10" />
+            </clipPath>
+          </defs>
+
+          <!-- Gatillos analógicos superiores (LT / RT) -->
+          <g>
+            <rect class="pad-btn" data-button="6" x="125" y="14" width="120" height="34" rx="10" />
+            <g clip-path="url(#clipTrigger6)">
+              <rect class="trigger-fill" id="svgTriggerFill6" x="125" y="14" width="0" height="34" />
+            </g>
+            <text class="pad-btn-label" data-label-btn="6" x="185" y="31">LT</text>
+          </g>
+          <g>
+            <rect class="pad-btn" data-button="7" x="515" y="14" width="120" height="34" rx="10" />
+            <g clip-path="url(#clipTrigger7)">
+              <rect class="trigger-fill" id="svgTriggerFill7" x="515" y="14" width="0" height="34" />
+            </g>
+            <text class="pad-btn-label" data-label-btn="7" x="575" y="31">RT</text>
+          </g>
+
+          <!-- Botones frontales superiores (LB / RB) -->
+          <g>
+            <rect class="pad-btn" data-button="4" x="110" y="58" width="150" height="34" rx="14" />
+            <text class="pad-btn-label" data-label-btn="4" x="185" y="75">LB</text>
+          </g>
+          <g>
+            <rect class="pad-btn" data-button="5" x="500" y="58" width="150" height="34" rx="14" />
+            <text class="pad-btn-label" data-label-btn="5" x="575" y="75">RB</text>
+          </g>
+
+          <!-- Carcasa simétrica del mando -->
+          <path class="gamepad-body" d="M 215 102 L 545 102 C 622 102, 672 144, 686 218 L 706 340 C 714 392, 682 428, 636 428 C 600 428, 574 406, 554 374 L 522 330 C 510 319, 496 316, 476 316 L 284 316 C 264 316, 250 319, 238 330 L 206 374 C 186 406, 160 428, 124 428 C 78 428, 46 392, 54 340 L 74 218 C 88 144, 138 102, 215 102 Z" />
+
+          <!-- Cruceta (D-Pad) -->
+          <g>
+            <rect class="pad-btn" data-button="12" x="177" y="138" width="36" height="40" rx="7" />
+            <text class="pad-btn-label" data-label-btn="12" x="195" y="158">↑</text>
+
+            <rect class="pad-btn" data-button="13" x="177" y="212" width="36" height="40" rx="7" />
+            <text class="pad-btn-label" data-label-btn="13" x="195" y="232">↓</text>
+
+            <rect class="pad-btn" data-button="14" x="138" y="177" width="40" height="36" rx="7" />
+            <text class="pad-btn-label" data-label-btn="14" x="158" y="195">←</text>
+
+            <rect class="pad-btn" data-button="15" x="212" y="177" width="40" height="36" rx="7" />
+            <text class="pad-btn-label" data-label-btn="15" x="232" y="195">→</text>
+
+            <circle class="dpad-center" cx="195" cy="195" r="13" />
+          </g>
+
+          <!-- Botones centrales (Select / Start / Home) -->
+          <g>
+            <rect class="pad-btn" data-button="8" x="303" y="156" width="48" height="24" rx="12" />
+            <text class="pad-btn-label small" data-label-btn="8" x="327" y="168">View</text>
+
+            <rect class="pad-btn" data-button="9" x="409" y="156" width="48" height="24" rx="12" />
+            <text class="pad-btn-label small" data-label-btn="9" x="433" y="168">Menu</text>
+
+            <circle class="pad-btn" data-button="16" cx="380" cy="212" r="20" />
+            <text class="pad-btn-label small" data-label-btn="16" x="380" y="212">Home</text>
+          </g>
+
+          <!-- Botones frontales de acción -->
+          <g>
+            <circle class="pad-btn" data-button="3" cx="565" cy="153" r="22" />
+            <text class="pad-btn-label" data-label-btn="3" x="565" y="153">Y</text>
+
+            <circle class="pad-btn" data-button="0" cx="565" cy="237" r="22" />
+            <text class="pad-btn-label" data-label-btn="0" x="565" y="237">A</text>
+
+            <circle class="pad-btn" data-button="2" cx="523" cy="195" r="22" />
+            <text class="pad-btn-label" data-label-btn="2" x="523" y="195">X</text>
+
+            <circle class="pad-btn" data-button="1" cx="607" cy="195" r="22" />
+            <text class="pad-btn-label" data-label-btn="1" x="607" y="195">B</text>
+          </g>
+
+          <!-- Stick Izquierdo (L3) -->
+          <g>
+            <circle class="stick-socket" cx="295" cy="262" r="38" />
+            <g id="svgStickLeft">
+              <circle class="pad-btn stick-cap" data-button="10" cx="295" cy="262" r="22" />
+              <text class="pad-btn-label small" data-label-btn="10" x="295" y="262">L3</text>
+            </g>
+          </g>
+
+          <!-- Stick Derecho (R3) -->
+          <g>
+            <circle class="stick-socket" cx="465" cy="262" r="38" />
+            <g id="svgStickRight">
+              <circle class="pad-btn stick-cap" data-button="11" cx="465" cy="262" r="22" />
+              <text class="pad-btn-label small" data-label-btn="11" x="465" y="262">R3</text>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Telemetría en vivo de sticks y gatillos -->
+      <div class="telemetry-grid">
+        <div class="telemetry-card">
+          <div class="telemetry-title">Stick Izquierdo</div>
+          <canvas id="leftStickCanvas" class="stick-canvas" width="132" height="132"></canvas>
+          <div class="axis-readout">
+            <div>X: <span id="leftAxisX">+0.000</span></div>
+            <div>Y: <span id="leftAxisY">+0.000</span></div>
+            <div>Mag: <span id="leftAxisMag">0%</span></div>
+          </div>
+        </div>
+
+        <div class="telemetry-card">
+          <div class="telemetry-title">Gatillos Analógicos</div>
+          <div class="triggers-panel">
+            <div class="trigger-meter">
+              <div class="trigger-meter-head">
+                <span data-label-btn="6">LT</span>
+                <span class="trigger-meter-value" id="triggerVal6">0% (0.00)</span>
+              </div>
+              <div class="trigger-meter-bar">
+                <div class="trigger-meter-fill" id="triggerBar6"></div>
+              </div>
+            </div>
+
+            <div class="trigger-meter">
+              <div class="trigger-meter-head">
+                <span data-label-btn="7">RT</span>
+                <span class="trigger-meter-value" id="triggerVal7">0% (0.00)</span>
+              </div>
+              <div class="trigger-meter-bar">
+                <div class="trigger-meter-fill" id="triggerBar7"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="telemetry-card">
+          <div class="telemetry-title">Stick Derecho</div>
+          <canvas id="rightStickCanvas" class="stick-canvas" width="132" height="132"></canvas>
+          <div class="axis-readout">
+            <div>X: <span id="rightAxisX">+0.000</span></div>
+            <div>Y: <span id="rightAxisY">+0.000</span></div>
+            <div>Mag: <span id="rightAxisMag">0%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mapa completo de botones (B0..B16 + botones extra si el mando los expone) -->
+      <div class="all-buttons-section">
+        <div class="section-heading">Todos los botones</div>
+        <div class="buttons-grid" id="buttonsGrid"></div>
+      </div>
+
+      <!-- Ejes adicionales para mandos no estándar -->
+      <div class="extra-axes-panel" id="extraAxesSection" hidden>
+        <div class="section-heading">Ejes adicionales</div>
+        <div class="extra-axes-grid" id="extraAxesGrid"></div>
+      </div>
+    </div>
+
+    <!-- Panel de estado e historial (equivalente a Test de Teclado) -->
+    <div class="status-panel">
+      <div class="status-title">Último botón presionado:</div>
+      <div class="last-button" id="lastButton">-</div>
+
+      <div class="pressed-buttons" id="pressedButtons"></div>
+
+      <div class="button-counter">
+        <div class="counter-item">
+          <div class="counter-value" id="totalPresses">0</div>
+          <div class="counter-label">Total</div>
+        </div>
+        <div class="counter-item">
+          <div class="counter-value" id="uniqueButtons">0 / 17</div>
+          <div class="counter-label">Únicos</div>
+        </div>
+        <div class="counter-item">
+          <div class="counter-value" id="connectedCount">0</div>
+          <div class="counter-label">Mandos</div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button type="button" class="rumble-btn" id="rumbleBtn">Probar Vibración</button>
+        <button type="button" class="reset-btn" id="resetBtn">Reiniciar Test</button>
+      </div>
+      <p class="rumble-status" id="rumbleStatus" aria-live="polite"></p>
+    </div>
+
+    <p class="instructions">Presiona cualquier botón de tu mando físico o haz clic en los botones virtuales para probarlos</p>
+  </div>
+
+  <script src="../../js/shared-ui.js"></script>
+  <script src="js/mando.js"></script>
+</body>
+</html>

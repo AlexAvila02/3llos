@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Series Tracker · Papubanda</title>
+  <link rel="stylesheet" href="series.css">
+</head>
+<body>
+  <div class="bg"></div>
+
+  <!-- Barra superior de navegación -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../../index.html" class="back-btn" id="back-home-btn">← Volver a Papubanda</a>
+      <span class="topbar-title">📺 SERIES TRACKER · PAPU BANDA</span>
+    </div>
+
+    <div class="topbar-actions">
+      <span class="sync-badge is-local" id="sync-status-badge" title="Estado de sincronización">● Listo</span>
+
+      <button type="button" class="btn-secondary topbar-users-btn" id="open-users-btn" title="Ver perfiles de otros usuarios">
+        👥 Usuarios <span class="users-count-badge" id="users-count-badge">0</span>
+      </button>
+
+      <button type="button" class="btn-secondary" id="share-profile-btn" title="Copiar enlace directo al perfil actual" hidden>
+        🔗 Compartir
+      </button>
+
+      <div class="account-dropdown" id="account-dropdown">
+        <button
+          type="button"
+          class="btn-accent account-trigger"
+          id="account-btn"
+          aria-expanded="false"
+          aria-haspopup="menu"
+        >
+          <span id="account-btn-label">👤 Entrar / Crear</span>
+          <span class="account-caret" aria-hidden="true">▾</span>
+        </button>
+
+        <div class="account-menu" id="account-menu" role="menu" hidden>
+          <div class="account-menu-header" id="account-menu-header" hidden>
+            <span class="account-menu-name" id="account-menu-name">Usuario</span>
+            <span class="account-menu-slug" id="account-menu-slug">@usuario</span>
+          </div>
+
+          <button type="button" class="account-menu-item" id="go-my-tracker-btn" role="menuitem" hidden>
+            ✨ Mi Series Tracker
+          </button>
+          <button type="button" class="account-menu-item" id="export-btn" role="menuitem">
+            💾 Exportar JSON
+          </button>
+          <button type="button" class="account-menu-item edit-only" id="import-btn" role="menuitem">
+            📂 Importar JSON
+          </button>
+          <div class="account-menu-divider"></div>
+          <button type="button" class="account-menu-item" id="open-auth-btn" role="menuitem">
+            🔑 Crear usuario / Iniciar sesión
+          </button>
+          <button type="button" class="account-menu-item is-danger" id="logout-btn" role="menuitem" hidden>
+            🚪 Cerrar sesión / Cambiar usuario
+          </button>
+        </div>
+      </div>
+
+      <input type="file" id="import-file-input" accept=".json,application/json" hidden>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Aviso de almacenamiento local o falta de KV -->
+    <div class="storage-notice" id="storage-notice" role="status" hidden>
+      <div class="storage-notice-text" id="storage-notice-text"></div>
+      <button type="button" class="btn-pill" id="storage-notice-close" aria-label="Cerrar aviso">Entendido</button>
+    </div>
+
+    <!-- Banner del perfil visualizado (solo lectura o propietario) -->
+    <section class="profile-banner is-readonly" id="profile-banner" hidden>
+      <div class="profile-banner-info">
+        <span class="profile-banner-badge" id="profile-banner-badge">👁️ Solo lectura</span>
+        <div class="profile-banner-texts">
+          <h2 class="profile-banner-title" id="profile-banner-title">Series Tracker</h2>
+          <p class="profile-banner-sub" id="profile-banner-sub"></p>
+        </div>
+      </div>
+      <div class="profile-banner-actions">
+        <button type="button" class="btn-accent" id="banner-my-tracker-btn" hidden>← Volver a mi tracker</button>
+        <button type="button" class="btn-accent" id="banner-auth-btn" hidden>Crear mi tracker / Entrar</button>
+        <button type="button" class="btn-secondary" id="banner-users-btn">👥 Ver otros usuarios</button>
+        <button type="button" class="btn-secondary" id="banner-share-btn">🔗 Copiar enlace</button>
+      </div>
+    </section>
+
+    <!-- Selector y cabecera de la serie activa -->
+    <section class="glass-card series-header-card">
+      <div class="series-tabs-bar">
+        <div class="tabs-scroll" id="series-tabs" role="tablist" aria-label="Series guardadas"></div>
+        <button type="button" class="btn-accent edit-only" id="add-series-btn">+ Nueva Serie</button>
+      </div>
+
+      <div class="series-title-row">
+        <div class="title-input-group">
+          <label for="series-title-input" class="sr-only">Nombre de la serie</label>
+          <input
+            type="text"
+            id="series-title-input"
+            class="series-title-input"
+            placeholder="Nombre de la serie..."
+            maxlength="80"
+            autocomplete="off"
+          >
+        </div>
+        <div class="series-meta-actions edit-only">
+          <button type="button" class="btn-danger-ghost" id="delete-series-btn" title="Eliminar serie actual">
+            Eliminar serie
+          </button>
+        </div>
+      </div>
+
+      <!-- Selector de temporadas y alcance del gráfico -->
+      <div class="season-bar">
+        <div class="season-left">
+          <div class="tabs-scroll" id="season-tabs" role="tablist" aria-label="Temporadas"></div>
+          <button type="button" class="btn-pill edit-only" id="add-season-btn">+ Temporada</button>
+          <button type="button" class="btn-pill btn-pill-danger edit-only" id="delete-season-btn" title="Eliminar temporada actual">
+            Eliminar temporada
+          </button>
+        </div>
+        <div class="scope-switch" role="group" aria-label="Alcance del gráfico">
+          <span class="scope-label">Ver en gráfico:</span>
+          <button type="button" class="scope-btn active" data-scope="season" id="scope-season-btn">
+            Temporada Actual
+          </button>
+          <button type="button" class="scope-btn" data-scope="series" id="scope-series-btn">
+            Toda la Serie
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel de estadísticas (KPI Cards) -->
+    <section class="kpi-grid" aria-label="Resumen estadístico">
+      <article class="kpi-card kpi-season">
+        <span class="kpi-label">Promedio Temporada</span>
+        <div class="kpi-value" id="stat-season-avg">—</div>
+        <p class="kpi-sub" id="stat-season-avg-sub">0 caps puntuados</p>
+      </article>
+
+      <article class="kpi-card kpi-series">
+        <span class="kpi-label">Promedio Serie</span>
+        <div class="kpi-value" id="stat-series-avg">—</div>
+        <p class="kpi-sub" id="stat-series-avg-sub">0 caps totales</p>
+      </article>
+
+      <article class="kpi-card kpi-max">
+        <span class="kpi-label">Máximo (Mejor Cap)</span>
+        <div class="kpi-value" id="stat-max-ep">—</div>
+        <p class="kpi-sub" id="stat-max-ep-sub">Sin puntuaciones</p>
+      </article>
+
+      <article class="kpi-card kpi-min">
+        <span class="kpi-label">Mínimo (Peor Cap)</span>
+        <div class="kpi-value" id="stat-min-ep">—</div>
+        <p class="kpi-sub" id="stat-min-ep-sub">Sin puntuaciones</p>
+      </article>
+
+      <article class="kpi-card kpi-progress">
+        <span class="kpi-label">Progreso</span>
+        <div class="kpi-value" id="stat-progress">0 / 0</div>
+        <div class="progress-track" aria-hidden="true">
+          <div class="progress-fill" id="stat-progress-bar" style="width: 0%;"></div>
+        </div>
+        <p class="kpi-sub" id="stat-progress-sub">0% completado</p>
+      </article>
+    </section>
+
+    <!-- Gráfico de avance capítulo a capítulo -->
+    <section class="glass-card chart-card">
+      <div class="chart-header">
+        <div>
+          <h2 class="section-title">📈 Avance de Puntuaciones</h2>
+          <p class="section-subtitle" id="chart-subtitle">Evolución capítulo a capítulo (escala 0 a 10)</p>
+        </div>
+        <div class="chart-legend" aria-label="Leyenda del gráfico">
+          <span class="legend-item">
+            <i class="legend-line legend-score"></i> Puntuación
+          </span>
+          <span class="legend-item" id="legend-season-avg-item">
+            <i class="legend-dash legend-season-avg"></i> Prom. Temporada
+          </span>
+          <span class="legend-item" id="legend-series-avg-item">
+            <i class="legend-dash legend-series-avg"></i> Prom. Serie
+          </span>
+          <span class="legend-item">
+            <i class="legend-dot legend-max"></i> ★ Máximo
+          </span>
+          <span class="legend-item">
+            <i class="legend-dot legend-min"></i> ▼ Mínimo
+          </span>
+        </div>
+      </div>
+
+      <div class="chart-container" id="chart-container">
+        <canvas id="ratings-chart"></canvas>
+        <div id="chart-tooltip" class="chart-tooltip" hidden></div>
+        <div id="chart-empty" class="chart-empty" hidden>
+          <p>Aún no hay capítulos puntuados en esta vista.</p>
+          <span id="chart-empty-hint">Asigna una nota de 0 a 10 abajo para generar el gráfico.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección de capítulos y puntuación -->
+    <section class="glass-card episodes-card">
+      <div class="episodes-toolbar">
+        <div class="toolbar-title-group">
+          <h2 class="section-title" id="episodes-section-title">🎬 Capítulos · Temporada 1</h2>
+          <span class="episodes-count-badge" id="episodes-count-badge">0 capítulos</span>
+        </div>
+
+        <div class="toolbar-controls">
+          <div class="filter-group" role="group" aria-label="Filtrar capítulos">
+            <button type="button" class="filter-btn active" data-filter="all">Todos</button>
+            <button type="button" class="filter-btn" data-filter="rated">Puntuados</button>
+            <button type="button" class="filter-btn" data-filter="unrated">Sin puntuar</button>
+          </div>
+
+          <div class="batch-group edit-only">
+            <input
+              type="number"
+              id="batch-count-input"
+              class="batch-input"
+              value="12"
+              min="1"
+              max="100"
+              aria-label="Cantidad de capítulos a generar"
+            >
+            <button type="button" class="btn-secondary" id="batch-add-btn">Generar N capítulos</button>
+          </div>
+
+          <button type="button" class="btn-accent edit-only" id="add-episode-btn">+ Añadir Capítulo</button>
+        </div>
+      </div>
+
+      <div class="episodes-list" id="episodes-list"></div>
+    </section>
+  </main>
+
+  <footer class="footer" id="tracker-footer">
+    Papubanda 2026 · Series Tracker · Crea tu usuario para guardar tus puntuaciones y compartirlas en modo solo lectura
+  </footer>
+
+  <!-- Modal de creación de usuario / inicio de sesión -->
+  <div class="modal-overlay" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title" hidden>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h2 class="modal-title" id="auth-modal-title">📺 Tu Series Tracker</h2>
+          <p class="modal-subtitle">Elegí tu nombre de usuario y una clave para guardar tus notas y que otros puedan verlas sin editar.</p>
+        </div>
+        <button type="button" class="modal-close-btn" id="auth-close-btn" aria-label="Cerrar ventana">×</button>
+      </div>
+
+      <div class="auth-tabs" role="tablist">
+        <button type="button" class="auth-tab active" id="auth-tab-register" data-auth-tab="register" role="tab" aria-selected="true">
+          Crear mi Tracker
+        </button>
+        <button type="button" class="auth-tab" id="auth-tab-login" data-auth-tab="login" role="tab" aria-selected="false">
+          Ya tengo usuario
+        </button>
+      </div>
+
+      <!-- Formulario de registro -->
+      <form class="auth-form" id="register-form" novalidate>
+        <div class="field-group">
+          <label class="field-label" for="reg-username">Nombre de usuario</label>
+          <input
+            type="text"
+            id="reg-username"
+            class="field-input"
+            placeholder="Ej: Alex, Calipso, Danilo..."
+            minlength="2"
+            maxlength="24"
+            autocomplete="username"
+            required
+          >
+          <span class="slug-preview" id="reg-slug-preview">Enlace público: ?user=...</span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="reg-pin">Clave o PIN corto (solo vos podrás editar)</label>
+          <div class="password-field">
+            <input
+              type="password"
+              id="reg-pin"
+              class="field-input"
+              placeholder="Mínimo 4 caracteres"
+              minlength="4"
+              maxlength="64"
+              autocomplete="new-password"
+              required
+            >
+            <button type="button" class="toggle-pin-btn" data-target="reg-pin" aria-label="Mostrar u ocultar clave">👁️</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="reg-pin-confirm">Repetir clave o PIN</label>
+          <div class="password-field">
+            <input
+              type="password"
+              id="reg-pin-confirm"
+              class="field-input"
+              placeholder="Repite tu clave"
+              minlength="4"
+              maxlength="64"
+              autocomplete="new-password"
+              required
+            >
+            <button type="button" class="toggle-pin-btn" data-target="reg-pin-confirm" aria-label="Mostrar u ocultar confirmación">👁️</button>
+          </div>
+        </div>
+
+        <label class="migrate-option" id="reg-migrate-wrap" hidden>
+          <input type="checkbox" id="reg-migrate-checkbox" checked>
+          <span>Importar las series que ya tenías guardadas en este navegador</span>
+        </label>
+
+        <div class="form-error" id="reg-error" role="alert" hidden></div>
+
+        <button type="submit" class="btn-accent auth-submit-btn" id="reg-submit-btn">
+          Crear mi Series Tracker
+        </button>
+      </form>
+
+      <!-- Formulario de inicio de sesión -->
+      <form class="auth-form" id="login-form" novalidate hidden>
+        <div class="field-group">
+          <label class="field-label" for="login-username">Tu usuario</label>
+          <input
+            type="text"
+            id="login-username"
+            class="field-input"
+            placeholder="Nombre o @usuario"
+            maxlength="24"
+            autocomplete="username"
+            required
+          >
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="login-pin">Tu clave o PIN</label>
+          <div class="password-field">
+            <input
+              type="password"
+              id="login-pin"
+              class="field-input"
+              placeholder="Ingresa tu clave"
+              maxlength="64"
+              autocomplete="current-password"
+              required
+            >
+            <button type="button" class="toggle-pin-btn" data-target="login-pin" aria-label="Mostrar u ocultar clave">👁️</button>
+          </div>
+        </div>
+
+        <div class="form-error" id="login-error" role="alert" hidden></div>
+
+        <button type="submit" class="btn-accent auth-submit-btn" id="login-submit-btn">
+          Entrar y editar mi Tracker
+        </button>
+      </form>
+
+      <div class="auth-modal-footer">
+        <div class="auth-browse-row">
+          <span>¿Solo querés ver puntajes de otros?</span>
+          <button type="button" class="btn-pill" id="browse-others-btn">Explorar usuarios →</button>
+        </div>
+        <div class="auth-quick-profiles" id="auth-quick-profiles" hidden></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Directorio de Usuarios -->
+  <div class="modal-overlay" id="users-modal" role="dialog" aria-modal="true" aria-labelledby="users-modal-title" hidden>
+    <div class="modal-card modal-card-wide">
+      <div class="modal-head">
+        <div>
+          <h2 class="modal-title" id="users-modal-title">👥 Trackers de la Papubanda</h2>
+          <p class="modal-subtitle">Entrá a cualquier perfil para ver sus series, gráficos y calificaciones en modo solo lectura.</p>
+        </div>
+        <button type="button" class="modal-close-btn" id="users-close-btn" aria-label="Cerrar directorio">×</button>
+      </div>
+
+      <div class="users-toolbar">
+        <input
+          type="search"
+          id="users-search-input"
+          class="field-input users-search-input"
+          placeholder="Buscar usuario o serie favorita..."
+          autocomplete="off"
+        >
+        <button type="button" class="btn-secondary" id="users-refresh-btn">↻ Actualizar</button>
+      </div>
+
+      <div class="users-grid" id="users-directory-list"></div>
+
+      <div class="users-empty-state" id="users-empty-state" hidden>
+        <p id="users-empty-text">Todavía no hay usuarios creados.</p>
+        <button type="button" class="btn-accent" id="users-create-cta-btn">Crear el primer Series Tracker</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast de confirmación / avisos -->
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="../../js/shared-ui.js"></script>
+  <script src="js/model.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/chart.js"></script>
+  <script src="js/episodes-ui.js"></script>
+  <script src="js/modals-ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

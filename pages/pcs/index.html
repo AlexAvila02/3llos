@@ -88,7 +88,7 @@ tr.rowlink:hover{background:rgba(102,126,234,.12)}
 <div><b>🥇 #1 SHADOWNIX23 (97/100)</b><br>Único con 32GB + RTX 3060 Ti + Ryzen X3D. No hay discusión, es otra liga.</div>
 <div><b>🥈 #2 gubi (74/100) vs 🥉 #3 LOKITO (32/100)</b><br>gubi duplica en todo a Lokito: i5 HX vs i3-N, 16GB vs 8GB, 8GB dedicados vs 128MB integrados.</div>
 </div>
-<div class="add">➕ <b>¿Nuevo integrante?</b> Pasame captura como la de Discord y lo agrego. Solo hay que sumar su bloque en <code>pcs-data.js</code> + crear su <code>nombre.html</code> copiando la plantilla.</div>
+<div class="add">➕ <b>¿Nuevo integrante?</b> Pasame captura como la de Discord y lo agrego. Solo hay que sumar su bloque en <code>pcs-data.js</code> y automáticamente se genera su ficha en <code>pc.html</code>.</div>
 <div class="footer">Papubanda 2026 · Top PCs · Pasame más miembros y sigo ampliando 💜</div>
 </div>
 <script src="pcs-data.js"></script>
@@ -101,10 +101,11 @@ const podium=document.getElementById('podium');
 const medals={1:'🥇',2:'🥈',3:'🥉'};
 const cls={1:'card first',2:'card second',3:'card third'};
 const tierCls={1:'tier s',2:'tier a',3:'tier c'};
+const pcHref=pc=>pc.page||('pc.html?id='+encodeURIComponent(pc.id));
 order.forEach(pc=>{
   const a=document.createElement('a');
   a.className=cls[pc.rank]||'card';
-  a.href=pc.page;
+  a.href=pcHref(pc);
   a.innerHTML=`
     <div class="medal">${medals[pc.rank]}</div>
     <div class="avatar">${pc.avatarEmoji}</div>
@@ -126,7 +127,7 @@ const tbody=document.getElementById('tbody');
 sorted.forEach(pc=>{
   const tr=document.createElement('tr');
   tr.className='rowlink';
-  tr.onclick=()=>location.href=pc.page;
+  tr.onclick=()=>location.href=pcHref(pc);
   tr.innerHTML=`<td><span class="rankbadge r${pc.rank}">#${pc.rank}</span></td>
   <td><b>${pc.avatarEmoji} ${pc.nombre}</b><br><span style="opacity:.6;font-size:12px">${pc.tag}</span></td>
   <td style="max-width:220px">${pc.cpu.nombre}</td>
