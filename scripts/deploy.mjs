@@ -36,7 +36,7 @@ function runGit(args, options = {}) {
     cwd: repoRoot,
     encoding: 'utf8',
     stdio: options.inheritStdio ? 'inherit' : ['ignore', 'pipe', 'pipe'],
-  })?.trim() ?? '';
+  })?.trimEnd() ?? '';
 }
 
 /**
@@ -264,13 +264,13 @@ async function main() {
     const behindCount = Number(runGit(['rev-list', '--count', 'HEAD..origin/main'])) || 0;
     if (behindCount > 0) {
       console.log(
-        `🔀 Hay ${behindCount} commit(s) nuevo(s) en origin/main. Integrando con git pull --rebase origin main...`
+        `🔀 Hay ${behindCount} commit(s) nuevo(s) en origin/main. Integrando con git rebase origin/main...`
       );
       try {
-        runGit(['pull', '--rebase', 'origin', 'main'], { inheritStdio: true });
+        runGit(['rebase', 'origin/main'], { inheritStdio: true });
       } catch (err) {
         console.error(
-          '❌ Falló git pull --rebase origin main (posible conflicto). Abortando rebase para dejar el repo seguro...'
+          '❌ Falló git rebase origin/main (posible conflicto). Abortando rebase para dejar el repo seguro...'
         );
         try {
           runGit(['rebase', '--abort']);
