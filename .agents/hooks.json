@@ -1,0 +1,11 @@
+{
+  "auto-git-deploy-guard": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "node ./scripts/check-git-deploy.mjs",
+        "timeout": 15
+      }
+    ]
+  }
+}
