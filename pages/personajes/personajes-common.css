@@ -1,0 +1,10 @@
+/* Estilos compartidos para las páginas individuales de personajes */
+.personaje-close {
+  position: fixed;
+  top: 20px;
+  right: 30px;
+  font-size: 40px;
+  color: var(--close-color, white);
+  text-decoration: none;
+  z-index: 10000;
+}

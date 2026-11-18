@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <title>La tipica</title>
+    <link rel="stylesheet" href="personajes-common.css">
     <style>
         body {
             background: linear-gradient(180deg, #ff6b35 0%, #f7931e 50%, #ffd93d 100%);
@@ -71,7 +72,7 @@
     </style>
 </head>
 <body>
-    <a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: white; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+    <a href="../../index.html" class="personaje-close" onclick="navigateWithCloseSound(event, '../../index.html')">&times;</a>
     
     <div class="title">🍊 La tipica 🍊</div>
     
@@ -84,6 +85,7 @@
     <div class="bubble" style="width: 55px; height: 55px; left: 70%; animation-delay: 0.5s;"></div>
     <div class="bubble" style="width: 25px; height: 25px; left: 80%; animation-delay: 2.5s;"></div>
     
+    <script src="../../js/shared-ui.js"></script>
     <script>
         // Crear patrones folclóricos
         function createFolkPattern() {
@@ -111,20 +113,6 @@
         // Inicializar elementos
         for(let i = 0; i < 8; i++) createFolkPattern();
         for(let i = 0; i < 15; i++) createSunRay();
-        
-        function playCloseSound() {
-          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-          const oscillator = audioContext.createOscillator();
-          const gainNode = audioContext.createGain();
-          oscillator.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-          oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
-          gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-          oscillator.start(audioContext.currentTime);
-          oscillator.stop(audioContext.currentTime + 0.15);
-        }
     </script>
 </body>
 </html>

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
 <title>Arroz</title>
+    <link rel="stylesheet" href="personajes-common.css">
     <style>
         body {
             margin: 0;
@@ -147,26 +148,13 @@
     </style>
 </head>
 <body>
-    <a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: white; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+    <a href="../../index.html" class="personaje-close" onclick="navigateWithCloseSound(event, '../../index.html')">&times;</a>
     <div class="title">ARROZ</div>
     <div class="flame"></div>
     <div class="rice-container" id="container"></div>
     
+    <script src="../../js/shared-ui.js"></script>
     <script>
-        function playCloseSound() {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-            oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
-            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.15);
-        }
-        
         const container = document.getElementById('container');
         const grainCount = 150;
         

@@ -56,6 +56,21 @@
     playTone({ startFreq: 600, endFreq: 400, duration: 0.15, volume: 0.2, ramp: 'linear' });
   }
 
+  /**
+   * Reproduce el sonido de cierre y navega hacia `targetUrl` (o vuelve atrás si es `'back'`).
+   */
+  function navigateWithCloseSound(event, targetUrl, delay = 200) {
+    if (event) event.preventDefault();
+    playCloseSound();
+    setTimeout(() => {
+      if (targetUrl === 'back') {
+        global.history.back();
+      } else if (targetUrl) {
+        global.location.href = targetUrl;
+      }
+    }, delay);
+  }
+
   // Paleta unificada de temas del sitio
   const SITE_THEMES = {
     default: {
@@ -211,6 +226,7 @@
   global.playSlideSound = playSlideSound;
   global.playCloseSound = playCloseSound;
   global.playCloseSoundMenu = playCloseSound;
+  global.navigateWithCloseSound = navigateWithCloseSound;
   global.SITE_THEMES = SITE_THEMES;
   global.setTheme = setTheme;
   global.initThemeControls = initThemeControls;

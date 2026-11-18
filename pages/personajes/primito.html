@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <title>Primito</title>
+    <link rel="stylesheet" href="personajes-common.css">
     <style>
         body {
             background: linear-gradient(135deg, #8B4513 0%, #D2691E 50%, #CD853F 100%);
@@ -96,10 +97,11 @@
     </style>
 </head>
 <body>
-    <a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: #FFF8DC; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+    <a href="../../index.html" class="personaje-close" style="--close-color: #FFF8DC;" onclick="navigateWithCloseSound(event, '../../index.html')">&times;</a>
     
     <div class="title">🏹 Primito 🏹</div>
     
+    <script src="../../js/shared-ui.js"></script>
     <script>
         // Crear partículas de fuego
         function createFireParticle() {
@@ -163,20 +165,6 @@
         
         // Generar fuego periódicamente
         setInterval(createFireParticle, 100);
-        
-        function playCloseSound() {
-          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-          const oscillator = audioContext.createOscillator();
-          const gainNode = audioContext.createGain();
-          oscillator.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-          oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
-          gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-          oscillator.start(audioContext.currentTime);
-          oscillator.stop(audioContext.currentTime + 0.15);
-        }
     </script>
 </body>
 </html>

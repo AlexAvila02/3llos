@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>el violador</title>
+<link rel="stylesheet" href="personajes-common.css">
 <style>
 body {
 background: linear-gradient(135deg, #1a0000 0%, #330000 50%, #1a0000 100%);
@@ -135,7 +136,7 @@ text-shadow: 0 0 40px #ff0000, 0 0 80px #ff0000, 0 0 120px #ff0000;
 </style>
 </head>
 <body>
-<a href="../../index.html" style="position: fixed; top: 20px; right: 30px; font-size: 40px; color: white; text-decoration: none; z-index: 10000;" onclick="event.preventDefault(); playCloseSound(); setTimeout(() => window.location.href='../../index.html', 200);">&times;</a>
+<a href="../../index.html" class="personaje-close" onclick="navigateWithCloseSound(event, '../../index.html')">&times;</a>
 
 <div class="alert-overlay"></div>
 <div class="siren-light" style="top: 10%; left: 10%;"></div>
@@ -149,6 +150,7 @@ text-shadow: 0 0 40px #ff0000, 0 0 80px #ff0000, 0 0 120px #ff0000;
 <div class="violador-title">el violador</div>
 <div class="number-33">33</div>
 
+<script src="../../js/shared-ui.js"></script>
 <script>
 // Crear partículas de advertencia
 function createWarningParticle() {
@@ -164,20 +166,6 @@ document.body.appendChild(particle);
 // Inicializar partículas
 for(let i = 0; i < 30; i++) {
 createWarningParticle();
-}
-
-function playCloseSound() {
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-const oscillator = audioContext.createOscillator();
-const gainNode = audioContext.createGain();
-oscillator.connect(gainNode);
-gainNode.connect(audioContext.destination);
-oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.15);
-gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-oscillator.start(audioContext.currentTime);
-oscillator.stop(audioContext.currentTime + 0.15);
 }
 </script>
 </body>
