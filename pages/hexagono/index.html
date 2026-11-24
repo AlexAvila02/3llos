@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hexágono de Arquetipos · Papubanda</title>
+  <link rel="stylesheet" href="hexagono.css">
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <!-- Barra superior -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../../index.html" class="back-btn" id="back-home-btn">← Volver a Papubanda</a>
+      <span class="topbar-title">⬡ HEXÁGONO HEXACO · PAPUBANDA</span>
+    </div>
+
+    <div class="topbar-actions">
+      <span class="sync-badge is-readonly" id="sync-status-badge">● Solo lectura</span>
+
+      <button type="button" class="btn-secondary" id="avg-toggle-btn" title="Mostrar u ocultar el promedio del grupo en el radar">
+        ⬡ Promedio grupo
+      </button>
+
+      <button type="button" class="btn-secondary" id="sound-toggle-btn" title="Activar o silenciar micro-efectos de sonido">
+        🔊 Sonido
+      </button>
+
+      <button type="button" class="btn-accent" id="alex-login-btn" title="Iniciar sesión como @alex para editar">
+        🔐 Acceso Alex
+      </button>
+
+      <button type="button" class="btn-accent" id="edit-mode-btn" hidden>
+        ✏️ Editar como Alex
+      </button>
+
+      <button type="button" class="btn-secondary" id="save-now-btn" hidden>
+        💾 Guardar
+      </button>
+
+      <button type="button" class="btn-danger-ghost" id="alex-logout-btn" hidden>
+        🚪 Salir (@alex)
+      </button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Aviso de modo local o sin KV -->
+    <div class="storage-notice" id="storage-notice" role="status" hidden>
+      <div class="storage-notice-text" id="storage-notice-text"></div>
+      <button type="button" class="btn-pill" id="storage-notice-close">Entendido</button>
+    </div>
+
+    <!-- Cabecera científica y filtros -->
+    <section class="glass-card hero-card">
+      <div class="hero-copy">
+        <span class="science-pill">🧬 Modelo Psicométrico HEXACO · 6 Dimensiones Científicas</span>
+        <h1 class="board-title" id="board-title">Hexágono de Arquetipos</h1>
+        <p class="board-subtitle" id="board-subtitle">
+          Clasificación de la Papubanda basada en el modelo científico HEXACO (evolución de 6 factores del Big Five)
+        </p>
+        <p class="board-meta" id="board-updated-meta">Cargando integrantes...</p>
+      </div>
+
+      <div class="filter-bar" id="archetype-filter-bar" role="group" aria-label="Filtrar por arquetipo"></div>
+    </section>
+
+    <!-- Escenario principal del hexágono + panel lateral -->
+    <section class="workspace-grid">
+      <div class="glass-card stage-card">
+        <div class="hex-stage" id="hex-stage">
+          <div class="hex-spotlight" aria-hidden="true"></div>
+          <canvas id="hex-fx-canvas" class="hex-fx-canvas" aria-hidden="true"></canvas>
+          <div class="hex-tilt-layer" id="hex-tilt-layer">
+            <svg id="hex-svg" class="hex-svg" role="img" aria-label="Hexágono interactivo de personalidad y arquetipos"></svg>
+          </div>
+          <div id="hex-tooltip" class="hex-tooltip" hidden></div>
+        </div>
+        <div class="stage-legend">
+          <span>✨ Pasa el cursor por los sectores, vértices o personas para activar el radar HEXACO</span>
+          <span>🖱️ Click para fijar ficha · <code>Esc</code> para soltar</span>
+        </div>
+      </div>
+
+      <aside class="side-column">
+        <!-- Inspector en vivo / Directorio -->
+        <div class="side-stack" id="inspector-section">
+          <section class="glass-card inspector-card" id="inspector-card"></section>
+
+          <section class="glass-card directory-card">
+            <div class="directory-head">
+              <h2>👥 Integrantes</h2>
+              <span class="count-pill" id="directory-count-badge">0</span>
+            </div>
+            <input
+              type="search"
+              id="directory-search-input"
+              class="field-input"
+              placeholder="Buscar por nombre, alias o arquetipo..."
+              autocomplete="off"
+            >
+            <div class="directory-list" id="people-directory-list"></div>
+          </section>
+        </div>
+
+        <!-- Estudio de edición exclusivo de @alex -->
+        <section class="glass-card editor-card" id="editor-panel" hidden>
+          <div class="editor-head">
+            <div>
+              <span class="science-pill is-alex">👑 Modo edición @alex</span>
+              <h2 class="editor-title">Estudio del Hexágono</h2>
+            </div>
+            <p class="editor-hint">También puedes arrastrar las fichas directamente dentro del hexágono.</p>
+          </div>
+
+          <div class="editor-tabs" role="tablist">
+            <button type="button" class="editor-tab is-active" id="editor-tab-people" data-editor-tab="people">👤 Personas</button>
+            <button type="button" class="editor-tab" id="editor-tab-archetypes" data-editor-tab="archetypes">⬡ Arquetipos</button>
+            <button type="button" class="editor-tab" id="editor-tab-board" data-editor-tab="board">⚙️ Tablero</button>
+          </div>
+
+          <!-- Pestaña Personas -->
+          <div class="editor-pane" id="editor-pane-people">
+            <div class="editor-select-row">
+              <select id="person-select" class="field-input" aria-label="Seleccionar persona a editar"></select>
+              <button type="button" class="btn-accent" id="add-person-btn">+ Nueva</button>
+            </div>
+
+            <div id="person-form-wrap" class="editor-form">
+              <div class="field-row-2">
+                <label class="field-group">
+                  <span class="field-label">Nombre</span>
+                  <input type="text" id="edit-person-name" class="field-input" maxlength="40" autocomplete="off">
+                </label>
+                <label class="field-group">
+                  <span class="field-label">Apodo / Rol</span>
+                  <input type="text" id="edit-person-alias" class="field-input" maxlength="40" autocomplete="off">
+                </label>
+              </div>
+
+              <div class="field-row-2">
+                <label class="field-group">
+                  <span class="field-label">Emoji</span>
+                  <input type="text" id="edit-person-emoji" class="field-input" maxlength="8" autocomplete="off">
+                </label>
+                <div class="field-group">
+                  <span class="field-label">Color de ficha</span>
+                  <div class="color-picker-row">
+                    <input type="color" id="edit-person-color" class="color-input">
+                    <button type="button" class="btn-mini-ghost" id="edit-person-color-clear">Auto</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="presets-wrap">
+                <div class="emoji-presets" id="emoji-presets-row"></div>
+                <div class="color-presets" id="person-color-presets"></div>
+              </div>
+
+              <label class="field-group">
+                <span class="field-label">Imagen / Avatar URL (opcional)</span>
+                <input type="url" id="edit-person-avatar" class="field-input" placeholder="https://... o ../../assets/images/..." maxlength="300" autocomplete="off">
+              </label>
+
+              <label class="field-group">
+                <span class="field-label">Descripción breve</span>
+                <textarea id="edit-person-bio" class="field-input field-textarea" rows="2" maxlength="260"></textarea>
+              </label>
+
+              <div class="field-group">
+                <span class="field-label">Orientar rápido hacia arquetipo</span>
+                <div class="arch-presets-grid" id="person-archetype-presets"></div>
+              </div>
+
+              <div class="field-group">
+                <div class="sliders-header">
+                  <span class="field-label">Perfil HEXACO (0 - 100%)</span>
+                  <button type="button" class="btn-mini-accent" id="recalc-pos-btn">🎯 Ubicar según puntajes</button>
+                </div>
+                <div class="sliders-list" id="person-scores-sliders"></div>
+              </div>
+
+              <div class="editor-danger-row">
+                <button type="button" class="btn-danger-ghost" id="delete-person-btn">🗑️ Eliminar persona</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pestaña Arquetipos -->
+          <div class="editor-pane" id="editor-pane-archetypes" hidden>
+            <div class="arch-edit-tabs" id="archetype-selector-pills"></div>
+
+            <div class="editor-form">
+              <div class="field-row-2">
+                <label class="field-group">
+                  <span class="field-label">Nombre del arquetipo</span>
+                  <input type="text" id="edit-arch-name" class="field-input" maxlength="40" autocomplete="off">
+                </label>
+                <label class="field-group">
+                  <span class="field-label">Emoji</span>
+                  <input type="text" id="edit-arch-emoji" class="field-input" maxlength="8" autocomplete="off">
+                </label>
+              </div>
+
+              <div class="field-row-2">
+                <label class="field-group">
+                  <span class="field-label">Dimensión científica</span>
+                  <input type="text" id="edit-arch-dimension" class="field-input" maxlength="50" autocomplete="off">
+                </label>
+                <div class="field-group">
+                  <span class="field-label">Color del eje</span>
+                  <input type="color" id="edit-arch-color" class="color-input">
+                </div>
+              </div>
+
+              <div class="color-presets" id="arch-color-presets"></div>
+
+              <label class="field-group">
+                <span class="field-label">Descripción del arquetipo</span>
+                <textarea id="edit-arch-description" class="field-input field-textarea" rows="3" maxlength="280"></textarea>
+              </label>
+
+              <label class="field-group">
+                <span class="field-label">Rasgos clave (separados por coma)</span>
+                <input type="text" id="edit-arch-traits" class="field-input" maxlength="160" autocomplete="off">
+              </label>
+
+              <div class="editor-danger-row">
+                <button type="button" class="btn-secondary" id="reset-archetypes-btn">↺ Restaurar arquetipos HEXACO</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pestaña Tablero -->
+          <div class="editor-pane" id="editor-pane-board" hidden>
+            <div class="editor-form">
+              <label class="field-group">
+                <span class="field-label">Título principal</span>
+                <input type="text" id="edit-board-title" class="field-input" maxlength="80" autocomplete="off">
+              </label>
+
+              <label class="field-group">
+                <span class="field-label">Subtítulo</span>
+                <textarea id="edit-board-subtitle" class="field-input field-textarea" rows="3" maxlength="200"></textarea>
+              </label>
+
+              <div class="board-tools-grid">
+                <button type="button" class="btn-secondary" id="export-json-btn">💾 Exportar JSON</button>
+                <button type="button" class="btn-secondary" id="import-json-btn">📂 Importar JSON</button>
+                <input type="file" id="import-json-input" accept=".json,application/json" hidden>
+              </div>
+
+              <div class="editor-danger-row">
+                <button type="button" class="btn-danger-ghost" id="reset-board-btn">↺ Restaurar tablero inicial</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Papubanda 2026 · Hexágono de Arquetipos HEXACO · Edición exclusiva de @alex
+  </footer>
+
+  <!-- Modal de autenticación exclusiva para @alex -->
+  <div class="modal-overlay" id="alex-auth-modal" role="dialog" aria-modal="true" aria-labelledby="alex-modal-title" hidden>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <span class="science-pill is-alex">🔐 Acceso restringido</span>
+          <h2 class="modal-title" id="alex-modal-title">Editar como @alex</h2>
+          <p class="modal-subtitle" id="alex-auth-hint">Usa la misma clave/PIN de tu cuenta @alex en el Series Tracker.</p>
+        </div>
+        <button type="button" class="modal-close-btn" id="alex-auth-close-btn" aria-label="Cerrar ventana">×</button>
+      </div>
+
+      <form class="auth-form" id="alex-auth-form" novalidate>
+        <div class="field-group">
+          <span class="field-label">Usuario autorizado</span>
+          <div class="locked-user-badge">👑 @alex (Administrador único)</div>
+        </div>
+
+        <label class="field-group">
+          <span class="field-label">Clave o PIN de Alex</span>
+          <div class="password-field">
+            <input
+              type="password"
+              id="alex-pin-input"
+              class="field-input"
+              placeholder="Ingresa tu clave..."
+              autocomplete="current-password"
+              required
+            >
+            <button type="button" class="toggle-pin-btn" id="toggle-pin-btn" aria-label="Mostrar u ocultar clave">👁️</button>
+          </div>
+        </label>
+
+        <div class="form-error" id="alex-auth-error" role="alert" hidden></div>
+
+        <button type="submit" class="btn-accent auth-submit-btn" id="alex-auth-submit-btn">
+          Desbloquear edición
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="../../js/shared-ui.js"></script>
+  <script src="js/model.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/hexagon-view.js"></script>
+  <script src="js/editor-ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
