@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mods Rendimiento - Papubanda</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/mods.css">
+</head>
+<body>
+  <div class="clouds">
+    <div class="cloud"></div>
+    <div class="cloud"></div>
+    <div class="cloud"></div>
+    <div class="cloud"></div>
+  </div>
+  <a class="back" href="../index.html">‹ INICIO</a>
+
+  <header class="header">
+    <h1>◼ <span>MODS</span> DE RENDIMIENTO ◼</h1>
+    <p>◆ Pack automático de optimización para Forge 1.20.1 (CurseForge) ◆<br>Incluye instalador, desinstalador, verificador de compatibilidad y lista de 27 mods</p>
+  </header>
+
+  <div class="grass-bar"></div>
+
+  <section class="mc-panel" aria-label="Acciones principales">
+    <div class="perf-hero-actions">
+      <a class="btn-mc green" href="../assets/perfmods/PerfMods.zip" download="PerfMods.zip">📦 DESCARGAR TODO (.ZIP)</a>
+      <a class="btn-mc" href="mods.html">◼ MODS DEL SERVIDOR</a>
+      <button type="button" class="btn-mc" id="toggleModsListBtn" aria-expanded="false">📋 VER 27 MODS INCLUIDOS</button>
+    </div>
+  </section>
+
+  <section class="mc-panel" aria-label="Instrucciones de uso">
+    <div class="perf-steps">
+      <h2 class="perf-steps-title">▶ CÓMO USARLO EN TU PC</h2>
+      <ol class="perf-steps-list">
+        <li>Descarga <code>PerfMods.zip</code> y descomprime la carpeta en tu PC.</li>
+        <li>Haz doble clic en <code>Instalar mods de rendimiento.bat</code> y elige tu pack de CurseForge (Forge 1.20.1).</li>
+        <li>Usa <code>Revisar pack.bat</code> para verificar incompatibilidades o <code>Quitar mods de rendimiento.bat</code> para revertir los cambios.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="mc-panel perf-mods-panel" id="perfModsPanel" aria-label="Lista de mods incluidos">
+    <div class="perf-mods-head">
+      <span>📋 27 MODS ACTIVOS EN MODS.TXT</span>
+      <span class="meta">Las dependencias obligatorias se agregan solas</span>
+    </div>
+    <div class="perf-mods-grid" id="perfModsList"></div>
+  </section>
+
+  <section class="mc-panel" aria-label="Archivos individuales">
+    <div class="toolbar">
+      <span class="count">5 ARCHIVOS DE PERFMODS</span>
+      <span class="meta">También puedes descargar cada archivo por separado</span>
+    </div>
+  </section>
+
+  <main class="grid" id="perfFilesGrid"></main>
+
+  <script src="../js/mods-rendimiento.js"></script>
+</body>
+</html>

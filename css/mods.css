@@ -499,3 +499,122 @@ a {
   cursor: pointer;
   min-width: 150px;
 }
+
+/* Estilos para la sección y descargas de Mods de Rendimiento */
+a.btn-mc {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.perf-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.perf-steps {
+  background: #d9d9d9;
+  border: 3px solid #373737;
+  box-shadow: inset 2px 2px 0 #fff, inset -2px -2px 0 #8b8b8b;
+  padding: 12px 14px;
+  color: #2b2b2b;
+}
+
+.perf-steps-title {
+  font-size: 9px;
+  color: #1f4d14;
+  margin-bottom: 10px;
+}
+
+.perf-steps-list {
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 7px;
+  line-height: 1.8;
+  color: #2b2b2b;
+}
+
+.perf-steps-list code {
+  background: #fff;
+  border: 1px solid #8b8b8b;
+  padding: 2px 5px;
+  color: #1f4d14;
+  font-family: monospace;
+  font-size: 10px;
+}
+
+.perf-mods-panel {
+  display: none;
+}
+
+.perf-mods-panel.open {
+  display: block;
+}
+
+.perf-mods-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  font-size: 9px;
+  color: #373737;
+}
+
+.perf-mods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.perf-mod-item {
+  background: #fff;
+  border: 2px solid #373737;
+  box-shadow: inset 2px 2px 0 #d9d9d9;
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 7px;
+  color: #2b2b2b;
+  line-height: 1.5;
+}
+
+.perf-mod-source {
+  font-size: 6px;
+  padding: 2px 5px;
+  border: 1px solid #373737;
+  background: #e8e8e8;
+  color: #373737;
+  flex-shrink: 0;
+}
+
+.perf-mod-source.modrinth {
+  background: #d8f8df;
+  border-color: #2d631d;
+  color: #1f4d14;
+}
+
+.perf-mod-source.curseforge {
+  background: #ffe8d6;
+  border-color: #9c4221;
+  color: #7b2d12;
+}
+
+.perf-card-desc {
+  font-size: 7px;
+  line-height: 1.7;
+  color: #2b2b2b;
+  background: #d9d9d9;
+  border: 2px solid #8b8b8b;
+  padding: 8px;
+  flex: 1;
+}

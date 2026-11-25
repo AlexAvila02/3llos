@@ -1,0 +1,36 @@
+# Lista de mods de rendimiento para Forge 1.20.1
+# Formato:  fuente | slug | nombre
+#   - fuente: modrinth o curseforge
+#   - slug:   lo que sale en la URL del mod (modrinth.com/mod/<slug> o curseforge.com/minecraft/mc-mods/<slug>)
+#   - En curseforge se puede agregar al final "| idArchivo | nombreArchivo" como respaldo fijo
+# Las dependencias obligatorias (Kotlin for Forge, Cloth Config, etc.) se agregan solas.
+# Para quitar un mod de la lista, borra la linea o ponle # al inicio.
+
+modrinth   | embeddium                   | Embeddium
+modrinth   | oculus                      | Oculus
+modrinth   | rubidium-extra              | Embeddium (Rubidium) Extra
+modrinth   | textrues-embeddium-options  | TexTrue's Embeddium Options
+modrinth   | entityculling               | EntityCulling
+modrinth   | immediatelyfast             | ImmediatelyFast
+modrinth   | modernfix                   | ModernFix
+modrinth   | ferrite-core                | FerriteCore
+curseforge | alltheleaks                 | AllTheLeaks         | 9640602 | alltheleaks-1.1.6-1.20.1-forge.jar
+modrinth   | radium                      | Radium Reforged
+modrinth   | badoptimizations            | BadOptimizations
+modrinth   | noisium                     | Noisium
+modrinth   | alternate-current           | Alternate Current
+modrinth   | servercore                  | ServerCore
+modrinth   | clumps                      | Clumps
+modrinth   | ai-improvements             | AI Improvements
+modrinth   | fastsuite                   | FastSuite
+# modrinth   | fastworkbench               | FastWorkbench   (desactivado: da problemas si el servidor no lo tiene)
+modrinth   | fastfurnace                 | FastFurnace
+modrinth   | placebo                     | Placebo
+curseforge | smooth-chunk-save           | Smooth Chunk Save   | 9255094 | smoothchunk-1.20.1-4.4.jar
+curseforge | connectivity                | Connectivity        | 8957366 | connectivity-1.20.1-7.7.jar
+curseforge | cupboard                    | Cupboard            | 8889041 | cupboard-1.20.1-4.2.jar
+modrinth   | cull-less-leaves-reforged   | CullLessLeaves Reforged
+modrinth   | particle-core               | Particle Core
+modrinth   | dynamic-fps                 | Dynamic FPS
+modrinth   | chunky                      | Chunky
+modrinth   | sodium-dynamic-lights       | Sodium/Embeddium Dynamic Lights
